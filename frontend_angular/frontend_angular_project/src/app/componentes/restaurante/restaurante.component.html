@@ -1,0 +1,13 @@
+<div class="restaurante modelo modelo1 ff-roboto-mono profile-summary" [ngClass]="larguraRestaurante()" *ngIf="restaurante">
+  <img class="container-img" src="../../../assets/images/usuario.png"alt="Foto usuário"/>
+  <span>
+<h3 class="nome">{{ restaurante.Nome }}
+</h3>
+<b translate>{{ restaurante.tipo_restaurante}}</b><br/>
+<p translate> {{ restaurante.descricao}}</p>
+</span>
+<span class="spacer"></span>
+<button routerLink="/perfilRestaurante/{{ restaurante.email }}" translate>Btn Ir Restaurante</button>
+<button routerLink="/perfilRestaurante/{{ restaurante.email }}/criaAvaliacao" translate>Btn Fazer Avaliacao</button>
+
+</div>

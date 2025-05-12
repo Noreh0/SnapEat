@@ -1,0 +1,69 @@
+<section class="container">
+  <header class="header d-flex">
+      <h2 class="ff-inter">Menu</h2>
+  </header>
+  <div class="buscar-restaurantes">
+    <input
+      type="search"
+      class="filtro"
+      [placeholder]="ValidaPlaceholderProcura()"
+      autofocus
+      [(ngModel)]="filtro"
+      (keyup)="pesquisarRestaurantes()"
+    >
+
+  </div><br/>
+  <div class="buscar-tipo">
+    <select
+      type="search"
+      class="filtro_tipo"
+      autofocus
+      [(ngModel)]="filtro_tipo"
+      (change)="filtrarRestaurantes()"
+    >
+    <option value="Nenhum" translate>Nenhum</option>
+    <option value="Arabe" translate>Arabe</option>
+        <option value="Brasileira" translate>Brasileira</option>
+        <option value="Carnes" translate>Carnes</option>
+        <option value="Chinesa" translate>Chinesa</option>
+        <option value="Francesa" translate>Francesa</option>
+        <option value="Frangos" translate>Frangos</option>
+        <option value="Italiana" translate>Italiana</option>
+        <option value="Japonesa" translate>Japonesa</option>
+        <option value="Lanches" translate>Lanches</option>
+        <option value="Mexicana" translate>Mexicana</option>
+        <option value="Peixes" translate>Peixes</option>
+        <option value="Pizzaria" translate>Pizzaria</option>
+        <option value="Saudável" translate>Saudável</option>
+        <option value="Vegana" translate>Vegana</option>
+        <option value="Vegetariana" translate>Vegetariana</option>
+
+    </select>
+
+  </div>
+  <div class="mural" *ngIf="listaRestaurante.length > 0, else SemRestaurante">
+      <div *ngFor="let restaurante of listaRestaurante">
+        <div class="restaurante modelo modelo1 ff-roboto-mono restaurante-p">
+          <img class="container-img" src="../../../assets/images/usuario.png"alt="Foto usuário"/>
+          <span>
+        <h3 class="nome">{{ restaurante.Nome }}
+        </h3>
+        <b translate>{{ restaurante.tipo_restaurante}}</b><br/>
+        <p translate> {{ restaurante.descricao}}</p>
+        </span>
+        <span class="spacer"></span>
+        <button routerLink="/perfilRestaurante/{{ restaurante.email }}" translate>Btn Ir Restaurante</button>
+        <button routerLink="/perfilRestaurante/{{ restaurante.email }}/criaAvaliacao" translate>Btn Fazer Avaliacao</button>
+
+          </div>
+
+      </div>
+    </div>
+
+</section>
+
+<ng-template #SemRestaurante>
+  <div>
+      <p translate>Sem Restaurante </p>
+  </div>
+</ng-template>

@@ -1,0 +1,55 @@
+<body>
+  <section class="container perfil-cliente">
+    <div class="profile-summary">
+      <div>
+        <img class="container-img" src="../../../assets/images/usuario.png" alt="Foto usuário" />
+      </div>
+
+      <div *ngIf="isPerfilDoUsuario(); else OutroPerfil">
+        <h1>{{ Nome }}</h1>
+
+        <a
+          class="button -small"
+          [routerLink]="['/perfilCliente', id, 'editarCliente']"
+          translate
+        >
+          Btn Editar Perfil
+        </a>
+        <a
+          class="button -small"
+          (click)="excluirCliente()"
+          translate
+        >
+          Btn Excluir Perfil
+        </a>
+      </div>
+
+      <div class="flex-container"></div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="person-display-name">
+      <h1 translate>Avaliações</h1>
+    </div>
+
+    <div class="mural" *ngIf="listaAvaliacao.length > 0; else SemAvaliacao">
+      <div *ngFor="let avaliacao of listaAvaliacao">
+        <app-avaliacao
+          [avaliacao]="avaliacao"
+          [ClienteComponent]="true"
+        ></app-avaliacao>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #SemAvaliacao>
+    <div class="ff-inter sem-avaliacao">
+      <p translate>Ainda não há avaliações criadas!</p>
+    </div>
+  </ng-template>
+
+  <ng-template #OutroPerfil>
+    <h1>{{ Nome }}</h1>
+  </ng-template>
+</body>

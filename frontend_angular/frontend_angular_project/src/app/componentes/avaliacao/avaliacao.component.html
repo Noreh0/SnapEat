@@ -1,0 +1,26 @@
+<div class="avaliacao modelo modelo1 ff-roboto-mono" *ngIf="ClienteComponent; else Restaurante">
+  <p class="nome" translate>Restaurante <b>{{ Nome_Restaurante }} </b></p>
+  <p class="nota" translate>Nota <b>{{ avaliacao.Nota }} </b></p>
+  <p class="comentario" translate>Comentario <b>{{ avaliacao.Comentario }}</b></p>
+  <p></p>
+ <div class="acoes" *ngIf="get() == Email; else OutroPerfilCliente">
+   <button routerLink="/perfilCliente/{{id}}/editarAvaliacao/{{avaliacao.ID}}" translate>Btn Editar Avaliacao </button>
+   <button (click)="excluirAvaliacao()" translate> Btn Excluir Avaliacao</button>
+  </div>
+</div>
+<ng-template #Restaurante>
+<div class="avaliacao modelo modelo1 ff-roboto-mono" >
+  <p class="nome" translate >Cliente <b>{{ Nome_Cliente }}</b></p>
+  <p class="nota" translate>Nota <b>{{ avaliacao.Nota }}</b></p>
+  <p class="comentario" translate>Comentario <b>{{ avaliacao.Comentario }}</b></p>
+  <p></p>
+ <div *ngIf="get() == Email; else OutroPerfilRestaurante">
+  </div>
+</div>
+</ng-template>
+<ng-template #OutroPerfilCliente>
+<button routerLink="/perfilRestaurante/{{EmailRestaurante}}" translate>Btn Ver Perfil</button>
+</ng-template>
+<ng-template #OutroPerfilRestaurante>
+<button routerLink="/perfilCliente/{{Email}}" translate>Btn Ver Perfil</button>
+</ng-template>

@@ -1,0 +1,173 @@
+
+h1{
+  font-size: 50px;
+  color: white;
+  padding: 1rem;
+}
+.tabela {
+  width: 68%;
+}
+td {
+padding-right: 8px;
+}
+div .botao_img{
+all: unset;
+  cursor: pointer;
+  
+
+}
+  .imagem{
+height: 50px;
+transform: translateY(40%);
+}
+.botao{
+  background-color: rgb(0, 0, 0);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 hsla(0,0%,100%,.2);
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family:'ff-inter';
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: .075em;
+  line-height: 12px;
+  margin: 1rem;
+  width: 200px;
+  height: 30px;
+  padding: 9px 12px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+ 
+}
+.cadastro-cliente {
+  background-color: rgb(24, 24, 27);
+  padding: 2rem 0;
+  border-radius: 50px;
+}
+
+.cadastro-cliente form {
+
+  border-radius: 20px;
+  border-color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}
+.cadastro-cliente form i {
+  margin-left: -30px;
+  cursor: pointer;
+}
+.cadastro-cliente form label {
+  color: #ffffff;
+  font-size: larger;
+  font-weight: bold;
+  margin: 0 0 1rem;
+  padding: 1rem;
+}
+.cadastro-cliente form .mensagem_erro {
+font-size: 12px;
+font-size: larger;
+font-weight: bold;
+font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+margin-left: 5px;
+color: red;
+margin-top: -25px;
+margin-bottom: 20px;
+}
+
+
+.cadastro-cliente form input {
+  border: none;
+  width: 50%;
+  height: 30px;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  margin: 0.5rem 0 2rem;
+}
+
+.cadastro-cliente form .textarea {
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  margin: 0.5rem 0 2rem;
+}
+
+.container-radio {
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.radio {
+  margin: 0;
+}
+
+input[type='radio'] {
+  display: none;
+}
+
+.radio-modelo label {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.custom-radio {
+  border: 1px solid #154580;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-content: center;
+  border-radius: 50%;
+}
+
+.custom-radio,
+span {
+  transition: 0.5s ease;
+  color: #154580;
+}
+
+.custom-radio span {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border-radius: 50%;
+}
+
+
+.botao_desabilitado{
+background-color: #575757;
+border-radius: 3px;
+box-shadow: inset 0 1px 0 hsla(0,0%,100%,.2);
+color: #ffffff;
+display: inline-block;
+font-family:'ff-inter';
+font-size: 1rem;
+font-weight: 400;
+letter-spacing: .075em;
+line-height: 12px;
+margin: 1rem;
+width: 200px;
+height: 30px;
+padding: 9px 12px 8px;
+border-radius: 20px;
+text-transform: uppercase;
+}
+@media only screen and (min-width: 500px)
+and (max-width: 864px){
+
+}
+
+@media only screen  and (max-width: 500px){
+  .cadastro-cliente form input {
+    border: none;
+    width: 40%;
+    height: 20px;
+    padding: 1rem 2rem;
+    border-radius: 20px;
+    margin: 0.5rem 0 2rem;
+  }
+ 
+}

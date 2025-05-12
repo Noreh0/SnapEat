@@ -1,0 +1,32 @@
+<body>
+    <section class="container login ff-inter">
+        <header class="header">
+            <h1>Login</h1>
+        </header>
+        <form [formGroup]="loginForm">   
+            <div>
+            <label for="email">Email</label><br/>
+            <input formControlName="email"  type="email" class="input" id="email"placeholder="digite seu email" >
+            <div class="mensagem_erro"  *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched" translate>
+                Campos
+            </div>
+            <div class="mensagem_erro"  *ngIf="loginForm.get('email')?.errors?.['email']" translate>
+               Validacao Email
+            </div>
+        </div>
+          <div>
+            <label for="senha" translate>Senha</label><br/>
+            <input formControlName="senha" type="password" class="input" id="password" name="password" placeholder="digite sua senha" >
+            <div class="mensagem_erro"  *ngIf="loginForm.get('senha')?.errors?.['required'] && loginForm.get('senha')?.touched" translate>
+                Campos
+            </div>
+        </div>
+            <div class="acoes">
+                <button class="botao" (click)="login()" translate>Salvar</button>
+            </div>
+            <div *ngIf="mensagemErro" class="alert alert-danger">
+                {{ mensagemErro }}
+            </div>
+        </form>
+    </section>
+    </body>

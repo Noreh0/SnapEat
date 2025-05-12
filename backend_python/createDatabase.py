@@ -1,0 +1,18 @@
+import mariadb
+
+conexao = mariadb.connect(
+    user='root',
+    password='SnapEats17',
+    host='192.168.1.101',
+    port=7000,
+    database='SnapEats'
+)
+
+cursor = conexao.cursor()
+
+# Exemplo de comando
+comando = ""
+cursor.execute(comando)
+conexao.commit()
+
+conexao.close()

@@ -1,0 +1,63 @@
+<body>
+    <section class="container admin ff-inter">
+        <header class="header">
+            <h1>Admin</h1>
+        </header>
+            <table>
+                <thead>
+                    <th translate>Nome</th>
+                    <th translate>Email</th>
+                    <th>Ações</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cliente of lista_Cliente">
+                    <td>{{cliente.Nome}}</td>
+                    <td>{{cliente.email}}</td>
+                    <td>
+                        <button routerLink="/perfilCliente/{{cliente.email}}/editarCliente"> Editar</button>
+                        <button (click)="excluirCliente(cliente.ID!)"> Remover</button>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+    
+                <table>
+                    <thead>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Ações</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let restaurante of lista_Restaurante">
+                        <td>{{restaurante.Nome}}</td>
+                        <td>{{restaurante.email}}</td>
+                        <td>
+                            <button routerLink="/perfilRestaurante/{{restaurante.email}}/editarRestaurante"> Editar</button>
+                            <button (click)="excluirRestaurante(restaurante.ID!)"> Remover</button>
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+    
+                <table>
+                    <thead>
+                        <th>Nota</th>
+                        <th>Comentario</th>
+                        <th>Ações</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let avaliacao of lista_Avaliacao">
+                        <td>{{avaliacao.Nota}}</td>
+                        <td>{{avaliacao.Comentario}}</td>
+                        <td>
+                            <Button> Editar</Button>
+                            <Button (click)="excluirAvaliacao(avaliacao.ID!)" > Remover</Button>
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+    
+    
+    </section>
+    </body>
+    

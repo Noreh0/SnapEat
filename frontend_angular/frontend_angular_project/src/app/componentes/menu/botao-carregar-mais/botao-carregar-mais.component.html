@@ -1,0 +1,6 @@
+<div class="center" *ngIf="haMaisRestaurantes; else semMaisRestaurantes">
+  <button class="botao carregar-mais">Carregar mais</button>
+</div>
+<ng-template #semMaisRestaurantes>
+  <p class="mensagem-center ff-inter">Não há mais Restaurantes para exibir</p>
+</ng-template>

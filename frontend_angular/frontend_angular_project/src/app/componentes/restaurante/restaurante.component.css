@@ -1,0 +1,84 @@
+.acoes {
+  display: flex;
+  justify-content: flex-end
+}
+
+.botao-excluir {
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  margin-top: 10px;
+}
+button{
+  background-color: rgb(0, 0, 0);
+  border-radius: 3px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Graphik-Semibold-Web, sans-serif;
+  font-size: 0.5rem;
+  padding: 9px 12px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+ 
+}
+.spacer{
+  flex: 1 1 auto;
+}
+.botao-editar {
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.restaurante {
+  background-color: #F8F9FE;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.restaurante .nome {
+  margin: 1rem auto;
+  word-wrap: break-word;
+}
+
+.restaurante .tipo {
+  word-wrap: break-word;
+}
+
+.modelo {
+  background-color: #404040;
+  padding: 1rem;
+  max-width: 500px;
+  margin: 1rem 0 2rem;
+}
+.modelo1 {
+  box-shadow: 8px 8px 0px #202020;
+}
+
+
+.restaurante-g {
+  width: 556px;
+}
+
+.restaurante-p {
+  width: 262px;
+}
+
+@media screen and (max-width: 768px) {
+  .restaurante-g {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 426px) {
+  .restaurante-p {
+    width: 100%;
+  }
+}
+.container-img{
+  border-radius: 50%;
+    width: 100px;
+    height: 100px;
+ 
+}

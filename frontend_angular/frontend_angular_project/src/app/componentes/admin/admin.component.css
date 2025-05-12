@@ -1,0 +1,19 @@
+.admin {
+  background-color: rgb(24, 24, 27);
+  padding: 2rem 0;
+  border-radius: 50px;
+}
+h1{
+  font-size: 50px;
+  color: white;
+  padding: 1rem;
+}
+table{
+  width: 100%;
+}
+th {
+  width: 33.3%;
+}
+td {
+  color: white;
+}

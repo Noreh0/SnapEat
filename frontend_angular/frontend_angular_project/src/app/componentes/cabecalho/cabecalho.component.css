@@ -1,0 +1,65 @@
+.cabecalho {
+  background-color: rgb(58, 58, 58);
+  background-size: cover;
+  display: flex;
+  justify-content: space-between;
+
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.container-img {
+  padding: 1rem;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  border-color: black;
+}
+.button {
+  all: unset;
+  cursor: pointer;
+}
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nome {
+  font-size: small;
+}
+div button {
+  background-color: rgb(0, 0, 0);
+  border-radius: 3px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Graphik-Semibold-Web, sans-serif;
+  font-size: 1rem;
+  padding: 9px 12px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+@media only screen and (min-width: 500px) and (max-width: 864px) {
+  button {
+    font-size: 0.1rem;
+  }
+  .container-img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  button {
+    font-size: 0.1rem;
+  }
+  .container-img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+  }
+  .nome {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,111 @@
+<section class="container editar-cliente ff-inter">
+  <form [formGroup]="formulario" *ngIf="formulario">
+    <header class="header">
+      <h1 translate>Editar Perfil</h1>
+    </header>
+
+    <!-- Nome -->
+    <div>
+      <label for="Nome" translate>Nome</label><br />
+      <input type="text" class="input" id="Nome" formControlName="Nome" [placeholder]="ValidaPlaceholderNome()" />
+      <div class="mensagem_erro" *ngIf="formulario.get('Nome')?.errors && formulario.get('Nome')?.touched" translate>
+        Campos
+      </div>
+    </div>
+
+    <!-- CPF -->
+    <div>
+      <label for="CPF" translate>CPF</label><br />
+      <input type="text" class="input" id="CPF" formControlName="CPF" mask="000.000.000-00" [placeholder]="ValidaPlaceholderCPF()" />
+      <div class="mensagem_erro" *ngIf="formulario.get('CPF')?.errors?.['required'] && formulario.get('CPF')?.touched" translate>
+        Campos
+      </div>
+      <div class="mensagem_erro" *ngIf="formulario.get('CPF')?.errors?.['minlength']" translate>
+        Validação CPF
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label for="email" translate>Email</label><br />
+      <input type="email" class="input" id="email" formControlName="email" [placeholder]="ValidaPlaceholderEmail()" />
+      <div class="mensagem_erro" *ngIf="formulario.get('email')?.errors?.['required'] && formulario.get('email')?.touched" translate>
+        Campos
+      </div>
+      <div class="mensagem_erro" *ngIf="formulario.get('email')?.errors?.['email']" translate>
+        Validação Email
+      </div>
+    </div>
+
+    <!-- Senha -->
+    <div>
+      <label for="senha" translate>Senha</label><br />
+      <input
+        [type]="hide ? 'password' : 'text'"
+        class="input"
+        id="senha"
+        formControlName="senha"
+        [placeholder]="ValidaPlaceholderSenha()" />
+      <button type="button" class="botao_img" (click)="hide = !hide" aria-label="Mostrar senha">
+        <img class="imagem" src="../../../assets/images/olho_senha.png" alt="olho" />
+      </button>
+      <div class="mensagem_erro" *ngIf="formulario.get('senha')?.errors?.['required'] && formulario.get('senha')?.touched" translate>
+        Campos
+      </div>
+      <div class="dica-senha" style="font-size: 0.85rem; color: #555;">
+        A senha deve conter pelo menos <strong>8 caracteres</strong>, incluindo:
+        <ul>
+            <li>Uma letra maiúscula (A-Z)</li>
+            <li>Uma letra minúscula (a-z)</li>
+            <li>Um número (0-9)</li>
+        </ul>
+        </div>
+      <div class="mensagem_erro" *ngIf="formulario.get('senha')?.errors?.['pattern']" translate>
+        Validação Senha
+      </div>
+    </div>
+
+    <!-- Confirmar Senha -->
+    <div>
+      <label for="confirmasenha" translate>Confirme sua senha</label><br />
+      <input type="password" class="input" id="confirmasenha" formControlName="confirmasenha" [placeholder]="ValidaPlaceholderConfirma()" />
+      <div class="mensagem_erro" *ngIf="formulario.get('confirmasenha')?.errors?.['required'] && formulario.get('confirmasenha')?.touched" translate>
+        Campos
+      </div>
+      <div class="mensagem_erro" *ngIf="formulario.get('confirmasenha')?.errors?.['equalTo']" translate>
+        Senhas não coincidem
+      </div>
+    </div>
+
+    <!-- Cidade -->
+    <div>
+      <label for="Cidade" translate>Cidade</label><br />
+      <input type="text" class="input" id="Cidade" formControlName="Cidade" [placeholder]="ValidaPlaceholderCidade()" />
+      <div class="mensagem_erro" *ngIf="formulario.get('Cidade')?.errors && formulario.get('Cidade')?.touched" translate>
+        Campos
+      </div>
+    </div>
+
+    <!-- Telefone -->
+    <div>
+      <label for="telefone" translate>Telefone</label><br />
+      <input type="text" class="input" id="telefone" formControlName="telefone" mask="(00) 0 0000-0000" [placeholder]="ValidaPlaceholderTelefone()" />
+      <div class="mensagem_erro" *ngIf="formulario.get('telefone')?.errors?.['required'] && formulario.get('telefone')?.touched" translate>
+        Campos
+      </div>
+      <div class="mensagem_erro" *ngIf="formulario.get('telefone')?.errors?.['minlength']" translate>
+        Validação Telefone
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="acoes">
+      <button [disabled]="!formulario.valid" (click)="editarCliente()" [ngClass]="habilitarBotao()" translate>
+        Btn Editar
+      </button>
+      <button class="botao" type="button" routerLink="/menu" translate>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</section>

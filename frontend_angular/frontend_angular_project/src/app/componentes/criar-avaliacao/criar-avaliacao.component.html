@@ -1,0 +1,27 @@
+
+<section class="container avaliacao ff-inter">
+  <header class="header">
+      <h1 translate>Avaliação</h1>
+  </header>
+  <form [formGroup]="formulario">
+
+    <div class="input-box">
+      <label>Qual a nota?</label><br/>
+      <select matNativeControl class="select"  formControlName="Nota" placeholder="selecione a nota">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </div>
+    <div class="input-box">
+      <label for="nome" translate>Comentario</label><br/>
+    <input type="textarea" class="input" id="nome"  formControlName="Comentario" [placeholder]="ValidaPlaceholderComentario()">
+  </div>
+      <div>
+          <button class="botao" (click)="salvarAvaliacao()" translate>Salvar</button>
+          <button class="botao" routerLink="/menu" translate>Cancelar</button>
+      </div>
+  </form>
+</section>

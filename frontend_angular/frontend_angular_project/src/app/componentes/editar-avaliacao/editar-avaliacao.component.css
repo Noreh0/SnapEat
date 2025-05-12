@@ -1,0 +1,140 @@
+.acoes {
+  display: flex;
+}
+
+
+h1{
+  font-size: 50px;
+  color: white;
+  padding: 1rem;
+}
+img{
+width:35px;
+cursor: pointer;
+}
+.botao {
+  margin: 5px;
+  margin-top: 100px;
+  width: 200px;
+  height: 30px;
+  color: white;
+  background-color: black;
+  border-radius: 20px;
+}
+.avaliacao {
+  background-color: rgb(24, 24, 27);
+  padding: 2rem 0;
+  border-radius: 50px;
+}
+
+.avaliacao form {
+  
+
+ /* border: none;*/
+  border-radius: 20px;
+  border-color: white;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 2rem;
+}
+.avaliacao form i {
+  margin-left: -30px;
+  cursor: pointer;
+}
+
+
+.avaliacao form label {
+  color: #ffffff;
+  font-size: larger;
+  font-weight: bold;
+  margin: 0 0 1rem;
+}
+
+.avaliacao form  .input {
+border: none;
+width: 50%;
+height: 30px;
+padding: 1rem 2rem;
+border-radius: 20px;
+margin: 0.5rem 0 2rem;
+}
+.avaliacao form  .select {
+  width: 50%;
+  height: 50px;
+  border-radius: 20px;
+  margin: 0.5rem 0 2rem;
+  padding: 0rem 2rem;
+  }
+
+.avaliacao form .textarea {
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  margin: 0.5rem 0 2rem;
+}
+
+.container-radio {
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.radio {
+  margin: 0;
+}
+
+input[type='radio'] {
+  display: none;
+}
+
+option[type='radio'] {
+  display: none;
+}
+
+.radio-modelo label {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.custom-radio {
+  border: 1px solid #154580;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-content: center;
+  border-radius: 50%;
+}
+
+.custom-radio,
+span {
+  transition: 0.5s ease;
+  color: #154580;
+}
+
+.custom-radio span {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border-radius: 50%;
+}
+
+input[type='radio']:checked+.custom-radio {
+  border-color: #154580;
+}
+
+input[type='radio']:checked+.custom-radio span {
+  background: #154580;
+}
+
+
+option[type='radio']:checked+.custom-radio {
+border-color: #154580;
+}
+
+option[type='radio']:checked+.custom-radio span {
+background: #154580;
+}

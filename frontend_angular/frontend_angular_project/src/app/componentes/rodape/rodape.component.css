@@ -1,0 +1,22 @@
+footer {
+  background-color: rgb(32, 30, 30);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-template-areas:
+    "TextoCopyright LogoRodape .";
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.TextoCopyright {
+  justify-self: center;
+  grid-area: TextoCopyright;
+}
+
+
+footer small {
+  color: white;
+}
+

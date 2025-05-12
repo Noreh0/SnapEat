@@ -1,0 +1,403 @@
+openapi: 3.0.0
+info:
+  title: SnapEats API
+  description: API para gerenciamento de usuários, restaurantes e avaliações
+  version: "1.0"
+
+servers:
+  - url: http://localhost:5000/
+    description: Servidor de desenvolvimento
+
+# Aplica o esquema BearerAuth por padrão a todas as operações.
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Usuario:
+      type: object
+      required:
+        - Nome
+        - CPF
+        - email
+        - senha
+        - telefone
+        - Cidade
+      properties:
+        Nome:
+          type: string
+        CPF:
+          type: string
+        email:
+          type: string
+        senha:
+          type: string
+        telefone:
+          type: string
+        Cidade:
+          type: string
+
+    Login:
+      type: object
+      required:
+        - email
+        - senha
+      properties:
+        email:
+          type: string
+        senha:
+          type: string
+
+    Restaurante:
+      type: object
+      required:
+        - Nome
+        - CNPJ
+        - email
+        - senha
+        - telefone
+        - Endereco
+        - Cidade
+        - tipo_restaurante
+        - descricao
+      properties:
+        Nome:
+          type: string
+        CNPJ:
+          type: string
+        email:
+          type: string
+        senha:
+          type: string
+        telefone:
+          type: string
+        Endereco:
+          type: string
+        Cidade:
+          type: string
+        tipo_restaurante:
+          type: string
+        descricao:
+          type: string
+
+    Avaliacao:
+      type: object
+      required:
+        - Comentario
+        - Nota
+        - ID_Cliente
+        - ID_Restaurante
+      properties:
+        Comentario:
+          type: string
+        Nota:
+          type: integer
+          minimum: 1
+          maximum: 5
+        ID_Cliente:
+          type: integer
+        ID_Restaurante:
+          type: integer
+
+paths:
+
+  /auth/cadastro:
+    post:
+      summary: Cadastra um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+        '400':
+          description: Email já existe
+
+  /auth/login:
+    post:
+      summary: Autenticação de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Token JWT retornado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '401':
+          description: Credenciais inválidas
+
+  /auth/logout:
+    post:
+      summary: Logout do usuário
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout realizado com sucesso
+        '401':
+          description: Token inválido ou ausente
+
+  /cliente/{ID}:
+    get:
+      summary: Busca usuário por ID
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário encontrado
+        '404':
+          description: Usuário não encontrado
+
+  /cliente/{ID}:
+    put:
+      summary: Edita usuário (somente dono)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '200':
+          description: Usuário atualizado
+        '403':
+          description: Ação não autorizada
+        '404':
+          description: Usuário não encontrado
+
+    delete:
+      summary: Exclui usuário (somente dono)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário removido
+        '403':
+          description: Ação não autorizada
+        '404':
+          description: Usuário não encontrado
+
+  /restaurante:
+    post:
+      summary: Cadastra um novo restaurante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurante'
+      responses:
+        '201':
+          description: Restaurante criado
+        '400':
+          description: Email já em uso
+
+    get:
+      summary: Lista todos os restaurantes
+      responses:
+        '200':
+          description: Lista de restaurantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurante'
+
+  /restaurante/{ID}:
+    get:
+      summary: Busca restaurante por ID
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurante encontrado
+        '404':
+          description: Restaurante não encontrado
+
+    put:
+      summary: Edita restaurante (somente dono)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurante'
+      responses:
+        '200':
+          description: Restaurante atualizado
+        '403':
+          description: Ação não autorizada
+        '404':
+          description: Restaurante não encontrado
+
+    delete:
+      summary: Exclui restaurante (somente dono)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Restaurante removido
+        '403':
+          description: Ação não autorizada
+        '404':
+          description: Restaurante não encontrado
+
+  /restaurante/tipo/{tipo_restaurante}:
+    get:
+      summary: Filtra restaurantes por tipo
+      parameters:
+        - in: path
+          name: tipo_restaurante
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista filtrada de restaurantes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurante'
+
+  /avaliacoes:
+    get:
+      summary: Lista todas as avaliações
+      responses:
+        '200':
+          description: Lista de avaliações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Avaliacao'
+
+    post:
+      summary: Cria uma nova avaliação (somente cliente autenticado)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Avaliacao'
+      responses:
+        '201':
+          description: Avaliação criada
+        '400':
+          description: Dados inválidos
+
+  /avaliacoes/{ID}:
+    get:
+      summary: Encontra uma avaliação pelo ID
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Avaliação encontrada
+        '404':
+          description: Avaliação não encontrada
+
+    put:
+      summary: Edita avaliação (somente autor)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Avaliacao'
+      responses:
+        '200':
+          description: Avaliação atualizada
+        '403':
+          description: Ação não autorizada
+        '404':
+          description: Avaliação não encontrada
+
+    delete:
+      summary: Exclui avaliação (somente autor)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Avaliação removida
+        '403':
+          description: Ação não autorizada
+        '404':
+          description: Avaliação não encontrada

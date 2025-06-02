@@ -30,11 +30,9 @@ export class AvaliacaoComponent implements OnInit {
   ngOnInit(): void {
     this.service_restaurante
       .buscarPorId(this.avaliacao.ID_Restaurante!)
-      .subscribe((restaurantes) => {
-        for (let restaurante of restaurantes) {
-          this.Nome_Restaurante = restaurante.Nome;
-          this.EmailRestaurante = restaurante.email;
-        }
+      .subscribe((restaurante) => {
+        this.Nome_Restaurante = restaurante.Nome;
+        this.EmailRestaurante = restaurante.email;
       });
     this.service_cliente
       .buscarPorId(this.avaliacao.ID_Cliente!)

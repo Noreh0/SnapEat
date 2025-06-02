@@ -1,108 +1,89 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
-  FormControl,
   FormGroup,
-  Validators,
+  Validators
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AvaliacaoService } from '../../services/avaliacao.service';
-import { RestauranteService } from '../../services/restaurante.service';
-import { ClienteService } from '../../services/cliente.service';
-import { async, concat, forkJoin, mergeMap } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { AvaliacaoModel } from '../../model/avaliacao.model';
 
 @Component({
   selector: 'app-criar-avaliacao',
   templateUrl: './criar-avaliacao.component.html',
-  styleUrl: './criar-avaliacao.component.css',
+  styleUrls: ['./criar-avaliacao.component.css'],
 })
 export class CadastroAvaliacaoComponent implements OnInit {
-  @Input() Nome!: String;
   formulario!: FormGroup;
+  idRestaurante!: number;
+  idCliente!: number;
+  tipoUsuario!: string;
+
   constructor(
-    private service: RestauranteService,
+    private fb: FormBuilder,
     private route: ActivatedRoute,
-    private formBuilder: FormBuilder,
-    private avaliacao: AvaliacaoService,
-    private serviceCliente: ClienteService,
     private router: Router,
-    private translate: TranslateService,
-    private jwthelper: JwtHelperService
-  ) {
-    this.formulario = this.formBuilder.group({
-      ID_Cliente: [0],
-      ID_Restaurante: [0],
-      Nota: new FormControl(
-        1,
-        Validators.compose([Validators.pattern(/(.|\s)*\S(.|\s)*/)])
-      ),
-      Comentario: new FormControl(
-        '',
-        Validators.compose([Validators.pattern(/(.|\s)*\S(.|\s)*/)])
-      ),
-    });
-  }
+    private jwtHelper: JwtHelperService,
+    private serviceAvaliacao: AvaliacaoService,
+    private translate: TranslateService
+  ) {}
 
-  email = this.route.snapshot.paramMap.get('id_restaurante');
-  id_restaurante!: number;
-  id_cliente!: number;
   ngOnInit(): void {
-    if (this.get() == null) {
-      this.router.navigate(['/login']);
+    // 1) Só clientes podem criar avaliação
+    const token = localStorage.getItem('token');
+    if (!token || this.jwtHelper.isTokenExpired(token)) {
       return;
-    } else if (this.get_tipo() == 'restaurante') {
-      this.router.navigate(['/perfilRestaurante/' + this.get()]);
+    }
+    const payload = this.jwtHelper.decodeToken(token);
+    this.tipoUsuario = payload.tipo;
+    this.idCliente = Number(payload.sub);
+    if (this.tipoUsuario !== 'cliente') {
       return;
     }
 
-    forkJoin([
-      this.service.buscarPorEmail(this.email!),
-      this.serviceCliente.buscarPorEmail(this.get()!),
-    ]).subscribe(([restaurantes, clientes]) => {
-      for (let restaurante of restaurantes) {
-        this.Nome = restaurante.Nome;
-        this.id_restaurante = restaurante.ID;
-      }
+    // 2) Pega id_restaurante da rota
+    this.idRestaurante = Number(this.route.snapshot.paramMap.get('id_restaurante'));
+    if (!this.idRestaurante) {
+      return;
+    }
 
-      for (let cliente of clientes) {
-        this.id_cliente = cliente.ID;
-      }
-
-      // Atualizar FormGroup com os valores obtidos
-      this.formulario.patchValue({
-        ID_Cliente: this.id_cliente,
-        ID_Restaurante: this.id_restaurante,
-      });
+    // 3) Monta form apenas com os campos que o usuário preenche
+    this.formulario = this.fb.group({
+      Nota: ['1', [Validators.required, Validators.min(1), Validators.max(5)]],
+      Comentario: ['', [Validators.required, Validators.minLength(5)]],
     });
   }
 
-  salvarAvaliacao() {
-    this.avaliacao
-      .criar(this.formulario.value)
-      .subscribe(() => this.router.navigate(['/menu']));
+  salvarAvaliacao(): void {
+    if (this.formulario.invalid) return;
+
+    const novaAvaliacao: AvaliacaoModel = {
+      ID_Cliente: this.idCliente,
+      ID_Restaurante: this.idRestaurante,
+      Nota: this.formulario.value.Nota,
+      Comentario: this.formulario.value.Comentario,
+    };
+
+    this.serviceAvaliacao.criar(novaAvaliacao).subscribe({
+      next: () => this.router.navigate(['/menu']),
+      error: err => {
+        console.error('Erro ao criar avaliação', err);
+        alert('Não foi possível salvar, tente novamente.');
+      }
+    });
   }
-  get() {
-    const token = localStorage.getItem('token');
-    const decodetoken = this.jwthelper.decodeToken(token!);
-    if (decodetoken == null) {
-      return null;
-    }
-    const email = decodetoken.sub;
-    return email;
-  }
-  get_tipo() {
-    return localStorage.getItem('tipo');
-  }
-  getLingua() {
+
+  // Placeholders multilíngue
+  getLingua(): string {
     return this.translate.currentLang;
   }
-  ValidaPlaceholderComentario() {
-    if (this.getLingua() == 'en') {
-      return 'Type a Commentary';
-    } else {
-      return 'Digite um Comentario';
-    }
+  ValidaPlaceholderComentario(): string {
+    return this.getLingua() === 'en'
+      ? 'Type a Review...'
+      : 'Digite seu comentário...';
   }
 }
+
+

@@ -41,24 +41,27 @@
     </select>
 
   </div>
-  <div class="mural" *ngIf="listaRestaurante.length > 0, else SemRestaurante">
-      <div *ngFor="let restaurante of listaRestaurante">
-        <div class="restaurante modelo modelo1 ff-roboto-mono restaurante-p">
-          <img class="container-img" src="../../../assets/images/usuario.png"alt="Foto usuário"/>
-          <span>
-        <h3 class="nome">{{ restaurante.Nome }}
-        </h3>
-        <b translate>{{ restaurante.tipo_restaurante}}</b><br/>
-        <p translate> {{ restaurante.descricao}}</p>
-        </span>
-        <span class="spacer"></span>
-        <button routerLink="/perfilRestaurante/{{ restaurante.email }}" translate>Btn Ir Restaurante</button>
-        <button routerLink="/perfilRestaurante/{{ restaurante.email }}/criaAvaliacao" translate>Btn Fazer Avaliacao</button>
+  <!-- menu.component.html -->
+  <div *ngFor="let resto of listaRestaurante" class="restaurante-card">
+    <h3>{{ resto.Nome }}</h3>
+    <p>{{ resto.descricao }}</p>
+    <!-- botão para ver perfil do restaurante -->
+    <button
+      *ngIf="tipoDoUsuario === 'cliente'"
+      [routerLink]="['/perfilRestaurante', resto.ID]"
+    >
+      Ver Perfil
+    </button>
 
-          </div>
+    <!-- botão para criar avaliação -->
+    <button
+      *ngIf="tipoDoUsuario === 'cliente'"
+      [routerLink]="['/perfilRestaurante', resto.ID, 'criaAvaliacao']"
+    >
+      Avaliar
+    </button>
+  </div>
 
-      </div>
-    </div>
 
 </section>
 

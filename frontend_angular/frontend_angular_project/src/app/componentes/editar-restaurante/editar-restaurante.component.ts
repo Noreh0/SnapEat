@@ -1,137 +1,134 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { RestauranteService } from '../../services/restaurante.service';
-import { FormValidations } from '../../form-validation';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { RestauranteService } from '../../services/restaurante.service';
+import { restauranteModel } from '../../model/restaurante.model';
+import { FormValidations } from '../../form-validation';
 
 @Component({
   selector: 'app-editar-restaurante',
   templateUrl: './editar-restaurante.component.html',
-  styleUrl: './editar-restaurante.component.css',
+  styleUrls: ['./editar-restaurante.component.css'],
 })
-export class EditarRestauranteComponent {
+export class EditarRestauranteComponent implements OnInit {
+  formulario!: FormGroup;
+  id = 0;
+  hide = true; // se você usa para toggle de senha
+
   constructor(
-    private jwthelper: JwtHelperService,
-    private restaurante: RestauranteService,
-    private formbuild: FormBuilder,
-    private router: Router,
+    private formBuilder: FormBuilder,
+    private restauranteService: RestauranteService,
     private route: ActivatedRoute,
+    private router: Router,
+    private jwtHelper: JwtHelperService,
     private translate: TranslateService
   ) {}
-  hide = true;
-  formulario!: FormGroup;
-  email = this.route.snapshot.paramMap.get('id_restaurante');
+
   ngOnInit(): void {
-    if (this.get() != this.email || this.get_tipo() != 'restaurante') {
+    // 1) Captura ID da rota
+    const idParam = this.route.snapshot.paramMap.get('id_restaurante');
+    this.id = idParam ? Number(idParam) : 0;
+
+    // 2) Checa autenticação e tipo
+    const token = localStorage.getItem('token');
+    const payload = token ? this.jwtHelper.decodeToken(token) : null;
+    if (!payload || payload.tipo !== 'restaurante' || Number(payload.sub) !== this.id) {
       this.router.navigate(['/menu']);
+      return;
     }
-    this.restaurante.buscarPorEmail(this.email!).subscribe((restaurantes) => {
-      for (let restaurante of restaurantes) {
-        this.formulario = this.formbuild.group({
-          ID: [restaurante.ID],
+
+    // 3) Busca dados iniciais e preenche o form
+    this.restauranteService.buscarPorId(this.id).subscribe({
+      next: (r: restauranteModel) => {
+        this.formulario = this.formBuilder.group({
+          ID: [r.ID],
           Nome: [
-            restaurante.Nome,
-            Validators.compose([
-              Validators.required,
-              Validators.pattern(/(.|\s)*\S(.|\s)*/),
-            ]),
+            r.Nome,
+            [Validators.required, Validators.pattern(/(.|\s)*\S(.|\s)*/)],
           ],
           descricao: [
-            restaurante.descricao,
-            Validators.compose([Validators.pattern(/(.|\s)*\S(.|\s)*/)]),
+            r.descricao,
+            [Validators.pattern(/(.|\s)*\S(.|\s)*/)],
           ],
           CNPJ: [
-            restaurante.CNPJ,
-            Validators.compose([Validators.required, Validators.minLength(14)]),
+            r.CNPJ,
+            [Validators.required, Validators.minLength(14)],
           ],
           email: [
-            restaurante.email,
-            Validators.compose([Validators.required, Validators.email]),
+            r.email,
+            [Validators.required, Validators.email],
           ],
           tipo_restaurante: [
-            restaurante.tipo_restaurante,
-            Validators.compose([Validators.pattern(/(.|\s)*\S(.|\s)*/)]),
+            r.tipo_restaurante,
+            [Validators.pattern(/(.|\s)*\S(.|\s)*/)],
           ],
           senha: [
-            restaurante.senha,
-            Validators.compose([
+            '',
+            [
               Validators.required,
               Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$'),
-            ]),
+            ],
           ],
           confirmasenha: [
             '',
-            Validators.compose([
+            [
               Validators.required,
               Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$'),
               FormValidations.equalTo('senha'),
-            ]),
+            ],
           ],
           Cidade: [
-            restaurante.Cidade,
-            Validators.compose([
-              Validators.required,
-              Validators.pattern(/(.|\s)*\S(.|\s)*/),
-            ]),
+            r.Cidade,
+            [Validators.required, Validators.pattern(/(.|\s)*\S(.|\s)*/)],
           ],
           telefone: [
-            restaurante.telefone,
-            Validators.compose([Validators.required, Validators.minLength(11)]),
+            r.telefone,
+            [Validators.required, Validators.minLength(11)],
           ],
           Endereco: [
-            restaurante.Endereco,
-            Validators.compose([
-              Validators.required,
-              Validators.pattern(/(.|\s)*\S(.|\s)*/),
-            ]),
+            r.Endereco,
+            [Validators.required, Validators.pattern(/(.|\s)*\S(.|\s)*/)],
           ],
         });
-      }
+      },
+      error: () => {
+        alert('Não foi possível carregar os dados do restaurante.');
+        this.router.navigate(['/menu']);
+      },
     });
   }
 
-  editarRestaurante() {
-    this.restaurante
-      .editar(this.formulario.value, this.formulario.get('ID')!.value)
-      .subscribe(() => {
-        localStorage.clear();
-        this.router.navigate(['/menu']);
-      });
+  editarRestaurante(): void {
+    if (this.formulario.invalid) {
+      return;
+    }
+    const data = this.formulario.value as restauranteModel;
+    this.restauranteService.editar(this.id, data).subscribe({
+      next: () => {
+        this.router.navigate(['/perfilRestaurante', this.id]);
+      },
+      error: () => {
+        alert('Falha ao editar. Tente novamente mais tarde.');
+      },
+    });
   }
+
   habilitarBotao(): string {
-    if (this.formulario.valid) {
-      return 'botao';
-    } else {
-      return 'botao_desabilitado';
-    }
+    return this.formulario.valid ? 'botao' : 'botao_desabilitado';
   }
-  get() {
-    const token = localStorage.getItem('token');
-    const decodetoken = this.jwthelper.decodeToken(token!);
-    if (decodetoken == null) {
-      return null;
-    }
-    const email = decodetoken.sub;
-    return email;
-  }
-  get_id() {
-    return localStorage.getItem('id');
-  }
-  get_tipo() {
-    return localStorage.getItem('tipo');
-  }
-  getLingua() {
+
+  // Métodos de placeholder reutilizáveis
+  getLingua(): string {
     return this.translate.currentLang;
   }
-  ValidaPlaceholderNome() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Name';
-    } else {
-      return 'Digite seu Nome';
+
+  ValidaPlaceholderNome(): string {
+    return this.getLingua() === 'en'
+      ? 'Type your Name'
+      : 'Digite seu Nome';
     }
-  }
   ValidaPlaceholderDescricao() {
     if (this.getLingua() == 'en') {
       return 'Type the Description of the Restaurante';
@@ -196,3 +193,4 @@ export class EditarRestauranteComponent {
     }
   }
 }
+

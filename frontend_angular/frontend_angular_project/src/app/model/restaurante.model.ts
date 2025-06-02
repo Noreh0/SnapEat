@@ -5,8 +5,9 @@ export interface restauranteModel {
   CNPJ: string;
   tipo_restaurante: string;
   email: string;
-  senha: string;
+  senha?: string;
   telefone: string;
   Cidade: string;
   Endereco: string;
+  NotaMedia?: number;
 }

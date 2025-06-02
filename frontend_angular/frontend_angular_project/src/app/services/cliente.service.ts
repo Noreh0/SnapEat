@@ -14,16 +14,21 @@ export class ClienteService {
   return this.http.get<clienteModel[]>(`${this.API}/todosClientes`);
 }
 
-  login(email: string, senha: string): Observable<clienteModel> {
-    const url = `${this.API}/login`;
-    const body = { email: email, senha: senha };
-    console.log('Funcionando');
-    return this.http.post<clienteModel>(url, body);
-  }
+  login(email: string, senha: string): Observable<any> {
+  return this.http.post(`${this.API}/auth/login`, { email, senha }).pipe(
+    tap((res: any) => {
+      localStorage.setItem('token', res.access_token);
+
+      const payload = JSON.parse(atob(res.access_token.split('.')[1]));
+      localStorage.setItem('tipo', payload.tipo);  // 'cliente' ou 'restaurante'
+    })
+  );
+}
+
   criar(cliente: clienteModel): Observable<clienteModel> {
-    const url = `${this.API}/cadastroCliente`;
-    return this.http.post<clienteModel>(url, cliente);
-  }
+  const url = `${this.API}auth/cadastro`; // <-- corrigido
+  return this.http.post<clienteModel>(url, cliente);
+}
   excluir(id: number): Observable<any> {
   return this.http.delete(`${this.API}/excluirCliente/${id}`);
 }
@@ -35,8 +40,13 @@ export class ClienteService {
     const url = `${this.API}/cliente/${id}`;
     return this.http.get<clienteModel>(url);
   }
+  
   editar(cliente: clienteModel): Observable<clienteModel> {
     const url = `${this.API}/editarCliente/${cliente.ID}`;
     return this.http.put<clienteModel>(url, cliente);
   }
+}
+
+function tap(arg0: (res: any) => void): import("rxjs").OperatorFunction<Object, any> {
+  throw new Error('Function not implemented.');
 }

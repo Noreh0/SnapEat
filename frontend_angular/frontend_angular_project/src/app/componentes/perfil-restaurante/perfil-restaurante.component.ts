@@ -1,70 +1,77 @@
-import { Component, Input } from '@angular/core';
+// perfil-restaurante.component.ts
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AvaliacaoModel } from '../../model/avaliacao.model';
-import { AvaliacaoService } from '../../services/avaliacao.service';
 import { RestauranteService } from '../../services/restaurante.service';
-import { JwtHelperService } from '@auth0/angular-jwt';
+import { AvaliacaoService }  from '../../services/avaliacao.service';
+import { JwtHelperService }  from '@auth0/angular-jwt';
 
 @Component({
   selector: 'app-perfil-restaurante',
   templateUrl: './perfil-restaurante.component.html',
-  styleUrl: './perfil-restaurante.component.css',
+  styleUrls: ['./perfil-restaurante.component.css'],
 })
-export class PerfilRestauranteComponent {
+export class PerfilRestauranteComponent implements OnInit {
+  id!: number;
+  Nome = '';
+  Email = '';
+  Nota = 0;
   listaAvaliacao: AvaliacaoModel[] = [];
-  @Input() Nome!: String;
-  @Input() Email!: string;
-  @Input() Nota = 0;
-  email = this.route.snapshot.paramMap.get('id_restaurante');
-  @Input() id!: number;
+
   constructor(
-    private jwthelper: JwtHelperService,
-    private service: RestauranteService,
-    private service_avaliacao: AvaliacaoService,
+    private jwtHelper: JwtHelperService,
+    private restoService: RestauranteService,
+    private avalService:  AvaliacaoService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    if (this.get() == null) {
-      this.router.navigate(['/login']);
-    }
-    this.service.buscarPorEmail(this.email!).subscribe((restaurantes) => {
-      for (let restaurante of restaurantes) {
-        this.Nome = restaurante.Nome;
-        this.Email = restaurante.email;
-        this.id = restaurante.ID;
-        console.log(this.Nome);
-      }
-      this.service_avaliacao
-        .listarPorIdRestaurante(this.id!)
-        .subscribe((listaAvaliacao) => {
-          this.listaAvaliacao = listaAvaliacao;
-          for (const avaliacao of listaAvaliacao) {
-            this.Nota += avaliacao.Nota;
-          }
-          this.Nota = this.Nota / listaAvaliacao.length;
-          this.Nota = Number(this.Nota.toFixed(1));
-        });
-    });
-  }
-  excluirRestaurante() {
-    console.log('Excluindo Restaurante: ' + this.id);
-    return this.service.excluir(this.id!).subscribe(() => {
-      localStorage.clear();
-      this.router.navigate(['/login']);
-    });
-  }
-  get() {
+    // Pega ID da rota
+    const idStr = this.route.snapshot.paramMap.get('id_restaurante');
+    this.id = idStr ? +idStr : 0;
+
+    // Valida token
     const token = localStorage.getItem('token');
-    const decodetoken = this.jwthelper.decodeToken(token!);
-    if (decodetoken == null) {
-      return null;
+    if (!token || this.jwtHelper.isTokenExpired(token) || this.id <= 0) {
+      this.router.navigate(['/login']);
+      return;
     }
-    const email = decodetoken.sub;
-    return email;
+
+    // Busca dados do restaurante
+    this.restoService.buscarPorId(this.id).subscribe({
+      next: r => {
+        this.Nome  = r.Nome;
+        this.Email = r.email;
+      },
+      error: () => {
+        alert('Restaurante não encontrado!');
+        this.router.navigate(['/menu']);
+      }
+    });
+
+    // Lista avaliações associadas (use listarPorIdRestaurante)
+    this.avalService.buscarPorRestaurante(this.id)
+      .subscribe({
+        next: (lista: AvaliacaoModel[]) => {
+          this.listaAvaliacao = lista;
+        },
+        error: err => console.error('Erro avaliações:', err)
+      });
   }
-  get_id() {
-    return this.id;
+
+  editarRestaurante(): void {
+    this.router.navigate(['/perfilRestaurante', this.id, 'editarRestaurante']);
+  }
+
+  excluirRestaurante(): void {
+    if (!confirm('Confirma exclusão do restaurante?')) return;
+    this.restoService.excluir(this.id).subscribe({
+      next: () => {
+        localStorage.clear();
+        this.router.navigate(['/login']);
+      },
+      error: () => alert('Falha ao excluir. Tente mais tarde.')
+    });
   }
 }

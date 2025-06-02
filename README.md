@@ -19,7 +19,7 @@ Backend: Python (Flask ou FastAPI)
 
 Frontend: Angular
 
-Banco de Dados: MariaDB
+Banco de Dados: MYSQL
 
 Autenticação: JWT
 

@@ -6,10 +6,10 @@ class UsuarioModel(banco.Model):
 
     ID = banco.Column(banco.Integer, primary_key=True)
     Nome = banco.Column(banco.String(100))
-    CPF = banco.Column(banco.String(14))
+    CPF = banco.Column(banco.String(20))
     email = banco.Column(banco.String(100), unique=True, nullable=False)
     senha_hash = banco.Column("senha", banco.String(256), nullable=False)
-    telefone = banco.Column(banco.String(20))
+    telefone = banco.Column(banco.String(25))
     Cidade = banco.Column(banco.String(100))
 
     def __init__(self, Nome, CPF, email, senha, telefone, Cidade):

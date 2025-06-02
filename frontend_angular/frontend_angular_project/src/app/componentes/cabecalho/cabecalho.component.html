@@ -1,33 +1,33 @@
 <header class="cabecalho ff-inter">
   <button class="button">
-      <img  class="container-img" src="../../../assets/images/usuario.png"alt="Foto usuário"/>
+    <img class="container-img" src="../../../assets/images/usuario.png" alt="Foto usuário" />
   </button>
-  <div *ngIf="get() != null; else login">
-  <div class="nome">
-    <h1> {{ get_tipo(  ) }}</h1>
-  </div>
-  <div *ngIf="get_tipo() == 'cliente'; else restaurante">
-  <button (click)="logout()">Logout</button>
-  <button routerLink="/menu">Menu</button>
-  <button routerLink="/perfilCliente/{{get_id()}}" translate>Perfil</button>
-  <button click (click)="changeLanguage()" translate> Btn Lingua </button>
+
+  <div *ngIf="logado; else login">
+  <h4 *ngIf="nomeUsuario">Olá, <strong>{{ nomeUsuario }}</strong>!</h4>
+  <!-- Cliente -->
+  <ng-container *ngIf="tipo === 'cliente'; else restaurante">
+    <button (click)="logout()">Logout</button>
+    <button routerLink="/menu">Menu</button>
+    <button [routerLink]="['/perfilCliente', id]" translate>Perfil</button>
+    <button (click)="changeLanguage()" translate>Btn Lingua</button>
+  </ng-container>
 </div>
-</div>
+<!-- Restaurante -->
 <ng-template #restaurante>
-  <span class="spacer"></span>
-
   <button (click)="logout()">Logout</button>
   <button routerLink="/menu">Menu</button>
-  <button routerLink="/perfilRestaurante/{{get_id()}}" translate>Perfil</button>
-  <button click (click)="changeLanguage()" translate> Btn Lingua </button>
-
+  <button [routerLink]="['/perfilRestaurante', id]">Perfil</button>
+  <button (click)="changeLanguage()" translate>Btn Lingua</button>
 </ng-template>
-<ng-template #login>
-  <div>
-   <button routerLink="/cadastroCliente" translate>Btn Cadastro Cliente</button>
- <button routerLink="/cadastroRestaurante" translate>Btn Cadastro Restaurante</button>
- <button routerLink="/login">Login</button>
- <button click (click)="changeLanguage()" translate> Btn Lingua </button>
- </div>
- </ng-template>
+
+
+  <ng-template #login>
+    <div>
+      <button routerLink="/cadastroCliente" translate>Cadastro Cliente</button>
+      <button routerLink="/cadastroRestaurante" translate>Cadastro Restaurante</button>
+      <button routerLink="/login">Login</button>
+      <button (click)="changeLanguage()" translate>Btn Lingua</button>
+    </div>
+  </ng-template>
 </header>

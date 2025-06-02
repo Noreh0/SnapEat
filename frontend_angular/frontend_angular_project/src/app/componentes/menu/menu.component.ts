@@ -1,91 +1,95 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { restauranteModel } from '../../model/restaurante.model';
 import { RestauranteService } from '../../services/restaurante.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
-  styleUrl: './menu.component.css',
+  styleUrls: ['./menu.component.css'],  // <— styleUrls, plural
 })
 export class MenuComponent implements OnInit {
-  @Input() restaurante!: restauranteModel;
+  id = 0;
+  tipoDoUsuario: string | null = null;
   listaRestaurante: restauranteModel[] = [];
-  paginaAtual: number = 1;
-  haMaisRestaurantes: boolean = true;
-  filtro: string = '';
-  filtro_tipo: string = '';
+  paginaAtual = 1;
+  haMaisRestaurantes = true;
+  filtro = '';
+  filtro_tipo = '';
+
   constructor(
-    private jwthelper: JwtHelperService,
+    private jwtHelper: JwtHelperService,     // <— jwtHelper, não jwthelper
     private service: RestauranteService,
     private router: Router,
     private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
-    if (this.get() == null) {
+    const token = localStorage.getItem('token');
+    if (!token || this.jwtHelper.isTokenExpired(token)) {
       this.router.navigate(['/login']);
+      return;
     }
-    this.service.listar().subscribe((listaRestaurante) => {
-      this.listaRestaurante = listaRestaurante;
-      console.log(listaRestaurante);
+
+    // Decodifica o payload
+    const payload = this.jwtHelper.decodeToken(token);
+    this.id = Number(payload.sub);
+    this.tipoDoUsuario = payload.tipo as string;
+
+    // Exemplo de checagem extra (opcional)
+    if (!this.id) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Carrega a lista de restaurantes
+    this.service.listar().subscribe((lista) => {
+      this.listaRestaurante = lista;
     });
-    console.log(this.listaRestaurante);
   }
 
   carregarMaisRestaurantes() {
-    this.service.listar().subscribe((listaRestaurante) => {
-      this.listaRestaurante.push(...listaRestaurante);
+    this.service.listar().subscribe((lista) => {
+      this.listaRestaurante.push(...lista);
       if (!this.listaRestaurante.length) {
         this.haMaisRestaurantes = false;
       }
     });
   }
+
   pesquisarRestaurantes() {
     this.haMaisRestaurantes = true;
     this.paginaAtual = 1;
-    this.service
-      .listarNome(this.paginaAtual, this.filtro)
-      .subscribe((listaRestaurante) => {
-        this.listaRestaurante = listaRestaurante;
-      });
+    this.service.listarNome(this.paginaAtual, this.filtro).subscribe((lista) => {
+      this.listaRestaurante = lista;
+    });
   }
+
   filtrarRestaurantes() {
     this.haMaisRestaurantes = true;
     this.paginaAtual = 1;
     this.service
       .listarTipo(this.paginaAtual, this.filtro_tipo)
-      .subscribe((listaRestaurante) => {
-        this.listaRestaurante = listaRestaurante;
+      .subscribe((lista) => {
+        this.listaRestaurante = lista;
       });
   }
-  get() {
-    const token = localStorage.getItem('token');
-    const decodetoken = this.jwthelper.decodeToken(token!);
-    if (decodetoken == null) {
-      return null;
-    }
-    const email = decodetoken.sub;
-    return email;
-  }
-  get_tipo() {
-    return localStorage.getItem('tipo');
-  }
-  getLingua() {
+
+  // Não faz mais sentido manter get() que usa jwthelper — use diretamente jwtHelper acima.
+
+  getLingua(): string {
     return this.translate.currentLang;
   }
-  ValidaPlaceholderProcura() {
-    if (this.getLingua() == 'en') {
-      return 'Type the Name of the Restaurant';
-    } else {
-      return 'Digite o Nome do Restaurante';
-    }
+
+  ValidaPlaceholderProcura(): string {
+    return this.getLingua() === 'en'
+      ? 'Type the Name of the Restaurant'
+      : 'Digite o Nome do Restaurante';
   }
-  larguraRestaurante(): string {
-    if (this.restaurante.descricao.length >= 256) {
-      return 'restaurante-g';
-    }
-    return 'restaurante-p';
+
+  larguraRestaurante(restaurante: restauranteModel): string {
+    return restaurante.descricao.length >= 256 ? 'restaurante-g' : 'restaurante-p';
   }
 }

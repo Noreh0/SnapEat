@@ -1,44 +1,21 @@
-<body>
-    <section class="container perfil-cliente">
-        <div class="profile-summary ">
-            <div>
-                <img class="container-img" src="../../../assets/images/usuario.png"alt="Foto usuário"/>
-            <col>
-        </div>
-        <div class="flex-container" *ngIf="get() == Email; else OutroPerfil">
-            <h1>{{ Nome }}</h1>
+<h2>{{ Nome }}</h2>
+<p>Email: {{ Email }}</p>
+<p>Nota média: {{ Nota }}</p>
 
-            <a class="button -small" routerLink="/perfilRestaurante/{{email}}/editarRestaurante"> Editar Perfil</a>
-            <a class="button -small" routerLink="/grafico/{{id}}" translate>Visualizar grafico</a>
-            <a class="button -small" (click)="excluirRestaurante()" translate>Btn Excluir Perfil</a>
-            <div class="nota">
-                <h1 translate> Nota <span>:</span> <b> {{ Nota }}</b></h1>
-                </div>
-        </div><br/>
-    </div>
-    <mat-divider></mat-divider>
-    <div class="person-display-name">
-        <h1 translate>Avaliacoes</h1>
+<button routerLink="/menu">Voltar</button>
 
-    </div>
+<button
+  *ngIf="id>0"
+  [routerLink]="['/perfilRestaurante', id, 'editarRestaurante']">
+  Editar Restaurante
+</button>
 
-        <div class="mural" *ngIf="listaAvaliacao.length > 0, else SemAvaliacao">
-            <div *ngFor="let avaliacao of listaAvaliacao">
-              <app-avaliacao [avaliacao]="avaliacao"></app-avaliacao>
-            </div>
-          </div>
-    </section>
-    </body>
-    <ng-template #SemAvaliacao>
-        <div class="ff-inter sem-avaliacao">
-          <p translate>Ainda não há avaliações criadas!</p>
-        </div>
-      </ng-template>
-      <ng-template #OutroPerfil>
-        <div>
-        <h1> {{Nome}}</h1>
+<button (click)="excluirRestaurante()">Excluir Restaurante</button>
 
-        <h1 translate> Nota<span>:</span> <b> {{ Nota }}</b></h1>
 
-    </div>
-    </ng-template>
+<h3>Avaliações</h3>
+<ul>
+  <li *ngFor="let a of listaAvaliacao">
+    {{ a.Comentario }} — Nota: {{ a.Nota }}
+  </li>
+</ul>

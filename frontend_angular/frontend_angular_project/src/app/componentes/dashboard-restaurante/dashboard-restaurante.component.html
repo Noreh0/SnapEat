@@ -1,0 +1,14 @@
+<div class="container">
+  <h2>Bem-vindo ao painel do restaurante</h2>
+
+  <div *ngIf="avaliacoes.length === 0">
+    <p>Você ainda não recebeu avaliações.</p>
+  </div>
+
+  <div *ngFor="let avaliacao of avaliacoes" class="card">
+    <h4>{{ avaliacao.clienteNome }}</h4>
+    <p>Nota: {{ avaliacao.Nota }} / 5</p>
+    <p>{{ avaliacao.Comentario }}</p>
+    <!-- Futuro: botão para responder -->
+  </div>
+</div>

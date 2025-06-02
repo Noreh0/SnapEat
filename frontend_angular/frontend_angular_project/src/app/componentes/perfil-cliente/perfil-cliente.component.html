@@ -1,55 +1,32 @@
 <body>
   <section class="container perfil-cliente">
-    <div class="profile-summary">
       <div>
         <img class="container-img" src="../../../assets/images/usuario.png" alt="Foto usuário" />
       </div>
 
-      <div *ngIf="isPerfilDoUsuario(); else OutroPerfil">
+      <div *ngIf="id && Nome; else loading">
         <h1>{{ Nome }}</h1>
+        <p>Email: {{ Email }}</p>
+        <button (click)="editarCliente()">Editar Perfil</button>
+        <button (click)="excluirCliente()">Excluir Perfil</button>
 
-        <a
-          class="button -small"
-          [routerLink]="['/perfilCliente', id, 'editarCliente']"
-          translate
-        >
-          Btn Editar Perfil
-        </a>
-        <a
-          class="button -small"
-          (click)="excluirCliente()"
-          translate
-        >
-          Btn Excluir Perfil
-        </a>
+        <h3>Avaliações</h3>
+        <ul *ngIf="listaAvaliacao.length; else semAval">
+          <li *ngFor="let a of listaAvaliacao">
+            {{ a.Comentario }} — Nota: {{ a.Nota }}
+          </li>
+        </ul>
+        <ng-template #semAval>
+          <p>Ainda não há avaliações criadas!</p>
+        </ng-template>
       </div>
+      <ng-template #loading>
+        <p>Carregando...</p>
+      </ng-template>
 
-      <div class="flex-container"></div>
-    </div>
 
-    <mat-divider></mat-divider>
-
-    <div class="person-display-name">
-      <h1 translate>Avaliações</h1>
-    </div>
-
-    <div class="mural" *ngIf="listaAvaliacao.length > 0; else SemAvaliacao">
-      <div *ngFor="let avaliacao of listaAvaliacao">
-        <app-avaliacao
-          [avaliacao]="avaliacao"
-          [ClienteComponent]="true"
-        ></app-avaliacao>
-      </div>
-    </div>
+    <ng-template #OutroPerfil>
+      <h1>{{ Nome }}</h1>
+    </ng-template>
   </section>
-
-  <ng-template #SemAvaliacao>
-    <div class="ff-inter sem-avaliacao">
-      <p translate>Ainda não há avaliações criadas!</p>
-    </div>
-  </ng-template>
-
-  <ng-template #OutroPerfil>
-    <h1>{{ Nome }}</h1>
-  </ng-template>
 </body>

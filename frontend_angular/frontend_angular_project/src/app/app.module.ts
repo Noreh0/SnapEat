@@ -52,6 +52,7 @@ import { RestauranteComponent } from './componentes/restaurante/restaurante.comp
 import { RodapeComponent } from './componentes/rodape/rodape.component';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { GraficoComponent } from './componentes/grafico/grafico.component';
+import { DashboardRestauranteComponent } from './componentes/dashboard-restaurante/dashboard-restaurante.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -72,11 +73,12 @@ import { GraficoComponent } from './componentes/grafico/grafico.component';
     EditarRestauranteComponent,
     EditarAvaliacaoComponent,
     GraficoComponent,
+    DashboardRestauranteComponent,
   ],
   imports: [
     JwtModule.forRoot({
     config: {
-      tokenGetter: tokenGetter,
+      tokenGetter: () => localStorage.getItem('token'),
       allowedDomains: ['localhost:5000'],
       disallowedRoutes: ['http://localhost:5000/auth/login'],
     },

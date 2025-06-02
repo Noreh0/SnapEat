@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+// perfil-cliente.component.ts
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AvaliacaoModel } from '../../model/avaliacao.model';
-import { clienteModel } from '../../model/cliente.model';
-import { AvaliacaoService } from '../../services/avaliacao.service';
-import { ClienteService } from '../../services/cliente.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+
+import { AvaliacaoModel } from '../../model/avaliacao.model';
+import { clienteModel }  from '../../model/cliente.model';
+import { AvaliacaoService }  from '../../services/avaliacao.service';
+import { ClienteService }    from '../../services/cliente.service';
 
 @Component({
   selector: 'app-perfil-cliente',
@@ -12,61 +14,78 @@ import { JwtHelperService } from '@auth0/angular-jwt';
   styleUrls: ['./perfil-cliente.component.css'],
 })
 export class PerfilClienteComponent implements OnInit {
+  // Propriedades que o template usa
+  Nome = '';
+  Email = '';
+  id = 0;
   listaAvaliacao: AvaliacaoModel[] = [];
-  Nome: string = '';
-  Email: string = '';
-  id!: number;
-
-  @Input() cliente?: clienteModel;
-  @Output() sair = new EventEmitter();
 
   constructor(
-    private jwthelper: JwtHelperService,
-    private serviceAvaliacao: AvaliacaoService,
     private route: ActivatedRoute,
+    private router: Router,
+    private jwtHelper: JwtHelperService,
     private clienteService: ClienteService,
-    private router: Router
+    private avaliacaoService: AvaliacaoService
   ) {}
 
   ngOnInit(): void {
+    // Pega ID do route e do token
     const idParam = this.route.snapshot.paramMap.get('id_cliente');
-    const idFromToken = this.getIdFromToken();
+    const idToken = this.getIdFromToken();
 
-    if (!idParam || !idFromToken) {
+    if (!idParam || idToken === null) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.id = parseInt(idParam);
+    this.id = +idParam;
 
-    this.clienteService.buscarPorId(this.id).subscribe((cliente) => {
-      this.Nome = cliente.Nome;
-      this.Email = cliente.email;
+    // Só permite ver seu próprio perfil
+    if (this.id !== idToken) {
+      this.router.navigate(['/menu']);
+      return;
+    }
 
-      this.serviceAvaliacao.listarPorId(this.id).subscribe((avaliacoes) => {
-        this.listaAvaliacao = avaliacoes;
-      });
+    // Busca dados do cliente
+    this.clienteService.buscarPorId(this.id).subscribe({
+      next: c => {
+        this.Nome  = c.Nome;
+        this.Email = c.email;
+      },
+      error: () => this.router.navigate(['/menu'])
+    });
+
+    // Busca avaliações deste cliente
+    // Substitua este:
+    // this.avaliacaoService.listarPorId(this.id).subscribe(...)
+    // por este:
+    this.avaliacaoService.buscarPorCliente(this.id).subscribe({
+      next: avals => this.listaAvaliacao = avals,
+      error: err  => console.error('Erro ao buscar avaliações:', err)
     });
   }
 
-  getIdFromToken(): number | null {
+  private getIdFromToken(): number | null {
     const token = localStorage.getItem('token');
-    if (!token) return null;
-
-    const decoded = this.jwthelper.decodeToken(token);
-    return decoded?.sub ? parseInt(decoded.sub) : null;
+    if (!token || this.jwtHelper.isTokenExpired(token)) return null;
+    const payload: any = this.jwtHelper.decodeToken(token);
+    return payload.sub ? +payload.sub : null;
   }
 
-  isPerfilDoUsuario(): boolean {
-    return this.getIdFromToken() === this.id;
+  // Botão “Editar” e “Excluir”
+  editarCliente(): void {
+    this.router.navigate(['/perfilCliente', this.id, 'editarCliente']);
   }
-
   excluirCliente(): void {
-    if (!this.id) return;
-
-    this.clienteService.excluir(this.id).subscribe(() => {
-      localStorage.clear();
-      this.router.navigate(['/login']);
+    this.clienteService.excluir(this.id).subscribe({
+      next: () => {
+        localStorage.clear();
+        this.router.navigate(['/login']);
+      },
+      error: err => {
+        console.error(err);
+        alert('Não foi possível excluir sua conta.');
+      }
     });
   }
 }

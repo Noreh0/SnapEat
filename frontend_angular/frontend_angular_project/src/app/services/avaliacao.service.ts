@@ -1,49 +1,50 @@
-
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 import { AvaliacaoModel } from '../model/avaliacao.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AvaliacaoService {
-  private readonly API = 'http://localhost:5000/';
+  /** Base URL para todos os endpoints de avaliação */
+  private readonly BASE = 'http://localhost:5000/avaliacoes';
 
   constructor(private http: HttpClient) {}
 
+  /** Lista todas as avaliações */
   listar(): Observable<AvaliacaoModel[]> {
-    const url = `${this.API}/todasAvaliacoes`;
-    return this.http.get<AvaliacaoModel[]>(url);
-  }
-  criar(avaliacao: AvaliacaoModel): Observable<AvaliacaoModel> {
-    console.log(avaliacao.ID_Cliente);
-    console.log(avaliacao.ID_Restaurante);
-    const url = `${this.API}/avaliando`
-    return this.http.post<AvaliacaoModel>(url, avaliacao);
-  }
-  excluir(id: number): Observable<AvaliacaoModel> {
-    const url = `${this.API}/excluirAvaliacao/${id}`;
-    console.log('Excluindo' + id);
-    return this.http.delete<AvaliacaoModel>(url);
+    return this.http.get<AvaliacaoModel[]>(this.BASE);
   }
 
+  // DEPOIS (apontando para /avaliando, que é o caminho correto definido no resource)
+  criar(av: AvaliacaoModel) {
+    // chama exatamente /avaliacoes/avaliando
+    return this.http.post<AvaliacaoModel>(`${this.BASE}/avaliando`, av);
+  }
+
+
+
+  /** Busca uma avaliação pelo seu ID */
   buscarPorId(id: number): Observable<AvaliacaoModel> {
-    const url = `${this.API}/avaliacoes/${id}`;
-    return this.http.get<AvaliacaoModel>(url);
+    return this.http.get<AvaliacaoModel>(`${this.BASE}/${id}`);
   }
 
-  listarPorId(id: number): Observable<AvaliacaoModel[]> {
-    const url = `${this.API}/encontraAvaliacaoCliente/${id}`;
-    return this.http.get<AvaliacaoModel[]>(url);
+  /** Lista todas as avaliações feitas por um cliente */
+  buscarPorCliente(id: number): Observable<AvaliacaoModel[]> {
+    return this.http.get<AvaliacaoModel[]>(`${this.BASE}/cliente/${id}`);
   }
-  listarPorIdRestaurante(id: number): Observable<AvaliacaoModel[]> {
-    const url = `${this.API}/encontraAvaliacao/${id}`;
-    return this.http.get<AvaliacaoModel[]>(url);
+
+  /** Lista todas as avaliações de um restaurante */
+  buscarPorRestaurante(id: number): Observable<AvaliacaoModel[]> {
+    return this.http.get<AvaliacaoModel[]>(`${this.BASE}/restaurante/${id}`);
   }
-  editar(avaliacao: AvaliacaoModel): Observable<AvaliacaoModel> {
-    const url = `${this.API}/editarAvaliacao/${avaliacao.ID}`;
-    return this.http.put<AvaliacaoModel>(url, avaliacao);
+
+  /** Edita uma avaliação existente */
+  editar(av: AvaliacaoModel): Observable<AvaliacaoModel> {
+    return this.http.put<AvaliacaoModel>(`${this.BASE}/${av.ID}`, av);
+  }
+
+  /** Exclui uma avaliação pelo ID */
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.BASE}/${id}`);
   }
 }

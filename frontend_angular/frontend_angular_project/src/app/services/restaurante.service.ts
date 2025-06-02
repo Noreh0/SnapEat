@@ -1,8 +1,7 @@
-
-
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { restauranteModel } from '../model/restaurante.model';
 
 @Injectable({
@@ -14,47 +13,51 @@ export class RestauranteService {
   constructor(private http: HttpClient) {}
 
   listar(): Observable<restauranteModel[]> {
-    //const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const url = `${this.API}/menu`;
     return this.http.get<restauranteModel[]>(url);
   }
-  login(email: string, senha: string): Observable<restauranteModel> {
-    const url = `${this.API}/loginrestaurante`;
-    const body = { email: email, senha: senha };
-    console.log('Funcionando');
-    return this.http.post<restauranteModel>(url, body);
+
+  login(email: string, senha: string): Observable<any> {
+    return this.http.post(`${this.API}/auth/login`, { email, senha }).pipe(
+      tap((res: any) => {
+        localStorage.setItem('token', res.access_token);
+
+        const payload = JSON.parse(atob(res.access_token.split('.')[1]));
+        localStorage.setItem('tipo', payload.tipo);  // 'cliente' ou 'restaurante'
+      })
+    );
   }
+
   listar_tabela(): Observable<restauranteModel[]> {
     return this.http.get<restauranteModel[]>(this.API);
   }
+
   criar(restaurante: restauranteModel): Observable<restauranteModel> {
-    console.log(restaurante.ID);
-    const url = `${this.API}/cadastroRestaurante`;
+    const url = `${this.API}/auth/cadastro/restaurante`;             //  ↑ barra a mais e rota deve bater com @api.route('/cadastro/restaurante')
     return this.http.post<restauranteModel>(url, restaurante);
-  }
-  excluir(id: number): Observable<restauranteModel> {
-    console.log(id);
-    const url = `${this.API}/excluirRestaurante/${id}`;
-    return this.http.delete<restauranteModel>(url);
+}
+
+
+  // DELETE /restaurante/:id
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API}/restaurante/${id}`);
   }
 
-  buscarPorId(id: number): Observable<restauranteModel[]> {
-    const url = `${this.API}/restaurante/${id}`;
-    return this.http.get<restauranteModel[]>(url);
+  // GET /restaurante/:id
+  buscarPorId(id: number): Observable<restauranteModel> {
+    return this.http.get<restauranteModel>(`${this.API}/restaurante/${id}`);
   }
+
 
   buscarPorEmail(email: string): Observable<restauranteModel[]> {
     const url = `${this.API}/encontrarRestaurante/${email}`;
     return this.http.get<restauranteModel[]>(url);
   }
 
-  editar(
-    restaurante: restauranteModel,
-    ID: number
-  ): Observable<restauranteModel> {
-    const url = `${this.API}/editarRestaurante/${ID}`;
-    console.log(restaurante);
-    return this.http.put<restauranteModel>(url, restaurante);
+  editar(id: number, data: restauranteModel): Observable<restauranteModel> {
+    return this.http.put<restauranteModel>(
+      `${this.API}/restaurante/${id}`, data
+    );
   }
 
   listarTipo(pagina: number, filtro: string): Observable<restauranteModel[]> {

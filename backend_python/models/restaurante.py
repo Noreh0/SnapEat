@@ -1,5 +1,6 @@
 from sql_alchemy import banco
 from flask import jsonify, request
+from werkzeug.security import generate_password_hash, check_password_hash
 import json
 
 class restauranteModel(banco.Model):
@@ -8,18 +9,18 @@ class restauranteModel(banco.Model):
     Nome = banco.Column(banco.String(100))
     CNPJ = banco.Column(banco.String(14))
     email = banco.Column(banco.String(100))
-    senha = banco.Column(banco.String(100))
+    senha_hash = banco.Column(banco.String(256))      # nome idêntico ao da tabela
     telefone = banco.Column(banco.String(20))
-    Endereco = banco.Column(banco.String(100))
-    Cidade = banco.Column(banco.String(100))
+    Endereco = banco.Column(banco.String(255))
+    Cidade = banco.Column(banco.String(255))
     tipo_restaurante = banco.Column(banco.String(50))
     descricao = banco.Column(banco.String(50))
         
-    def __init__(self, Nome, CNPJ, email, senha, telefone, Endereco, Cidade, tipo_restaurante, descricao):
+    def __init__(self, Nome, CNPJ, email, senha_plain, telefone, Endereco, Cidade, tipo_restaurante, descricao):
       self.Nome = Nome
       self.CNPJ = CNPJ
       self.email = email
-      self.senha = senha
+      self.senha_hash = generate_password_hash(senha_plain)
       self.telefone = telefone
       self.Endereco = Endereco
       self.Cidade = Cidade
@@ -32,7 +33,7 @@ class restauranteModel(banco.Model):
           "Nome": self.Nome,
           "CNPJ": self.CNPJ,
           "email": self.email,
-          "senha": self.senha,
+          # não expomos a senha nem o hash aqui
           "telefone": self.telefone,
           "Endereco": self.Endereco,
           "Cidade": self.Cidade,
@@ -40,6 +41,17 @@ class restauranteModel(banco.Model):
           "descricao": self.descricao
       }
 
+
+    
+    @property
+    def senha(self):
+        raise AttributeError("Senha não pode ser lida diretamente")
+
+    @senha.setter
+    def senha(self, senha_plaintext):
+        # salva o hash na coluna senha_hash
+        self.senha_hash = generate_password_hash(senha_plaintext)
+        
     @classmethod
     def find_all_restaurante(cls):
         restaurantes = cls.query.all()
@@ -61,23 +73,30 @@ class restauranteModel(banco.Model):
         return lista_de_dicionarios
     @classmethod
     def find_restaurante(cls, ID):
-      restaurantes = cls.query.filter_by(ID=ID).all()
-      lista_de_dicionarios = []
+      try:
+          print(f"DEBUG: Buscando restaurante com ID={ID} (type: {type(ID)})")
+          restaurante = cls.query.filter_by(ID=int(ID)).first()
+          if restaurante:
+              result = {
+                  "ID": restaurante.ID,
+                  "Nome": restaurante.Nome,
+                  "CNPJ": restaurante.CNPJ,
+                  "email": restaurante.email,
+                  "telefone": restaurante.telefone,
+                  "Endereco": restaurante.Endereco,
+                  "Cidade": restaurante.Cidade,
+                  "tipo_restaurante": restaurante.tipo_restaurante,
+                  "descricao": restaurante.descricao
+              }
+              print(f"DEBUG: Restaurante encontrado: {result}")
+              return result
+          print("DEBUG: Nenhum restaurante encontrado para esse ID.")
+          return None
+      except Exception as e:
+          print(f"ERRO em find_restaurante: {e}")
+          return None
 
-      for restaurante in restaurantes:
-          restaurante_dict = {
-              "ID": restaurante.ID,
-              "Nome": restaurante.Nome,
-              "CNPJ": restaurante.CNPJ,
-              "email": restaurante.email,
-              "telefone": restaurante.telefone,
-              "Endereco": restaurante.Endereco,
-              "Cidade": restaurante.Cidade,
-              "tipo_restaurante": restaurante.tipo_restaurante,
-              "descricao": restaurante.descricao
-          }
-          lista_de_dicionarios.append(restaurante_dict)
-      return lista_de_dicionarios
+
     
     @classmethod
     def find_tipo_restaurante(cls, tipo_restaurante):
@@ -126,28 +145,26 @@ class restauranteModel(banco.Model):
     
     @classmethod
     def find_email_restaurante(cls, email):
-      restaurante = cls.query.filter_by(email=email).first()
-      if restaurante:
-        return restaurante
-      return None
+      return cls.query.filter_by(email=email).first()
     
 
     @classmethod
-    def updaterestaurante(self, ID,  Nome, CNPJ, email, senha, telefone, Endereco, Cidade, tipo_restaurante, descricao):     
-      restaurantes = self.query.filter_by(ID=ID).first()
-      if restaurantes:
-        # Atualiza os atributos do restaurante com base no dicionário
-        restaurantes.Nome = Nome
-        restaurantes.CNPJ = CNPJ
-        restaurantes.email = email
-        restaurantes.senha = senha
-        restaurantes.telefone = telefone
-        restaurantes.Endereco = Endereco
-        restaurantes.Cidade = Cidade
-        restaurantes.tipo_restaurante = tipo_restaurante
-        restaurantes.descricao = descricao
+    def update_restaurante(cls, ID, **kwargs):
+        restaurante = cls.query.filter_by(ID=ID).first()
+        if not restaurante:
+            return None
+
+        # se vier campo senha, dispara o setter
+        if 'senha' in kwargs:
+            restaurante.senha = kwargs.pop('senha')
+
+        # atualiza demais
+        for key, value in kwargs.items():
+            if hasattr(restaurante, key):
+                setattr(restaurante, key, value)
+
         banco.session.commit()
-        return restaurantes
+        return restaurante
       
     def delete_restaurante(ID):
       restaurantes = restauranteModel.query.get(ID)

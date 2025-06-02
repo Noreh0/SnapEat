@@ -1,41 +1,68 @@
-from flask import Flask, jsonify, request
-from flask_restx import Resource, reqparse
+# resource/restaurante.py
+from flask import request
+from flask_restx import Resource, Namespace, fields
+from flask_jwt_extended import jwt_required
 from models.restaurante import restauranteModel
 from models.avaliacao import avaliacaoModel
-from flask_jwt_extended import create_access_token, jwt_required
-from werkzeug.security import generate_password_hash, check_password_hash
 
-# Parser para cadastro/edição
-atributos = reqparse.RequestParser()
-atributos.add_argument('Nome', type=str, required=True, location='json')
-atributos.add_argument('CNPJ', type=str, required=True, location='json')
-atributos.add_argument('email', type=str, required=True, location='json')
-atributos.add_argument('senha', type=str, required=True, location='json')
-atributos.add_argument('telefone', type=str, required=True, location='json')
-atributos.add_argument('Endereco', type=str, required=True, location='json')
-atributos.add_argument('Cidade', type=str, required=True, location='json')
-atributos.add_argument('tipo_restaurante', type=str, required=True, location='json')
-atributos.add_argument('descricao', type=str, required=True, location='json')
+api = Namespace('restaurante', description='Operações com restaurantes')
 
+# Definição do modelo para Swagger e para marshal
+restaurante_fields = api.model('Restaurante', {
+    'ID': fields.Integer(readOnly=True),
+    'Nome': fields.String(required=True),
+    'CNPJ': fields.String(required=True),
+    'email': fields.String(required=True),
+    'telefone': fields.String,
+    'Endereco': fields.String,
+    'Cidade': fields.String,
+    'tipo_restaurante': fields.String,
+    'descricao': fields.String,
+})
 
-# Parser para login
-login = reqparse.RequestParser()
-login.add_argument('email', type=str, required=True)
-login.add_argument('senha', type=str, required=True)
+@api.route('', '/<int:ID>')
+class RestauranteResource(Resource):
+    @jwt_required()
+    @api.marshal_with(restaurante_fields, as_list=False)
+    def get(self, ID=None):
+        if ID is None:
+            # lista todos
+            return restauranteModel.find_all_restaurante()
+        data = restauranteModel.find_restaurante(ID)
+        if data:
+            return data
+        api.abort(404, "Restaurante não encontrado.")
 
-class Restaurante(Resource):
-    def get(self, ID):
-        restaurante = restauranteModel.find_restaurante(ID)
-        if restaurante:
-            return restaurante, 200
-        return {'message': 'Restaurante não encontrado.'}, 404
+    @api.expect(restaurante_fields)
+    @jwt_required()
+    def post(self):
+        """Criação de restaurante (se ainda não tiver)"""
+        dados = request.json
+        # verifique duplicação de email, hash da senha, etc.
+        # ...
+        return {"message": "Não implementado."}, 501
 
-class RemoverRestaurante(Resource):
+    @api.expect(restaurante_fields)
+    @jwt_required()
+    def put(self, ID):
+        dados = request.get_json() or {}
+        dados.pop('ID', None)
+        dados.pop('confirmasenha', None)
+        atualizado = restauranteModel.update_restaurante(ID, **dados)
+        if atualizado:
+            return atualizado.json(), 200
+        api.abort(404, "Restaurante não encontrado para edição.")
+
     @jwt_required()
     def delete(self, ID):
+        # opcional: apagar avaliações antes
         avaliacaoModel.findandremove(ID)
-        restauranteModel.delete_restaurante(ID)
-        return {"message": "Restaurante removido com sucesso."}, 200
+        sucesso = restauranteModel.delete_restaurante(ID)
+        if sucesso:
+            return {"message": "Restaurante removido."}, 200
+        api.abort(404, "Restaurante não encontrado para exclusão.")
+
+
 
 class TipoRestaurante(Resource):
     def get(self, tipo_restaurante):
@@ -68,51 +95,14 @@ class EncontrarEmailRes(Resource):
     def get(self, email):
         return restauranteModel.buscar_email_restaurante(email), 200
 
-class CadastroRestaurante(Resource): 
-    def post(self):
-        dados = request.get_json(silent=True)
-
-        if not dados:
-            return {'message': 'JSON inválido ou ausente no corpo da requisição.'}, 400
-
-        campos_obrigatorios = ['Nome', 'CNPJ', 'email', 'senha', 'telefone', 'Endereco', 'Cidade', 'tipo_restaurante', 'descricao']
-        for campo in campos_obrigatorios:
-            if campo not in dados or not dados[campo]:
-                return {'message': f"Campo obrigatório ausente ou vazio: {campo}"}, 400
-
-        if restauranteModel.find_email_restaurante(dados['email']):
-            return {"message": f"O email '{dados['email']}' já está em uso."}, 400
-
-        dados['senha'] = generate_password_hash(dados['senha'])
-        restaurante = restauranteModel(**dados)
-        restaurante.save_restaurante()
-        return {"message": "Restaurante criado com sucesso!"}, 201
-
-
-
 class EditarRestaurante(Resource):
     @jwt_required()
     def put(self, ID):
         dados = request.get_json()
-        restaurante = restauranteModel.updaterestaurante(ID, **dados)
+        restaurante = restauranteModel.update_restaurante(ID, **dados)
         if restaurante:
             return restaurante.json(), 200
         return {"message": "Restaurante não encontrado para edição."}, 404
-
-
-class LoginRestaurante(Resource):
-    def post(self):
-        dados = login.parse_args()
-        restaurante = restauranteModel.find_email_restaurante(dados['email'])
-        if restaurante and check_password_hash(restaurante.senha, dados['senha']):
-            token = create_access_token(identity=restaurante.email)
-            return {"access_token": token}, 200
-        return {'message': 'Email ou senha incorretos.'}, 401
-
-class LogoutRestaurante(Resource):
-    @jwt_required()
-    def post(self):
-        return {'message': 'Você foi deslogado com sucesso!'}, 200
 
 class PesquisarRestaurante(Resource):
     def get(self, Nome):

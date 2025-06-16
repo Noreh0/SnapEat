@@ -1,9 +1,12 @@
 # resource/restaurante.py
-from flask import request
+from flask import request, current_app, send_from_directory
+from werkzeug.utils import secure_filename
+import os
 from flask_restx import Resource, Namespace, fields
 from flask_jwt_extended import jwt_required
 from models.restaurante import restauranteModel
 from models.avaliacao import avaliacaoModel
+from sql_alchemy import banco
 
 api = Namespace('restaurante', description='Operações com restaurantes')
 
@@ -110,3 +113,28 @@ class PesquisarRestaurante(Resource):
         if restaurantes:
             return restaurantes, 200
         return {'message': 'Nenhum restaurante encontrado com esse nome.'}, 404
+    
+@api.route('/<int:ID>/upload-imagem')
+class RestauranteImagemUpload(Resource):
+    def post(self, ID):
+        restaurante = restauranteModel.query.get(ID)
+        if not restaurante:
+            return {"message": "Restaurante não encontrado."}, 404
+
+        if 'imagem' not in request.files:
+            return {"message": "Nenhuma imagem enviada."}, 400
+
+        file = request.files['imagem']
+        if file.filename == '':
+            return {"message": "Nome de arquivo vazio."}, 400
+
+        filename = secure_filename(file.filename)
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        os.makedirs(upload_folder, exist_ok=True)
+        filepath = os.path.join(upload_folder, filename)
+        file.save(filepath)
+
+        # Salva o caminho relativo
+        restaurante.imagem_url = f'/static/uploads/{filename}'
+        banco.session.commit()
+        return {"imagem_url": restaurante.imagem_url}, 200

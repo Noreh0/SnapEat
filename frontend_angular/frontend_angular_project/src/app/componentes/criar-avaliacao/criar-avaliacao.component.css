@@ -1,151 +1,218 @@
-.acoes {
+/* *****************************************
+   1. FUNDO DA PÁGINA (degradê escuro)
+   ***************************************** */
+.criar-avaliacao-page {
+  min-height: 100vh;
+  padding: 2rem;
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: linear-gradient(to right, #1c1c1f, #111113);
 }
 
-
-h1{
-  font-size: 50px;
-  color: white;
-  padding: 1rem;
-}
-img{
-width:35px;
-cursor: pointer;
-}
-.botao{
-background-color: rgb(0, 0, 0);
-border-radius: 3px;
-box-shadow: inset 0 1px 0 hsla(0,0%,100%,.2);
-color: #ffffff;
-cursor: pointer;
-display: inline-block;
-font-family:'ff-inter';
-font-size: 1rem;
-font-weight: 400;
-letter-spacing: .075em;
-line-height: 12px;
-margin: 1rem;
-width: 200px;
-height: 30px;
-padding: 9px 12px 8px;
-border-radius: 20px;
-text-transform: uppercase;
-
-}
-.avaliacao {
-  background-color: rgb(24, 24, 27);
-  padding: 2rem 0;
-  border-radius: 50px;
+/* *****************************************
+   2. CARD PRINCIPAL (estilo “TripAdvisor/Facebook”)
+   ***************************************** */
+.eval-card {
+  background-color: #202024;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  color: #ffffff;
 }
 
-.avaliacao form {
-  
-
- /* border: none;*/
-  border-radius: 20px;
-  border-color: white;
-
+/* *****************************************
+   3. CABEÇALHO: Logo e detalhes do restaurante
+   ***************************************** */
+.eval-header {
   display: flex;
   flex-direction: column;
-
-  padding: 2rem;
-}
-.avaliacao form i {
-  margin-left: -30px;
-  cursor: pointer;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-
-.avaliacao form label {
-  color: #ffffff;
-  font-size: larger;
-  font-weight: bold;
-  margin: 0 0 1rem;
-}
-
-.avaliacao form  .input {
-border: none;
-width: 50%;
-height: 30px;
-padding: 1rem 2rem;
-border-radius: 20px;
-margin: 0.5rem 0 2rem;
-}
-.avaliacao form  .select {
-  width: 50%;
-  height: 50px;
-  border-radius: 20px;
-  margin: 0.5rem 0 2rem;
-  padding: 0rem 2rem;
-  }
-
-.avaliacao form .textarea {
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 20px;
-  margin: 0.5rem 0 2rem;
-}
-
-.container-radio {
+/* Agrupa avatar + texto */
+.rest-info {
   display: flex;
-  gap: 2.5rem;
-  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.radio {
+/* Avatar circular com borda azul */
+.rest-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  margin-right: 1rem;
+  background-color: #444;
+}
+
+/* Texto do restaurante */
+.rest-details h2 {
+  font-size: 1.75rem;
+  margin: 0;
+  color: #f3f3f3;
+}
+
+.rest-subtitle {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin: 0.25rem 0;
+}
+
+.rest-rating {
+  font-size: 0.9rem;
+  color: #d1d5db;
   margin: 0;
 }
 
-input[type='radio'] {
-  display: none;
+/* Título “Nova Avaliação” */
+.eval-header h1 {
+  font-size: 2.25rem;
+  margin: 0;
+  color: #ffffff;
 }
 
-option[type='radio'] {
-  display: none;
-}
-
-.radio-modelo label {
+/* *****************************************
+   4. GRUPOS DE INPUTS (form-group)
+   ***************************************** */
+.form-group {
   display: flex;
-  align-items: center;
-  column-gap: 20px;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
 }
 
-.custom-radio {
-  border: 1px solid #154580;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-content: center;
-  border-radius: 50%;
+.form-group label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #e5e5e5;
 }
 
-.custom-radio,
-span {
-  transition: 0.5s ease;
-  color: #154580;
+/* 4.1. SELECT (nota) */
+.form-select {
+  padding: 0.75rem 1rem;
+  background-color: #2c2c2f;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none; /* remove estilo padrão do browser */
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23fff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px 8px;
+  transition: outline 0.2s ease;
 }
 
-.custom-radio span {
-  content: '';
-  width: 18px;
-  height: 18px;
-  background: transparent;
-  border-radius: 50%;
+.form-select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-input[type='radio']:checked+.custom-radio {
-  border-color: #154580;
+/* 4.2. TEXTAREA (comentário) */
+.form-textarea {
+  padding: 0.75rem 1rem;
+  background-color: #2c2c2f;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical; /* redimensiona apenas verticalmente */
+  transition: outline 0.2s ease;
 }
 
-input[type='radio']:checked+.custom-radio span {
-  background: #154580;
+.form-textarea:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-
-option[type='radio']:checked+.custom-radio {
-border-color: #154580;
+/* *****************************************
+   5. MENSAGENS DE ERRO
+   ***************************************** */
+.error {
+  color: #f87171; /* vermelho suave */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
-option[type='radio']:checked+.custom-radio span {
-background: #154580;
+/* *****************************************
+   6. BOTÕES (form-actions)
+   ***************************************** */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* 6.1. BOTÃO “SALVAR” */
+.btn-primary {
+  background-color: #3b82f6; /* azul vivo */
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-primary:disabled {
+  background-color: #575757; /* cinza escuro quando desabilitado */
+  cursor: not-allowed;
+}
+
+.btn-primary:not(:disabled):hover {
+  background-color: #2563eb; /* azul mais escuro no hover */
+}
+
+/* 6.2. BOTÃO “CANCELAR” */
+.btn-secondary {
+  background-color: transparent;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* *****************************************
+   7. RESPONSIVIDADE
+   ***************************************** */
+@media (max-width: 640px) {
+  .eval-card {
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+  .rest-avatar {
+    width: 60px;
+    height: 60px;
+  }
+  .rest-details h2 {
+    font-size: 1.5rem;
+  }
+  .eval-header h1 {
+    font-size: 1.75rem;
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
 }

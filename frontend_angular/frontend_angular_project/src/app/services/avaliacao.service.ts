@@ -30,8 +30,9 @@ export class AvaliacaoService {
 
   /** Lista todas as avaliações feitas por um cliente */
   buscarPorCliente(id: number): Observable<AvaliacaoModel[]> {
-    return this.http.get<AvaliacaoModel[]>(`${this.BASE}/cliente/${id}`);
-  }
+  return this.http.get<AvaliacaoModel[]>(`${this.BASE}/encontraAvaliacaoCliente/${id}`);
+}
+
 
   /** Lista todas as avaliações de um restaurante */
   buscarPorRestaurante(id: number): Observable<AvaliacaoModel[]> {
@@ -40,8 +41,12 @@ export class AvaliacaoService {
 
   /** Edita uma avaliação existente */
   editar(av: AvaliacaoModel): Observable<AvaliacaoModel> {
-    return this.http.put<AvaliacaoModel>(`${this.BASE}/${av.ID}`, av);
+    return this.http.put<AvaliacaoModel>(
+      `${this.BASE}/${av.ID}`,
+      av
+    );
   }
+
 
   /** Exclui uma avaliação pelo ID */
   excluir(id: number): Observable<void> {

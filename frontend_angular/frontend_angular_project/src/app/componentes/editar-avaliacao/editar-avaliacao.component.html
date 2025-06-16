@@ -1,26 +1,83 @@
-<section class="container avaliacao ff-inter">
-  <header class="header">
-      <h1 translate>Editar Avaliacao</h1>
-  </header>
-  <form [formGroup]="formulario" *ngIf="formulario">
+<section class="edit-eval-page" *ngIf="formulario && restaurante">
+  <div class="card">
 
-    <div class="input-box">
-      <label translate>Nota</label><br/>
-      <select matNativeControl class="select"  formControlName="Nota" placeholder="selecione a nota">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
-    </div>
-    <div class="input-box">
-      <label for="nome" translate>Comentario</label><br/>
-    <input type="textarea" class="input" id="Comentario"  formControlName="Comentario" [placeholder]="ValidaPlaceholderComentario()">
-  </div>
-      <div class="acoes">
-          <button class="botao" (click)="editarAvaliacao()" translate>Salvar</button>
-          <button class="botao" routerLink="/menu" translate>Cancelar</button>
+    <!-- HEADER DO RESTAURANTE -->
+    <header class="card-header">
+      <img
+        [src]="restaurante.avatarUrl || defaultAvatar"
+        alt="{{ restaurante.Nome }}"
+        class="avatar"
+      />
+      <div class="restaurant-info">
+        <h2>{{ restaurante.Nome }}</h2>
+        <p class="meta">
+          {{ restaurante.tipo_restaurante | titlecase }}
+          <span>·</span>
+          CNPJ: {{ restaurante.CNPJ }}
+        </p>
+        <p class="meta">
+          Avaliação média:
+          <strong>{{ restaurante.mediaAvaliacoes | number:'1.1-1' }}</strong>
+          ({{ restaurante.totalAvaliacoes }} opiniões)
+        </p>
       </div>
-  </form>
+    </header>
+
+    <!-- FORMULÁRIO -->
+    <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+
+      <!-- NOTA COMO ESTRELAS -->
+      <div class="form-group rating-group">
+        <label translate>Nota</label>
+        <div class="star-rating">
+          <ng-container *ngFor="let s of [1,2,3,4,5]">
+            <i
+              class="star"
+              [class.filled]="formulario.get('Nota')?.value >= s"
+              (click)="setRating(s)"
+            >★</i>
+          </ng-container>
+        </div>
+        <div class="error" *ngIf="f['Nota'].touched && f['Nota'].hasError('required')" translate>
+          Selecione uma nota.
+        </div>
+      </div>
+
+      <!-- COMENTÁRIO -->
+      <div class="form-group">
+        <label translate>Comentário</label>
+        <textarea
+          formControlName="Comentario"
+          rows="4"
+          placeholder="Conte como foi sua experiência..."
+        ></textarea>
+        <div class="error" *ngIf="f['Comentario'].touched && f['Comentario'].hasError('required')" translate>
+          Comentário é obrigatório.
+        </div>
+        <div class="error" *ngIf="f['Comentario'].touched && f['Comentario'].hasError('minlength')" translate>
+          Mínimo de 10 caracteres.
+        </div>
+      </div>
+
+      <!-- AÇÕES -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="formulario.invalid"
+          translate
+        >
+          Salvar
+        </button>
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="cancel()"
+          translate
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
 </section>

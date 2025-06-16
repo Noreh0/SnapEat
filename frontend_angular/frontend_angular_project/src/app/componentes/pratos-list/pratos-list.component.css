@@ -1,0 +1,57 @@
+.pratos-list-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(90deg, #1c1c1f, #111113);
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.filter {
+  margin-bottom: 1rem;
+}
+.filter input {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #2c2c2f;
+  color: #fff;
+}
+.pratos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.prato-card {
+  background: #202024;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: #fff;
+}
+.prato-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.descricao {
+  flex: 1;
+  color: #d1d5db;
+}
+.preco {
+  font-weight: bold;
+  color: #f3f3f3;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

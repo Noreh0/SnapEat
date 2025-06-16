@@ -1,259 +1,288 @@
-.container {
+/* menu.component.css */
+
+/* 1) Container geral do menu */
+.menu-container {
   background-color: rgb(24, 24, 27);
   padding: 2rem;
-  border-radius: 50px;
+  border-radius: 20px;
+  min-height: 100vh;
 }
-.mural {
+
+/* 2) Cabeçalho */
+.menu-header {
+  margin-bottom: 1rem;
+}
+
+.menu-header h2 {
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* 3) Área de filtros */
+.menu-filtros {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin: 1rem 0 2rem;
-}
-h2 {
-  font-size: 50px;
-  color: white;
-}
-p {
-  color: white;
-}
-.spacer {
-  flex: 1 1 auto;
-}
-button {
-  background-color: rgb(0, 0, 0);
-  border-radius: 3px;
-  color: #ffffff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: Graphik-Semibold-Web, sans-serif;
-  font-size: 0.5rem;
-  padding: 9px 12px 8px;
-  border-radius: 20px;
-  text-transform: uppercase;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
 }
 
-.sem-rest.buscar-restaurantes {
-  text-align: center;
-  padding: 2rem 0 5rem;
+/* Box genérica para filtros */
+.filtro-box {
+  position: relative;
+  flex: 1 1 300px; /* permite encolher/expander */
+  max-width: 400px;
 }
 
-.profile-summary {
+/* Estilo do input de busca */
+.filtro-input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filtro-input::placeholder {
+  color: #999999;
+}
+
+/* Ícone de busca dentro do input */
+.icon-search {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: url('/assets/icons/search.svg') no-repeat center center;
+  background-size: contain;
+}
+
+/* Estilo do select de filtro de tipo */
+.filtro-select {
+  width: 100%;
+  padding: 10px 35px 10px 15px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  appearance: none; /* remove seta nativa */
+}
+
+/* Ícone de filtro dentro do select */
+.icon-filter {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: url('/assets/icons/filter.svg') no-repeat center center;
+  background-size: contain;
+  pointer-events: none;
+}
+
+/* 4) Grid de cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+/*
+.resto-rating {
   display: flex;
-  grid-template-areas:
-    "avatar name"
-    "avatar info"
-    "avatar button";
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0.5rem;
 }
-.container-img {
-  padding: 1rem;
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  border-color: black;
+.icon-star {
+  width: 16px;
+  height: 16px;
+  background: url('assets/icons/star-empty.svg') no-repeat center center;
+  background-size: contain;
 }
-.modelo {
-  background-color: #404040;
-  padding: 1rem;
-  max-width: 500px;
-  margin: 1rem 0 2rem;
+.icon-star.filled {
+  background: url('assets/icons/star-filled.svg') no-repeat center center;
+  background-size: contain;
 }
-.modelo1 {
-  box-shadow: 8px 8px 0px #202020;
+.media-valor {
+  font-size: 0.85rem;
+  color: #444;
+  margin-left: 4px;
 }
 
-@media only screen and (max-device-width: 900px) {
-  /* .menu { width:100%; } */
-}
-.d-flex {
+*/
+/* 5) Card individual de restaurante */
+.restaurante-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.buscar-restaurantes {
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  height: 44px;
-  left: 421px;
-  top: 490px;
-  width: 50%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  align-self: center;
-}
-.buscar-tipo {
-  background: #f8f9fe;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  height: 44px;
-  left: 421px;
-  top: 490px;
-  width: 250px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  align-self: center;
-}
-.buscar-restaurantes img {
-  padding-right: 15px;
+/* Sutil hover nos cards */
+.restaurante-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-input::placeholder {
-  color: #c4c4c4;
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 29px;
+/* 6) Banner / imagem do card */
+.card-banner {
+  height: 150px;
+  overflow: hidden;
+  background-color: #f0f0f0; /* cor neutra caso não haja imagem */
 }
 
-input[type="search"]::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
-
-.filtro {
+.resto-imagem {
   width: 100%;
   height: 100%;
-  left: 437px;
-  top: 537px;
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 29px;
-  border: none;
-  outline: 0;
-  text-decoration: none;
-  padding-left: 15px;
-  border-radius: 10px;
-}
-.filtro_tipo {
-  width: 100%;
-  height: 100%;
-  left: 437px;
-  top: 537px;
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 29px;
-  border: none;
-  outline: 0;
-  text-decoration: none;
-  padding-left: 15px;
-  border-radius: 10px;
-}
-@media screen and (max-width: 216px) {
-  .buscar-restaurantes {
-    width: 100%;
-  }
-  .buscar-tipo {
-    width: 90%;
-  }
+  object-fit: cover;
+  display: block;
 }
 
-@media screen and (max-width: 396px) {
-  .buscar-restaurantes {
-    width: 100%;
-  }
-  .buscar-tipo {
-    width: 100%;
-  }
-}
-
-@media screen and (max-width: 576px) {
-  .buscar-restaurantes {
-    width: 100%;
-  }
-  .buscar-tipo {
-    width: 100%;
-  }
-}
-
-.acoes {
+/* 7) Conteúdo do card */
+.card-content {
   display: flex;
-  justify-content: flex-end;
-}
-
-.botao-excluir {
-  border: none;
-  cursor: pointer;
-  margin-left: 5px;
-  margin-top: 10px;
-}
-button {
-  background-color: rgb(0, 0, 0);
-  border-radius: 3px;
-  color: #ffffff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: Graphik-Semibold-Web, sans-serif;
-  font-size: 0.5rem;
-  padding: 6px 10px 6px;
-  border-radius: 20px;
-  text-transform: uppercase;
-}
-p {
-  color: black;
-}
-
-.spacer {
+  flex-direction: column;
+  padding: 1rem 1.5rem;
   flex: 1 1 auto;
 }
-.botao-editar {
+
+/* Cabeçalho do card: nome e tipo */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.resto-nome {
+  font-size: 1.25rem;
+  color: #222222;
+  font-weight: 600;
+  margin: 0;
+  word-break: break-word;
+}
+
+.resto-tipo {
+  font-size: 0.875rem;
+  color: #555555;
+  background-color: #e2e2e2;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+/* Descrição: limitar a no máximo 2 linhas */
+.resto-descricao {
+  font-size: 0.95rem;
+  color: #444444;
+  margin: 0.5rem 0 1rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 2 linhas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Informações rápidas (CNPJ, cidade, etc) */
+.resto-info-rapida {
+  font-size: 0.85rem;
+  color: #555555;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.resto-info-rapida span {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* 8) Botões de ação dentro do card */
+.card-actions {
+  margin-top: auto; /* empurra para baixo */
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+}
+
+.card-actions button {
+  padding: 8px 14px;
   border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
   cursor: pointer;
-  margin-right: 10px;
-  margin-top: 10px;
+  transition: background-color 0.2s ease;
 }
 
-.restaurante {
-  background-color: #f8f9fe;
-  padding: 1rem;
-  box-sizing: border-box;
+/* Botão “Ver Perfil” */
+.btn-ver-perfil {
+  background-color: #1976d2;
+  color: #ffffff;
 }
 
-.restaurante .nome {
-  margin: 1rem auto;
-  word-wrap: break-word;
+.btn-ver-perfil:hover {
+  background-color: #1565c0;
 }
 
-.restaurante .tipo {
-  word-wrap: break-word;
+/* Botão “Avaliar” */
+.btn-avaliar {
+  background-color: #43a047;
+  color: #ffffff;
 }
 
-.modelo {
-  background-color: #404040;
-  padding: 1rem;
-  max-width: 500px;
-  margin: 1rem 0 2rem;
-}
-.modelo1 {
-  box-shadow: 8px 8px 0px #202020;
+.btn-avaliar:hover {
+  background-color: #388e3c;
 }
 
-.restaurante-g {
-  width: 556px;
+/* 9) Sem restaurante */
+.sem-restaurante {
+  text-align: center;
+  margin-top: 2rem;
 }
 
-.restaurante-p {
-  width: 262px;
+.sem-restaurante p {
+  color: #f0f0f0;
+  font-size: 1.1rem;
 }
 
-@media screen and (max-width: 768px) {
-  .restaurante-g {
-    width: 100%;
+/* 10) Responsividade */
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
   }
 }
-@media screen and (max-width: 426px) {
-  .restaurante-p {
-    width: 100%;
+
+@media (max-width: 480px) {
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
   }
-}
-.container-img {
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
+
+  .menu-filtros {
+    flex-direction: column;
+  }
+
+  .filtro-box {
+    max-width: 100%;
+  }
 }

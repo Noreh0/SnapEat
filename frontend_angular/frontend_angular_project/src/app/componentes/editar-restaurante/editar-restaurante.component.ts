@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
@@ -15,11 +15,17 @@ import { FormValidations } from '../../form-validation';
 export class EditarRestauranteComponent implements OnInit {
   formulario!: FormGroup;
   id = 0;
-  hide = true; // se você usa para toggle de senha
+  hideSenha = true;
+  tipos = [
+    'Arabe','Brasileira','Carnes','Chinesa','Francesa','Frango',
+    'Italiana','Japonesa','Lanches','Mexicana','Peixes',
+    'Pizzaria','Saudavel','Vegana','Vegetariana'
+  ];
+
 
   constructor(
-    private formBuilder: FormBuilder,
-    private restauranteService: RestauranteService,
+    private fb: FormBuilder,
+    private svc: RestauranteService,
     private route: ActivatedRoute,
     private router: Router,
     private jwtHelper: JwtHelperService,
@@ -27,6 +33,44 @@ export class EditarRestauranteComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.formulario = this.fb.group(
+      {
+        Nome: ['', [Validators.required, Validators.minLength(3)]],
+        descricao: ['', [Validators.maxLength(200)]],
+        CNPJ: [{ value: '', disabled: true }, []],           // readonly
+        email: ['', [Validators.required, Validators.email]],
+        tipo_restaurante: ['', Validators.required],
+        senha: [
+          '',
+          [
+            Validators.pattern(
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&\*]).{8,}$/
+            ),
+          ],
+        ],
+        confirmasenha: [''],
+        telefone: ['', [Validators.required, Validators.minLength(15)]],
+        Cidade: ['', Validators.required],
+        Endereco: ['', Validators.required],
+      },
+      { validators: [this.senhasIguaisValidator] }
+    );
+
+    const id = +this.route.snapshot.paramMap.get('id')!;
+    this.svc.buscarPorId(id).subscribe((r) => {
+      // popula o form com os dados atuais
+      this.formulario.patchValue({
+        Nome: r.Nome,
+        descricao: r.descricao,
+        CNPJ: r.CNPJ,
+        email: r.email,
+        tipo_restaurante: r.tipo_restaurante,
+        telefone: r.telefone,
+        Cidade: r.Cidade,
+        Endereco: r.Endereco,
+      });
+    });
+
     // 1) Captura ID da rota
     const idParam = this.route.snapshot.paramMap.get('id_restaurante');
     this.id = idParam ? Number(idParam) : 0;
@@ -40,9 +84,9 @@ export class EditarRestauranteComponent implements OnInit {
     }
 
     // 3) Busca dados iniciais e preenche o form
-    this.restauranteService.buscarPorId(this.id).subscribe({
+    this.svc.buscarPorId(this.id).subscribe({
       next: (r: restauranteModel) => {
-        this.formulario = this.formBuilder.group({
+        this.formulario = this.fb.group({
           ID: [r.ID],
           Nome: [
             r.Nome,
@@ -100,19 +144,70 @@ export class EditarRestauranteComponent implements OnInit {
     });
   }
 
-  editarRestaurante(): void {
+  /** Facilidade para acessar controles no template */
+  get f(): { [key: string]: AbstractControl } {
+    return this.formulario.controls;
+  }
+  /** Valida se senha e confirmação batem (só se senha foi alterada) */
+  private senhasIguaisValidator(fg: AbstractControl): ValidationErrors | null {
+    const s = fg.get('senha')?.value;
+    const c = fg.get('confirmasenha')?.value;
+    if (s && c && s !== c) {
+      fg.get('confirmasenha')?.setErrors({ mismatch: true });
+      return { mismatch: true };
+    }
+    return null;
+  }
+  /** Envio do form (inclui CNPJ via getRawValue) */
+  onSubmit() {
     if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
       return;
     }
-    const data = this.formulario.value as restauranteModel;
-    this.restauranteService.editar(this.id, data).subscribe({
-      next: () => {
-        this.router.navigate(['/perfilRestaurante', this.id]);
-      },
-      error: () => {
-        alert('Falha ao editar. Tente novamente mais tarde.');
-      },
+    const dados = this.formulario.getRawValue();
+    this.svc.editar(this.id, dados).subscribe(() => {
+      this.router.navigate(['/dashboard-restaurante', this.id]);
     });
+  }
+  onCancel() {
+    this.router.navigate(['/perfil-restaurante', this.route.snapshot.paramMap.get('id')]);
+  }
+
+  selectedFile: File | null = null;
+  previewImg: string | null = null;
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = e => this.previewImg = reader.result as string;
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+  editarRestaurante(): void {
+    if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
+      return;
+    }
+    const data = this.formulario.getRawValue() as restauranteModel;
+    this.svc.editar(this.id, data).subscribe({
+      next: (restaurante) => {
+        if (this.selectedFile) {
+          this.svc.uploadImagem(restaurante.ID, this.selectedFile).subscribe(() => {
+            this.router.navigate(['/perfilRestaurante', restaurante.ID]);
+          });
+        } else {
+          this.router.navigate(['/perfilRestaurante', restaurante.ID]);
+        }
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Falha ao editar. Tente novamente mais tarde.');
+      }
+    });
+  }
+  onCancelar(): void {
+    this.router.navigate(['/perfil-restaurante', this.route.snapshot.paramMap.get('id')]);
   }
 
   habilitarBotao(): string {
@@ -185,6 +280,7 @@ export class EditarRestauranteComponent implements OnInit {
       return 'Digite seu Telefone';
     }
   }
+  
   ValidaPlaceholderEndereco() {
     if (this.getLingua() == 'en') {
       return 'Type the Address';

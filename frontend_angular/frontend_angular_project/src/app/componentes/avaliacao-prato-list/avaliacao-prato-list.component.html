@@ -1,0 +1,60 @@
+<section class="eval-prato-list-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h1>Avaliações do Prato</h1>
+    <button
+      *ngIf="isCliente"
+      class="btn-primary"
+      [routerLink]="['/prato', pratoId, 'avaliacoes', 'criar']"
+    >
+      + Nova Avaliação
+    </button>
+  </div>
+
+  <!-- SEM AVALIAÇÕES -->
+  <ng-container *ngIf="avaliacoes.length; else noEvals">
+    <!-- LISTA DE CARDS -->
+    <div class="eval-list">
+      <div *ngFor="let a of avaliacoes" class="review-card">
+        
+        <!-- CABEÇALHO DO CARD -->
+        <div class="review-header">
+          <div class="reviewer">
+            <img src="assets/icons/user-avatar.svg" alt="avatar" class="avatar"/>
+            <span>{{ a.ID_Cliente }}</span>
+          </div>
+          <div class="meta">
+            <span class="stars">{{ renderStars(a.Nota) }}</span>
+          </div>
+        </div>
+
+        <!-- CORPO DO COMENTÁRIO -->
+        <p class="review-body">{{ a.Comentario }}</p>
+
+        <!-- AÇÕES -->
+        <div class="review-actions">
+          <button
+            *ngIf="isCliente && a.ID_Cliente === auth.usuarioAtual?.ID"
+            class="btn-secondary"
+            (click)="edit(a)"
+          >Editar</button>
+          <button
+            *ngIf="isCliente && a.ID_Cliente === auth.usuarioAtual?.ID"
+            class="btn-secondary"
+            (click)="delete(a.ID)"
+          >Excluir</button>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- TEMPLATE “SEM AVALIAÇÕES” -->
+  <ng-template #noEvals>
+    <div class="no-evals">
+      Ainda não há avaliações para este prato.
+    </div>
+  </ng-template>
+
+</section>

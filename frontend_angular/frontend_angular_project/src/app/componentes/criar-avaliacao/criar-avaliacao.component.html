@@ -1,27 +1,119 @@
+<section class="criar-avaliacao-page">
+  <div class="eval-card">
+    <!-- =======================
+         CABEÇALHO: INFORMAÇÕES DO RESTAURANTE
+         ======================= -->
+    <header class="eval-header">
+      <div class="rest-info">
+        <!-- Avatar / Logo do restaurante
+             Troque o caminho abaixo para o seu asset real -->
+        <img
+          src="../../../assets/images/default-restaurant.png"
+          alt="{{ NomeRestaurante }}"
+          class="rest-avatar"
+        />
 
-<section class="container avaliacao ff-inter">
-  <header class="header">
-      <h1 translate>Avaliação</h1>
-  </header>
-  <form [formGroup]="formulario">
-
-    <div class="input-box">
-      <label>Qual a nota?</label><br/>
-      <select matNativeControl class="select"  formControlName="Nota" placeholder="selecione a nota">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
-    </div>
-    <div class="input-box">
-      <label for="nome" translate>Comentario</label><br/>
-    <input type="textarea" class="input" id="nome"  formControlName="Comentario" [placeholder]="ValidaPlaceholderComentario()">
-  </div>
-      <div>
-          <button class="botao" (click)="salvarAvaliacao()" translate>Salvar</button>
-          <button class="botao" routerLink="/menu" translate>Cancelar</button>
+        <div class="rest-details">
+          <!-- Variáveis que você preenche no componente TS -->
+          <h2>{{ NomeRestaurante }}</h2>
+          <p class="rest-subtitle">
+            {{ Categoria }} · {{ Cidade }}
+          </p>
+          <p class="rest-rating">
+            Avaliação média:
+            <b>{{ AvaliacaoMedia | number:'1.1-1' }}</b>
+            ({{ TotalAvaliacoes }} avaliações)
+          </p>
+        </div>
       </div>
-  </form>
+
+      <h1 translate>Nova Avaliação</h1>
+    </header>
+
+    <!-- =======================
+         FORMULÁRIO DE AVALIAÇÃO
+         ======================= -->
+    <form
+      [formGroup]="formulario"
+      (ngSubmit)="salvarAvaliacao()"
+      novalidate
+    >
+      <!-- ====== NOTA ====== -->
+      <div class="form-group">
+        <label for="nota" translate>Qual a nota?</label>
+        <select
+          id="nota"
+          formControlName="Nota"
+          class="form-select"
+        >
+          <option value="" disabled>Selecione</option>
+          <option *ngFor="let n of [1, 2, 3, 4, 5]" [value]="n">
+            {{ n }}
+          </option>
+        </select>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('Nota')?.touched &&
+            formulario.get('Nota')?.hasError('required')
+          "
+          translate
+        >
+          A nota é obrigatória.
+        </div>
+      </div>
+
+      <!-- ====== COMENTÁRIO ====== -->
+      <div class="form-group">
+        <label for="comentario" translate>Comentário</label>
+        <textarea
+          id="comentario"
+          formControlName="Comentario"
+          rows="4"
+          placeholder="Digite seu comentário..."
+          class="form-textarea"
+        ></textarea>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('Comentario')?.touched &&
+            formulario.get('Comentario')?.hasError('required')
+          "
+          translate
+        >
+          O comentário é obrigatório.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('Comentario')?.touched &&
+            formulario.get('Comentario')?.hasError('minlength')
+          "
+          translate
+        >
+          O comentário deve ter ao menos 10 caracteres.
+        </div>
+      </div>
+
+      <!-- ====== BOTÕES DE AÇÃO ====== -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="!formulario.valid"
+          translate
+        >
+          Salvar
+        </button>
+        <button
+          type="button"
+          class="btn-secondary"
+          routerLink="/restaurante/{{ idRestaurante }}"
+          translate
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
 </section>

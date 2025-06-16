@@ -1,6 +1,6 @@
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd  } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom, tap } from 'rxjs';
@@ -53,31 +53,32 @@ export class CabecalhoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.setSessionData();
-    this.setLanguage();
-    this.buscarNomeUsuario();
-    
-
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.setSessionData();
-        this.buscarNomeUsuario();
-      }
-    });
-    this.auth.authState$.subscribe(isLoggedIn => {
-      if (isLoggedIn) {
-        this.setSessionData();
-        this.buscarNomeUsuario();
+    // Inscreva-se no Observable de estado de autenticação (caso exista)
+    // Se seu serviço retornar BehaviorSubject<boolean>, basta assinar:
+    this.logado = this.auth.isAuthenticated();
+    // Quem for disparar o “logado” para atualizar as props, deve chamar
+    // algo como `this.auth.authState$.next(true)` no login.
+    this.auth.authState$.subscribe((v) => {
+      this.logado = v;
+      if (v) {
+        const payload: any = this.auth.getDecodedToken();
+        this.nomeUsuario = payload.nome   // ou payload['name'] se você armazenou
+          || payload.email
+          || '';
+        this.tipo = payload.tipo;
+        this.id = String(payload.sub);
       } else {
-        this.logado = false;
         this.nomeUsuario = null;
-        this.tipo = localStorage.getItem('tipo');
-        this.id = localStorage.getItem('id');
-
+        this.tipo = null;
+        this.id = null;
       }
     });
-
   }
+
+  goHome(): void {
+    this.router.navigate(['/']);
+  }
+
 
   
   buscarNomeUsuario(): void {

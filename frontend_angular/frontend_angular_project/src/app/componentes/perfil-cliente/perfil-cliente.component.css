@@ -1,93 +1,223 @@
-section{
-  display: block;
-}
-div{
-  unicode-bidi: isolate;
-}
-h1{
-color: white;
-}
-.container-img{
-  padding: 1rem;
-  border-radius: 50%;
-    width: 100px;
-    height: 100px;
- border-color: black;
-}
-.perfil-cliente {
-  background-color: rgb(188, 188, 188);
-  padding: 2rem;
-  border-radius: 50px;
-}
- .person-display-name {
-  font-size: 1.69230769rem;
-  line-height: 1.25;
-  color: #fff;
-  font-family: 'ff-inter';
-  font-weight: 400;
-  margin-bottom: 0;
-  margin-top: 0;
-}
-.display-name{
-  display: inline-flex;
-  max-width: 450px;
-}
-.profile-summary {
+/* perfil-cliente.component.css */
+
+/* Container geral: fundo escuro e centralizado */
+.perfil-cliente-container {
+  background-color: #1b1b1f; /* tom quase preto */
+  min-height: calc(100vh - 60px); /* considerando cabeçalho fixo de 60px */
+  padding: 2rem 1rem;
   display: flex;
-  grid-template-areas:
-      "avatar name"
-      "avatar info"
-      "avatar button";
+  flex-direction: column;
+  align-items: center;
 }
 
-.profile-actions{
-  -moz-column-gap: calc(var(--column-gap)* .75);
-  column-gap: calc(var(--column-gap)* .75);
-}
-
-.perfil-cliente .button{
-  background: rgb(0, 0, 0);
-  border-radius: 3px;
-  box-shadow: inset 0 1px 0 hsla(0,0%,100%,.2);
-  color: #ffffff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: 'ff-inter';
-  font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: .075em;
-  line-height: 12px;
-  margin:  1rem;
-  padding: 9px 12px 8px;
-  border-radius: 20px;
-  text-transform: uppercase;
- 
-}
-@media only screen and (min-width: 500px)
-and (max-width: 769px){
-  .perfil-cliente .button {
-    font-size: 0.5rem;
-  }
-  .container-img{
-      border-radius: 50%;
-        width: 50px;
-        height: 50px;
-    }
-}
-
-@media only screen  and (max-width: 500px){
-
-  .container-img{
-    border-radius: 50%;
-      width: 50px;
-      height: 50px;
-  }
-
-}
-
-.flex-container {
+/* Card do topo com avatar e info */
+.perfil-cliente-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
+  background-color: #2c2c2e;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Avatar */
+.perfil-cliente-card__avatar-wrapper {
+  flex-shrink: 0;
+}
+
+.perfil-cliente-card__avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #444;
+}
+
+/* Box com nome, email e botões */
+.perfil-cliente-card__info {
+  margin-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nome do cliente */
+.perfil-cliente-card__name {
+  color: #fff;
+  font-size: 2rem;
+  margin: 0;
+  font-weight: bold;
+}
+
+/* Email */
+.perfil-cliente-card__email {
+  color: #bbb;
+  font-size: 1rem;
+  margin: 0.3rem 0 1rem;
+}
+
+/* Botões Editar Perfil / Excluir Perfil */
+.perfil-cliente-card__actions button {
+  background-color: #ff9f1c;
+  color: #1b1b1f;
+  border: none;
+  border-radius: 20px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-right: 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.perfil-cliente-card__actions button:last-child {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.perfil-cliente-card__actions button:hover {
+  opacity: 0.9;
+}
+
+/* --------------------------------------------- */
+/* Seção “Minhas Avaliações”                     */
+/* --------------------------------------------- */
+
+.perfil-cliente-avaliacoes {
+  width: 100%;
+  max-width: 800px;
+  background-color: #2c2c2e;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Título “Minhas Avaliações” */
+.perfil-cliente-avaliacoes__titulo {
+  color: #fff;
+  font-size: 1.8rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+/* Mensagem “sem avaliações” */
+.perfil-cliente-avaliacoes__vazio {
+  color: #aaa;
+  font-size: 1rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Lista de avaliações */
+.perfil-cliente-avaliacoes__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Item individual de avaliação */
+.perfil-cliente-avaliacoes__item {
+  background-color: #37373a;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Box com “Nota” e “Comentário” (lado esquerdo do item) */
+.avaliacao-item__texto {
+  display: flex;
+  flex-direction: column;
+  color: #ddd;
+  max-width: 70%;
+}
+
+/* Exibe cada campo com uma leve margem */
+.avaliacao-item__texto span {
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+/* Botões de “Editar” e “Excluir” (lado direito do item) */
+.avaliacao-item__botoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Botão “Editar Avaliação” */
+.avaliacao-btn--editar {
+  background-color: #1f7a1f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.avaliacao-btn--editar:hover {
+  background-color: #166e16;
+}
+
+/* Botão “Excluir Avaliação” */
+.avaliacao-btn--excluir {
+  background-color: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.avaliacao-btn--excluir:hover {
+  background-color: #992a24;
+}
+
+/* Ajustes responsivos (para telas muito estreitas) */
+@media (max-width: 600px) {
+  .perfil-cliente-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .perfil-cliente-card__avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .perfil-cliente-card__info {
+    margin-left: 0;
+  }
+
+  .perfil-cliente-avaliacoes__item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .avaliacao-item__texto {
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .avaliacao-item__botoes {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .avaliacao-item__botoes button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
 }

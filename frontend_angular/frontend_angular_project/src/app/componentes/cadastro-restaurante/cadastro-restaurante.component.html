@@ -1,145 +1,215 @@
-<section class="container cadastro-restaurante ff-inter">
-  <header class="header">
-      <h1 translate>Cadastro</h1>
-  </header>
-  <form [formGroup]="formulario">
+<section class="cadastro-restaurante-page">
+  <div class="form-card">
+    <!-- HEADER -->
+    <header class="form-header">
+      <h1 translate>Cadastro de Restaurante</h1>
+    </header>
 
-    <div>
-    <div class="input-box">
-        <label for="Nome" translate>Nome<b>*</b></label><br/>
-      <input type="textarea" class="input" id="Nome"  formControlName="Nome" [placeholder]="ValidaPlaceholderNome()">
-    </div>
-    <div class="mensagem_erro"  *ngIf="formulario.get('Nome')?.errors && formulario.get('Nome')?.touched" translate>
-      Campos
-  </div>
-  </div>
-  <div>
-    <div>
-      <label for="CNPJ" translate>Descricao</label><br/>
-      <input type="text" class="input" id="descricao"  formControlName="descricao" [placeholder]="ValidaPlaceholderDescricao()">
-    </div>
-
-  </div>
-  <div>
-    <div>
-      <label for="CNPJ" translate>Validacao Empresa<b>*</b></label><br/>
-      <input type="text" class="input" id="CNPJ"  formControlName="CNPJ" mask="00.000.000/0000-00" [placeholder]="ValidaPlaceholderCNPJ()">
-    </div>
-    <div class="mensagem_erro"  *ngIf="formulario.get('CNPJ')?.errors?.['required'] && formulario.get('CNPJ')?.touched" translate>
-      Campos
-  </div>
-  <div class="mensagem_erro"  *ngIf="formulario.get('CNPJ')?.errors?.['minlength'] " translate>
-      Validacao CNPJ
-  </div>
-  </div>
-
-
-  <div>
-    <div>
-      <label for="email">Email<b>*</b></label><br/>
-      <input type="email" class="input" id="email" formControlName="email"[placeholder]="ValidaPlaceholderEmail()" >
-    </div>
-    <div class="mensagem_erro"  *ngIf="formulario.get('email')?.errors?.['required'] && formulario.get('email')?.touched" translate>
-      Campos
-  </div>
-  <div class="mensagem_erro"  *ngIf="formulario.get('email')?.errors?.['email']" translate>
-      Validacao email
-  </div>
-  </div>
-<div>
-  <div class="input-box">
-    <label translate>Tipo<b>*</b></label><br/>
-    <select matNativeControl class="select" formControlName="tipo_restaurante" [placeholder]="ValidaPlaceholderTipo()">
-      <option value="Arabe" translate>Arabe</option>
-      <option value="Brasileira" translate>Brasileira</option>
-      <option value="Carnes" translate>Carnes</option>
-      <option value="Chinesa" translate>Chinesa</option>
-      <option value="Francesa" translate>Francesa</option>
-      <option value="Frangos" translate>Frangos</option>
-      <option value="Italiana" translate>Italiana</option>
-      <option value="Japonesa" translate>Japonesa</option>
-      <option value="Lanches" translate>Lanches</option>
-      <option value="Mexicana" translate>Mexicana</option>
-      <option value="Peixes" translate>Peixes</option>
-      <option value="Pizzaria" translate>Pizzaria</option>
-      <option value="Saudável" translate>Saudável</option>
-      <option value="Vegana" translate>Vegana</option>
-      <option value="Vegetariana" translate>Vegetariana</option>
-
-    </select>
-  </div>
-</div>
-
-  <div>
-    <div >
-      <label for="senha" translate>Senha<b>*</b></label><br/>
-
-      <input matInput class="input" [type]="hide ? 'password' : 'text'" formControlName="senha" [placeholder]="ValidaPlaceholderSenha()">
-        <button class="botao_img"(click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" >
-          <img class="imagem" src="../../../assets/images/olho_senha.png" alt="olho"/>
-         </button>
-    </div>
-    <div class="mensagem_erro"  *ngIf="formulario.get('senha')?.errors?.['required'] && formulario.get('senha')?.touched" translate>
-      Campos
-  </div>
-  <div class="mensagem_erro"  *ngIf="formulario.get('senha')?.errors?.['pattern']" translate>
-    Validacao Senha
-  </div>
-  </div>
-
-  <div>
-    <div>
-      <label for="autoria" translate>Confirme sua senha<b>*</b></label><br/>
-      <input type="password" class="input" id="senha"  formControlName="confirmasenha" [placeholder]=" ValidaPlaceholderConfirma()" >
-    </div>
-    <div class="mensagem_erro"  *ngIf="formulario.get('confirmasenha')?.errors?.['required'] && formulario.get('confirmasenha')?.touched" translate>
-      Campos
-  </div>
-  <div class="mensagem_erro"  *ngIf="formulario.get('confirmasenha')?.errors?.['equalTo']" translate>
-    Validacao confirmar
-</div>
-  </div>
-
-  <div>
-   <div style="width: 100%;">
-    <div>
-      <label for="telefone" translate>Telefone<b>*</b></label><br/>
-      <input type="text" class="input" id="telefone" formControlName="telefone" mask="(00) 0 0000-0000" [placeholder]="ValidaPlaceholderTelefone()" >
-
-    </div>
-    <div class="mensagem_erro"  *ngIf="formulario.get('telefone')?.errors?.['required'] && formulario.get('telefone')?.touched" translate>
-      Campos
-  </div>
-  <div class="mensagem_erro"  *ngIf="formulario.get('telefone')?.errors?.['minlength'] " translate>
-      Validacao Telefone
-  </div>
-  </div>
-
-<div>
-      <div style="width: 100%;">
-        <div>
-          <label for="Cidade" translate>Cidade<b>*</b></label><br/>
-          <input type="text" class="input" id="Cidade" formControlName="Cidade" [placeholder]="ValidaPlaceholderCidade()" >
+    <!-- FORMULÁRIO REATIVO -->
+    <form [formGroup]="formulario" (ngSubmit)="salvarRestaurante()" novalidate>
+      
+      <!-- NOME -->
+      <div class="form-group">
+        <label for="Nome" translate>Nome<b>*</b></label>
+        <input
+          id="Nome"
+          type="text"
+          class="form-input"
+          formControlName="Nome"
+          placeholder="Digite o nome do restaurante"
+        />
+        <div class="error" *ngIf="f['Nome'].hasError('required') && f['Nome'].touched" translate>
+          O nome é obrigatório.
         </div>
-        <div class="mensagem_erro"  *ngIf="formulario.get('Cidade')?.errors && formulario.get('Cidade')?.touched" translate>
-          Campos
-      </div>
+        <div class="error" *ngIf="f['Nome'].hasError('minlength') && f['Nome'].touched" translate>
+          Deve ter ao menos 3 caracteres.
+        </div>
       </div>
 
-    <div style="width: 100%;">
-      <div>
-        <label for="Endereco" translate>Endereco<b>*</b></label><br/>
-        <input type="text" class="input" id="Endereco" formControlName="Endereco" [placeholder]="ValidaPlaceholderEndereco()" >
+      <!-- DESCRIÇÃO -->
+      <div class="form-group">
+        <label for="descricao" translate>Descrição</label>
+        <textarea
+          id="descricao"
+          class="form-textarea"
+          formControlName="descricao"
+          rows="3"
+          placeholder="Descreva o restaurante (opcional)"
+        ></textarea>
+        <div class="error" *ngIf="f['descricao'].hasError('maxlength') && f['descricao'].touched" translate>
+          Máximo de 200 caracteres.
+        </div>
       </div>
-      <div class="mensagem_erro"  *ngIf="formulario.get('Endereco')?.errors && formulario.get('Endereco')?.touched" translate>
-        Campos
-    </div>
-    </div>
+
+      <!-- CNPJ -->
+      <div class="form-group">
+        <label for="CNPJ" translate>CNPJ<b>*</b></label>
+        <input
+          id="CNPJ"
+          type="text"
+          mask="00.000.000/0000-00"
+          class="form-input"
+          formControlName="CNPJ"
+          placeholder="00.000.000/0000-00"
+          autocomplete="off"
+        />
+        <div class="error" *ngIf="f['CNPJ'].hasError('required') && f['CNPJ'].touched" translate>
+          O CNPJ é obrigatório.
+        </div>
+        <div class="error" *ngIf="f['CNPJ'].hasError('minlength') && f['CNPJ'].touched" translate>
+          CNPJ incompleto.
+        </div>
+        <div class="error" *ngIf="f['CNPJ'].hasError('cnpjInvalido') && f['CNPJ'].touched" translate>
+          CNPJ inválido.
+        </div>
+      </div>
+
+      <!-- E-MAIL -->
+      <div class="form-group">
+        <label for="email" translate>Email<b>*</b></label>
+        <input
+          id="email"
+          type="email"
+          class="form-input"
+          formControlName="email"
+          placeholder="email@exemplo.com"
+        />
+        <div class="error" *ngIf="f['email'].hasError('required') && f['email'].touched" translate>
+          O email é obrigatório.
+        </div>
+        <div class="error" *ngIf="f['email'].hasError('email') && f['email'].touched" translate>
+          Email inválido.
+        </div>
+      </div>
+
+      <!-- TIPO DE COZINHA -->
+      <div class="form-group">
+        <label for="tipo_restaurante" translate>Tipo de Cozinha<b>*</b></label>
+        <select
+          id="tipo_restaurante"
+          class="form-select"
+          formControlName="tipo_restaurante"
+        >
+          <option value="" disabled translate>Selecione</option>
+          <option *ngFor="let t of tipos" [value]="t">{{ t | titlecase }}</option>
+        </select>
+        <div class="error" *ngIf="f['tipo_restaurante'].hasError('required') && f['tipo_restaurante'].touched" translate>
+          Selecione um tipo.
+        </div>
+      </div>
+
+      <!-- SENHA -->
+      <div class="form-group">
+        <label for="senha" translate>Senha<b>*</b></label>
+        <div class="senha-wrapper">
+          <input
+            [type]="hideSenha ? 'password' : 'text'"
+            id="senha"
+            class="form-input input-with-icon"
+            formControlName="senha"
+            placeholder="Crie uma senha forte"
+          />
+          <button type="button" class="icon-btn" (click)="hideSenha = !hideSenha" aria-label="Mostrar/ocultar senha">
+            <img src="../../../assets/images/olho_senha.png" alt="Toggle" class="password-icon" />
+          </button>
+        </div>
+        <div class="password-hint" translate>
+          Mín. 8 caracteres, incluindo:<br/>
+          • 1 letra maiúscula<br/>
+          • 1 letra minúscula<br/>
+          • 1 número<br/>
+          • 1 caractere especial
+        </div>
+        <div class="error" *ngIf="f['senha'].hasError('required') && f['senha'].touched" translate>
+          A senha é obrigatória.
+        </div>
+        <div class="error" *ngIf="f['senha'].hasError('pattern') && f['senha'].touched" translate>
+          Senha fraca.
+        </div>
+      </div>
+
+      <!-- CONFIRMAR SENHA -->
+      <div class="form-group">
+        <label for="confirmasenha" translate>Confirme a Senha<b>*</b></label>
+        <input
+          id="confirmasenha"
+          type="password"
+          class="form-input"
+          formControlName="confirmasenha"
+          placeholder="Repita a senha"
+        />
+        <div class="error" *ngIf="f['confirmasenha'].hasError('required') && f['confirmasenha'].touched" translate>
+          Obrigatório confirmar.
+        </div>
+        <div class="error" *ngIf="f['confirmasenha'].hasError('mismatch') && f['confirmasenha'].touched" translate>
+          Senhas não coincidem.
+        </div>
+      </div>
+
+      <!-- TELEFONE -->
+      <div class="form-group">
+        <label for="telefone" translate>Telefone<b>*</b></label>
+        <input
+          id="telefone"
+          type="text"
+          mask="(00) 0 0000-0000"
+          class="form-input"
+          formControlName="telefone"
+          placeholder="(99) 9 9999-9999"
+        />
+        <div class="error" *ngIf="f['telefone'].hasError('required') && f['telefone'].touched" translate>
+          Telefone obrigatório.
+        </div>
+        <div class="error" *ngIf="f['telefone'].hasError('minlength') && f['telefone'].touched" translate>
+          Telefone incompleto.
+        </div>
+      </div>
+
+      <!-- CIDADE -->
+      <div class="form-group">
+        <label for="Cidade" translate>Cidade<b>*</b></label>
+        <input
+          id="Cidade"
+          type="text"
+          class="form-input"
+          formControlName="Cidade"
+          placeholder="Digite seu município"
+        />
+        <div class="error" *ngIf="f['Cidade'].hasError('required') && f['Cidade'].touched" translate>
+          Cidade obrigatória.
+        </div>
+      </div>
+
+      <!-- ENDEREÇO -->
+      <div class="form-group">
+        <label for="Endereco" translate>Endereço<b>*</b></label>
+        <input
+          id="Endereco"
+          type="text"
+          class="form-input"
+          formControlName="Endereco"
+          placeholder="Rua, número, complemento"
+        />
+        <div class="error" *ngIf="f['Endereco'].hasError('required') && f['Endereco'].touched" translate>
+          Endereço obrigatório.
+        </div>
+      </div>
+      <!-- Adicione no form de cadastro/edição -->
+      <div class="form-group">
+        <label for="imagem">Foto do Restaurante</label>
+        <input type="file" id="imagem" (change)="onFileSelected($event)" />
+        <img *ngIf="previewImg" [src]="previewImg" class="preview-img" />
+      </div>
+
+      <!-- AÇÕES -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="!formulario.valid" translate>
+          Salvar
+        </button>
+        <button type="button" class="btn-secondary" (click)="cancelar()" translate>
+          Cancelar
+        </button>
+      </div>
+    </form>
   </div>
- </div>
-      <div class="acoes">
-          <button  [disabled]="!formulario.valid" (click)="salvarRestaurante()" [ngClass]="habilitarBotao()" translate>Salvar</button>
-          <button class="botao" routerLink="/login" translate>Cancelar</button>
-      </div>
-  </form>
 </section>

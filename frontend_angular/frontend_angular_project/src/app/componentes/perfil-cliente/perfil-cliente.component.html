@@ -1,32 +1,80 @@
-<body>
-  <section class="container perfil-cliente">
-      <div>
-        <img class="container-img" src="../../../assets/images/usuario.png" alt="Foto usuário" />
+<!-- perfil-cliente.component.html -->
+
+<section class="perfil-cliente-container">
+  <!-- 1) Card principal com avatar + informações -->
+  <div class="perfil-cliente-card">
+    <!-- Avatar -->
+    <div class="perfil-cliente-card__avatar-wrapper">
+      <img
+        src="assets/images/usuario.png"
+        alt="Avatar do Cliente"
+        class="perfil-cliente-card__avatar"
+      />
+    </div>
+    <!-- Informações básicas (nome, email e botões) -->
+    <div class="perfil-cliente-card__info">
+      <h2 class="perfil-cliente-card__name">{{ Nome }}</h2>
+      <p class="perfil-cliente-card__email">{{ Email }}</p>
+      <div class="perfil-cliente-card__actions">
+        <button class="perfil-btn--editar" (click)="editarCliente()">Editar Perfil</button>
+        <button class="perfil-btn--excluir" (click)="excluirCliente()">Excluir Perfil</button>
       </div>
+    </div>
+  </div>
 
-      <div *ngIf="id && Nome; else loading">
-        <h1>{{ Nome }}</h1>
-        <p>Email: {{ Email }}</p>
-        <button (click)="editarCliente()">Editar Perfil</button>
-        <button (click)="excluirCliente()">Excluir Perfil</button>
+  <!-- 2) Seção “Minhas Avaliações” -->
+  <div class="perfil-cliente-avaliacoes">
+    <h3 class="perfil-cliente-avaliacoes__titulo">Minhas Avaliações</h3>
 
-        <h3>Avaliações</h3>
-        <ul *ngIf="listaAvaliacao.length; else semAval">
-          <li *ngFor="let a of listaAvaliacao">
-            {{ a.Comentario }} — Nota: {{ a.Nota }}
-          </li>
-        </ul>
-        <ng-template #semAval>
-          <p>Ainda não há avaliações criadas!</p>
-        </ng-template>
-      </div>
-      <ng-template #loading>
-        <p>Carregando...</p>
-      </ng-template>
+    <!-- 2.1) Mensagem caso não haja avaliações -->
+    <div
+      *ngIf="listaAvaliacao.length === 0"
+      class="perfil-cliente-avaliacoes__vazio"
+    >
+      Você ainda não fez nenhuma avaliação.
+    </div>
 
+    <!-- 2.2) Lista de avaliações, quando houver -->
+    <ul *ngIf="listaAvaliacao.length > 0" class="perfil-cliente-avaliacoes__lista">
+      <li
+        *ngFor="let aval of listaAvaliacao"
+        class="perfil-cliente-avaliacoes__item"
+      >
+        <!-- Box de texto da avaliação -->
+        <div class="avaliacao-item__texto">
+          <span class="avaliacao-item__nota">
+            <strong>Nota:</strong> {{ aval.Nota }}
+          </span>
+          <span class="avaliacao-item__comentario">
+            <strong>Comentário:</strong> {{ aval.Comentario }}
+          </span>
+          <span class="avaliacao-item__restaurante">
+            <strong>Restaurante:</strong>
+            <!-- Caso queira exibir o nome do restaurante, pode adicionar propriedade no model -->
+            {{ aval.ID_Restaurante || '—' }}
+          </span>
+          <!--<span class="avaliacao-item__data">
+            <strong>Data:</strong>
+            {{ aval.criado_em ? (avaliacaoDataPipe(avaliacaoData(av al.criado_em))) : '—' }}
+          </span>-->
+        </div>
 
-    <ng-template #OutroPerfil>
-      <h1>{{ Nome }}</h1>
-    </ng-template>
-  </section>
-</body>
+        <!-- Botões “Editar” e “Excluir” -->
+        <div class="avaliacao-item__botoes">
+          <button
+            class="avaliacao-btn--editar"
+            (click)="irParaEditarAvaliacao(aval.ID!)"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            class="avaliacao-btn--excluir"
+            (click)="removerAvaliacao(aval.ID!)"
+          >
+            🗑️ Excluir
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>

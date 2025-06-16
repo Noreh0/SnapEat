@@ -142,4 +142,7 @@ export class CadastroClienteComponent implements OnInit {
       return 'Digite seu Telefone';
     }
   }
+  cancelarCadastro() {
+    this.router.navigate(['/login']);
+  }
 }

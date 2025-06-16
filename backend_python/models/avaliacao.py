@@ -41,17 +41,14 @@ class avaliacaoModel(banco.Model):
       banco.session.commit()
       
     @classmethod
-    def updateAvaliacao(self, ID, Nota, Comentario, ID_Cliente, ID_Restaurante):     
-      avaliacao = self.query.filter_by(ID=ID).first()
-      if avaliacao:
-        # Atualiza os atributos do restaurante com base no dicionário
-        avaliacao.Nota = Nota
-        avaliacao.Comentario = Comentario
-        avaliacao.ID_Cliente = ID_Cliente
-        avaliacao.ID_Restaurante = ID_Restaurante
-        
-        banco.session.commit()
-        return avaliacao
+    def updateAvaliacao(cls, ID, Nota, Comentario, ID_Restaurante):
+        avaliacao = cls.query.filter_by(ID=ID).first()
+        if avaliacao:
+            avaliacao.Nota = Nota
+            avaliacao.Comentario = Comentario
+            avaliacao.ID_Restaurante = ID_Restaurante
+            banco.session.commit()
+            return avaliacao
     
     
     @classmethod

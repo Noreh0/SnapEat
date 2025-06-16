@@ -1,9 +1,11 @@
 from flask import request
+from sql_alchemy import banco  # certifique-se de importar!
 from flask_restx import Resource, reqparse, abort, Namespace, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.avaliacao import avaliacaoModel
 from models.restaurante import restauranteModel
 from models.usuario import UsuarioModel
+
 
 api = Namespace('avaliacoes', description='Operações de Avaliações')
 
@@ -25,7 +27,7 @@ parser.add_argument('Comentario',     type=str,   required=True, help="Comentár
 
 
 @api.route('')
-@api.route('/cliente/<int:id>')
+@api.route('/encontraAvaliacaoCliente/<int:id>')
 class AvaliacoesPorCliente(Resource):
     @jwt_required()
     @api.marshal_list_with(avaliacao_schema)
@@ -129,14 +131,15 @@ class Avaliacao(Resource):
 
     @jwt_required()
     def delete(self, id):
-        """Exclui uma avaliação"""
         aval = avaliacaoModel.query.get(id)
         if not aval:
             abort(404, "Avaliação não encontrada.")
         if aval.ID_Cliente != get_jwt_identity():
             abort(403, "Você não pode remover esta avaliação.")
         try:
-            aval.avaliacoes_delete()
+            from sql_alchemy import banco  # adicione este import se ainda não estiver no topo
+            banco.session.delete(aval)
+            banco.session.commit()
         except Exception as e:
             abort(500, f"Erro ao remover avaliação: {e}")
         return {'message': 'Avaliação removida com sucesso.'}, 200

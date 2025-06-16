@@ -4,10 +4,15 @@ from models.restaurante import restauranteModel
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 from blacklist import BLACKLIST
-from flask import jsonify
+from flask import jsonify, url_for, current_app
+from flask_mail import Message
+from itsdangerous import URLSafeTimedSerializer
 import datetime
 
 api = Namespace('auth', description='Operações de autenticação de usuários')
+
+SECRET_KEY = 'SUA_SECRET_KEY'  # Use a mesma do Flask
+serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 usuario_model = api.model('Usuario', {
     'Nome': fields.String(required=True, description='Nome do usuário'),
@@ -52,6 +57,7 @@ class CadastroCliente(Resource):
         usuario.save()
         return {"message": "Usuário criado com sucesso!"}, 201
  
+# resource/auth_usuario.py
 @api.route('/cadastro/restaurante')
 class CadastroRestaurante(Resource):
     @api.expect(restaurante_model)
@@ -62,8 +68,7 @@ class CadastroRestaurante(Resource):
             return {"message": f"O email '{dados['email']}' já está em uso."}, 400
 
         dados.pop('confirmasenha', None)
-        dados['senha'] = generate_password_hash(dados['senha'])
-        
+        # NÃO faça hash aqui!
         restaurante = restauranteModel(**dados)
         restaurante.save_restaurante()
         return {"message": "Restaurante criado com sucesso!"}, 201
@@ -101,6 +106,7 @@ class Login(Resource):
             print("Login recebido:", dados)
             print("restaurante encontrado:", restaurante)
 
+            restaurante = restauranteModel.find_email_restaurante(email)
             if restaurante and check_password_hash(restaurante.senha_hash, senha):
                 id_var = restaurante.ID
                 tipo  = 'restaurante'
@@ -117,7 +123,53 @@ class Login(Resource):
         )
 
         return {'access_token': token, 'tipo': tipo}, 200
+@api.route('/recuperar-senha')
+class RecuperarSenha(Resource):
+    @api.expect(api.model('RecuperarSenha', {'email': fields.String(required=True)}))
+    def post(self):
+        dados = api.payload
+        email = dados.get('email')
+        user = UsuarioModel.find_by_email(email)
+        if not user:
+            return {'message': 'Se o e-mail existir, você receberá instruções para redefinir sua senha.'}, 200
+        token = serializer.dumps(email, salt='recuperar-senha')
+        link = url_for('auth_redefinir_senha', token=token, _external=True)
+        try:
+            msg = Message(
+                subject="Recuperação de senha - SnapEats",
+                recipients=[email],
+                body=f"Olá!\n\nPara redefinir sua senha, clique no link abaixo:\n{link}\n\nSe não solicitou, ignore este e-mail."
+            )
+            mail = current_app.extensions['mail']
+            mail.send(msg)
+        except Exception as e:
+            print(f"Erro ao enviar e-mail: {e}")
+            print(f"Link de redefinição: {link}")
+        return {'message': 'Se o e-mail existir, você receberá instruções para redefinir sua senha.'}, 200
 
+
+@api.route('/redefinir-senha/<string:token>')
+class RedefinirSenha(Resource):
+    def get(self, token):
+        from flask import redirect
+        return redirect(f'http://localhost:4200/#/redefinir-senha/{token}')
+    
+    @api.expect(api.model('RedefinirSenha', {
+        'nova_senha': fields.String(required=True, min_length=6)
+    }))
+    def post(self, token):
+        try:
+            email = serializer.loads(token, salt='recuperar-senha', max_age=3600)  # 1 hora
+        except Exception:
+            return {'message': 'Token inválido ou expirado.'}, 400
+        user = UsuarioModel.find_by_email(email)
+        if not user:
+            return {'message': 'Usuário não encontrado.'}, 404
+        nova_senha = api.payload.get('nova_senha')
+        user.senha = nova_senha
+        user.save()
+        return {'message': 'Senha redefinida com sucesso.'}, 200
+    
 @api.route('/logout')
 class logoutUsuario(Resource):
     @api.doc(security='BearerAuth')  

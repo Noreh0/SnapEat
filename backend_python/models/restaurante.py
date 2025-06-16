@@ -15,17 +15,19 @@ class restauranteModel(banco.Model):
     Cidade = banco.Column(banco.String(255))
     tipo_restaurante = banco.Column(banco.String(50))
     descricao = banco.Column(banco.String(50))
-        
-    def __init__(self, Nome, CNPJ, email, senha_plain, telefone, Endereco, Cidade, tipo_restaurante, descricao):
+    imagem_url = banco.Column(banco.String(255))  # <-- adicione esta linha
+
+    def __init__(self, Nome, CNPJ, email, senha, telefone, Endereco, Cidade, tipo_restaurante, descricao, imagem_url=None):
       self.Nome = Nome
       self.CNPJ = CNPJ
       self.email = email
-      self.senha_hash = generate_password_hash(senha_plain)
+      self.senha_hash = generate_password_hash(senha)
       self.telefone = telefone
       self.Endereco = Endereco
       self.Cidade = Cidade
       self.tipo_restaurante = tipo_restaurante
       self.descricao = descricao
+      self.imagem_url = imagem_url
       
     def json(self):
       return {
@@ -38,7 +40,8 @@ class restauranteModel(banco.Model):
           "Endereco": self.Endereco,
           "Cidade": self.Cidade,
           "tipo_restaurante": self.tipo_restaurante,
-          "descricao": self.descricao
+          "descricao": self.descricao,
+          "imagem_url": self.imagem_url
       }
 
 
@@ -67,34 +70,33 @@ class restauranteModel(banco.Model):
                 "Endereco": restaurante.Endereco,
                 "Cidade": restaurante.Cidade,
                 "tipo_restaurante": restaurante.tipo_restaurante,
-                "descricao": restaurante.descricao
+                "descricao": restaurante.descricao,
+                "imagem_url": restaurante.imagem_url 
             }
             lista_de_dicionarios.append(restaurante_dict)
         return lista_de_dicionarios
     @classmethod
     def find_restaurante(cls, ID):
-      try:
-          print(f"DEBUG: Buscando restaurante com ID={ID} (type: {type(ID)})")
-          restaurante = cls.query.filter_by(ID=int(ID)).first()
-          if restaurante:
-              result = {
-                  "ID": restaurante.ID,
-                  "Nome": restaurante.Nome,
-                  "CNPJ": restaurante.CNPJ,
-                  "email": restaurante.email,
-                  "telefone": restaurante.telefone,
-                  "Endereco": restaurante.Endereco,
-                  "Cidade": restaurante.Cidade,
-                  "tipo_restaurante": restaurante.tipo_restaurante,
-                  "descricao": restaurante.descricao
-              }
-              print(f"DEBUG: Restaurante encontrado: {result}")
-              return result
-          print("DEBUG: Nenhum restaurante encontrado para esse ID.")
-          return None
-      except Exception as e:
-          print(f"ERRO em find_restaurante: {e}")
-          return None
+        try:
+            restaurante = cls.query.filter_by(ID=int(ID)).first()
+            if restaurante:
+                result = {
+                    "ID": restaurante.ID,
+                    "Nome": restaurante.Nome,
+                    "CNPJ": restaurante.CNPJ,
+                    "email": restaurante.email,
+                    "telefone": restaurante.telefone,
+                    "Endereco": restaurante.Endereco,
+                    "Cidade": restaurante.Cidade,
+                    "tipo_restaurante": restaurante.tipo_restaurante,
+                    "descricao": restaurante.descricao,
+                    "imagem_url": restaurante.imagem_url  # <-- ESSA LINHA É FUNDAMENTAL
+                }
+                return result
+            return None
+        except Exception as e:
+            print(f"ERRO em find_restaurante: {e}")
+            return None
 
 
     
@@ -115,7 +117,8 @@ class restauranteModel(banco.Model):
                 "Endereco": restaurante.Endereco,
                 "Cidade": restaurante.Cidade,
                 "tipo_restaurante": restaurante.tipo_restaurante,
-                "descricao": restaurante.descricao
+                "descricao": restaurante.descricao,
+                "imagem_url": restaurante.imagem_url  # <-- ADICIONE ESTA LINHA
             }
             modelo_restaurante.append(restaurante_dict)
         return modelo_restaurante 
@@ -134,7 +137,8 @@ class restauranteModel(banco.Model):
               "Endereco": restaurante.Endereco,
               "Cidade": restaurante.Cidade,
               "tipo_restaurante": restaurante.tipo_restaurante,
-              "descricao": restaurante.descricao
+              "descricao": restaurante.descricao,
+              "imagem_url": restaurante.imagem_url  # <-- ADICIONE ESTA LINHA
           }
           lista_de_email.append(restaurante_dict)
       return lista_de_email 
@@ -166,10 +170,14 @@ class restauranteModel(banco.Model):
         banco.session.commit()
         return restaurante
       
-    def delete_restaurante(ID):
-      restaurantes = restauranteModel.query.get(ID)
-      banco.session.delete(restaurantes)
-      banco.session.commit()
+    @classmethod
+    def delete_restaurante(cls, ID):
+        restaurante = cls.query.get(ID)
+        if not restaurante:
+            return False
+        banco.session.delete(restaurante)
+        banco.session.commit()
+        return True
       
       
     @classmethod
@@ -189,7 +197,8 @@ class restauranteModel(banco.Model):
                 "Endereco": restaurante.Endereco,
                 "Cidade": restaurante.Cidade,
                 "tipo_restaurante": restaurante.tipo_restaurante,
-                "descricao": restaurante.descricao
+                "descricao": restaurante.descricao,
+                "imagem_url": restaurante.imagem_url  # <-- ADICIONE ESTA LINHA
             }
             modelo_restaurante.append(restaurante_dict)
         return modelo_restaurante 

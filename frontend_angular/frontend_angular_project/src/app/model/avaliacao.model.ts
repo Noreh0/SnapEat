@@ -4,4 +4,5 @@ export interface AvaliacaoModel {
   ID_Restaurante: number;
   Nota: number;
   Comentario?: string;
+  data?: string;
 }

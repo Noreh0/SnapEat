@@ -1,28 +1,31 @@
-<section class="container">
-  <header class="header d-flex">
-      <h2 class="ff-inter">Menu</h2>
+<section class="menu-container">
+  <header class="menu-header">
+    <h2>Menu de Restaurantes</h2>
   </header>
-  <div class="buscar-restaurantes">
-    <input
-      type="search"
-      class="filtro"
-      [placeholder]="ValidaPlaceholderProcura()"
-      autofocus
-      [(ngModel)]="filtro"
-      (keyup)="pesquisarRestaurantes()"
-    >
 
-  </div><br/>
-  <div class="buscar-tipo">
-    <select
-      type="search"
-      class="filtro_tipo"
-      autofocus
-      [(ngModel)]="filtro_tipo"
-      (change)="filtrarRestaurantes()"
-    >
-    <option value="Nenhum" translate>Nenhum</option>
-    <option value="Arabe" translate>Arabe</option>
+  <!-- FILTROS -->
+  <div class="menu-filtros">
+    <!-- Campo de busca por nome -->
+    <div class="filtro-box">
+      <input
+        type="search"
+        class="filtro-input"
+        [placeholder]="ValidaPlaceholderProcura()"
+        [(ngModel)]="filtro"
+        (keyup)="pesquisarRestaurantes()"
+      />
+      <i class="icon-search"></i>
+    </div>
+
+    <!-- Select de tipo de cozinha -->
+    <div class="filtro-box">
+      <select
+        class="filtro-select"
+        [(ngModel)]="filtro_tipo"
+        (change)="filtrarRestaurantes()"
+      >
+        <option value="Nenhum" translate>Nenhum</option>
+        <option value="Arabe" translate>Árabe</option>
         <option value="Brasileira" translate>Brasileira</option>
         <option value="Carnes" translate>Carnes</option>
         <option value="Chinesa" translate>Chinesa</option>
@@ -37,36 +40,72 @@
         <option value="Saudável" translate>Saudável</option>
         <option value="Vegana" translate>Vegana</option>
         <option value="Vegetariana" translate>Vegetariana</option>
-
-    </select>
-
-  </div>
-  <!-- menu.component.html -->
-  <div *ngFor="let resto of listaRestaurante" class="restaurante-card">
-    <h3>{{ resto.Nome }}</h3>
-    <p>{{ resto.descricao }}</p>
-    <!-- botão para ver perfil do restaurante -->
-    <button
-      *ngIf="tipoDoUsuario === 'cliente'"
-      [routerLink]="['/perfilRestaurante', resto.ID]"
-    >
-      Ver Perfil
-    </button>
-
-    <!-- botão para criar avaliação -->
-    <button
-      *ngIf="tipoDoUsuario === 'cliente'"
-      [routerLink]="['/perfilRestaurante', resto.ID, 'criaAvaliacao']"
-    >
-      Avaliar
-    </button>
+      </select>
+      <i class="icon-filter"></i>
+    </div>
   </div>
 
+  <!-- LISTA DE RESTAURANTES -->
+  <div *ngIf="listaRestaurante.length > 0; else SemRestaurante" class="cards-grid">
+    <div *ngFor="let resto of listaRestaurante" class="restaurante-card">
+      <!-- IMAGEM / ÍCONE (pode ser placeholder ou foto real) -->
+      <div class="card-banner">
+        <img
+          [src]="resto.imagem_url ? 'http://localhost:5000' + resto.imagem_url : 'assets/images/default-restaurant.png'"
+          alt="Logo {{ resto.Nome }}"
+          class="resto-imagem"
+        />
+      </div>
 
+      <div class="card-content">
+        <!-- TÍTULO E TIPO/CIDADE -->
+        <div class="card-header">
+          <h3 class="resto-nome">{{ resto.Nome }}</h3>
+          <span class="resto-tipo">{{ resto.tipo_restaurante }}</span>
+        </div>
+
+        <!-- DESCRIÇÃO (limitada a 2 linhas) -->
+        <p class="resto-descricao">{{ resto.descricao }}</p>
+        <!--
+        <div class="resto-rating">
+          <ng-container *ngFor="let star of Array(5); let i = index">
+            <i [class.filled]="i < resto.mediaNotas" class="icon-star"></i>
+          </ng-container>
+          <span class="media-valor">{{ resto.mediaNotas.toFixed(1) }}</span>
+        </div>
+        -->
+
+        <!-- CNPJ / Cidade / Telefone (informações rápidas) -->
+        <div class="resto-info-rapida">
+          <span><strong>CNPJ:</strong> {{ resto.CNPJ }}</span>
+          <span><strong>Cidade:</strong> {{ resto.Cidade }}</span>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="card-actions">
+          <button
+            *ngIf="tipoDoUsuario === 'cliente'"
+            class="btn-ver-perfil"
+            [routerLink]="['/restaurante', resto.ID]"
+          >
+            Ver Perfil
+          </button>
+
+          <button
+            *ngIf="tipoDoUsuario === 'cliente'"
+            class="btn-avaliar"
+            [routerLink]="['/perfilRestaurante', resto.ID, 'criaAvaliacao']"
+          >
+            Avaliar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #SemRestaurante>
+    <div class="sem-restaurante">
+      <p translate>Nenhum restaurante encontrado.</p>
+    </div>
+  </ng-template>
 </section>
-
-<ng-template #SemRestaurante>
-  <div>
-      <p translate>Sem Restaurante </p>
-  </div>
-</ng-template>

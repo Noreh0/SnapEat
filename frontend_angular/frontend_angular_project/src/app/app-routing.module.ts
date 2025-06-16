@@ -15,6 +15,15 @@ import { PerfilRestauranteComponent } from './componentes/perfil-restaurante/per
 import { GraficoComponent } from './componentes/grafico/grafico.component';
 import { DashboardRestauranteComponent } from './componentes/dashboard-restaurante/dashboard-restaurante.component';
 import { AuthGuard } from './guards/auth.guard';
+import { RestauranteComponent } from './componentes/restaurante/restaurante.component';
+import { PratoFormComponent } from './componentes/prato-form/prato-form.component';
+import { PratoEditComponent } from './componentes/prato-edit/prato-edit.component';
+import { PratosListComponent } from './componentes/pratos-list/pratos-list.component';
+import { CardapioComponent } from './componentes/cardapio/cardapio.component';
+import { AvaliacaoPratoListComponent } from './componentes/avaliacao-prato-list/avaliacao-prato-list.component';
+import { AvaliacaoPratoFormComponent } from './componentes/avaliacao-prato-form/avaliacao-prato-form.component';
+import { RecuperarSenhaComponent } from './componentes/recuperar-senha/recuperar-senha.component';
+import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir-senha.component';
 
 const routes: Routes = [
   {
@@ -30,12 +39,35 @@ const routes: Routes = [
     path: 'menu',
     component: MenuComponent,
   },
+  { path: 'restaurante/:id',
+    component: RestauranteComponent 
+  },
+  { path: 'dashboard-restaurante/:id', component: DashboardRestauranteComponent },
   {
   path: 'perfilRestaurante/:id_restaurante',
   component: PerfilRestauranteComponent,
   canActivate: [AuthGuard]
   // removi data.tipo aqui: qualquer usuário logado pode ver o perfil
 },
+{
+    path: 'restaurante/:id/pratos',
+    component: PratosListComponent
+  },
+  {
+    path: 'restaurante/:id/pratos/criar',
+    component: PratoFormComponent
+  },
+  {
+    path: 'restaurante/:id/cardapio',
+    component: CardapioComponent
+  },
+  {
+    path: 'restaurante/:restauranteId/pratos/:pratoId/editar',
+    component: PratoEditComponent
+  },
+  { path: 'recuperar-senha', component: RecuperarSenhaComponent },
+  { path: 'redefinir-senha/:token', component: RedefinirSenhaComponent },
+
 {
   path: 'perfilRestaurante/:id_restaurante/criaAvaliacao',
   component: CadastroAvaliacaoComponent,
@@ -54,6 +86,20 @@ const routes: Routes = [
 // não defina rota de excluir!
 
   {
+    path: 'prato/:pratoId/avaliacoes',
+    component: AvaliacaoPratoListComponent
+  },
+  {
+    path: 'prato/:pratoId/avaliacoes/criar',
+    component: AvaliacaoPratoFormComponent
+  },
+  {
+    path: 'prato/:pratoId/avaliacoes/:id/editar',
+    component: AvaliacaoPratoFormComponent
+  },
+
+
+  {
   path: 'perfilCliente',
   children: [
     {
@@ -68,14 +114,16 @@ const routes: Routes = [
       canActivate: [AuthGuard],
       data: { tipo: 'cliente' }
     },
-    {
-      path: ':id_cliente/editarAvaliacao/:id_avaliacao',
-      component: EditarAvaliacaoComponent,
-      canActivate: [AuthGuard],
-      data: { tipo: 'cliente' }
-    }
   ]
 },
+// E adicione fora do children:
+{
+  path: 'perfilCliente/:id_cliente/editarAvaliacao/:id_avaliacao',
+  component: EditarAvaliacaoComponent,
+  canActivate: [AuthGuard],
+  data: { tipo: 'cliente' }
+},
+// ...existing code...
   {
     path: 'cadastroRestaurante',
     component: CadastroRestauranteComponent,
@@ -93,12 +141,6 @@ const routes: Routes = [
     path: 'grafico/:id_restaurante',
     component: GraficoComponent,
   },
-  {
-  path: 'dashboard-restaurante',
-  component: DashboardRestauranteComponent,
-  canActivate: [AuthGuard],
-  data: { tipo: 'restaurante' }
-}
 
 ];
 

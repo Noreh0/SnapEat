@@ -1,140 +1,162 @@
-.acoes {
+.edit-eval-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(to right, #1c1c1f, #111113);
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-
-h1{
-  font-size: 50px;
-  color: white;
-  padding: 1rem;
-}
-img{
-width:35px;
-cursor: pointer;
-}
-.botao {
-  margin: 5px;
-  margin-top: 100px;
-  width: 200px;
-  height: 30px;
-  color: white;
-  background-color: black;
-  border-radius: 20px;
-}
-.avaliacao {
-  background-color: rgb(24, 24, 27);
-  padding: 2rem 0;
-  border-radius: 50px;
-}
-
-.avaliacao form {
-  
-
- /* border: none;*/
-  border-radius: 20px;
-  border-color: white;
-
+.card {
+  background: #202024;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 700px;
+  padding: 2rem;
+  color: #fff;
   display: flex;
   flex-direction: column;
-
-  padding: 2rem;
-}
-.avaliacao form i {
-  margin-left: -30px;
-  cursor: pointer;
+  gap: 2rem;
 }
 
-
-.avaliacao form label {
-  color: #ffffff;
-  font-size: larger;
-  font-weight: bold;
-  margin: 0 0 1rem;
-}
-
-.avaliacao form  .input {
-border: none;
-width: 50%;
-height: 30px;
-padding: 1rem 2rem;
-border-radius: 20px;
-margin: 0.5rem 0 2rem;
-}
-.avaliacao form  .select {
-  width: 50%;
-  height: 50px;
-  border-radius: 20px;
-  margin: 0.5rem 0 2rem;
-  padding: 0rem 2rem;
-  }
-
-.avaliacao form .textarea {
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 20px;
-  margin: 0.5rem 0 2rem;
-}
-
-.container-radio {
-  display: flex;
-  gap: 2.5rem;
-  flex-wrap: wrap;
-}
-
-.radio {
-  margin: 0;
-}
-
-input[type='radio'] {
-  display: none;
-}
-
-option[type='radio'] {
-  display: none;
-}
-
-.radio-modelo label {
+/* HEADER */
+.card-header {
   display: flex;
   align-items: center;
-  column-gap: 20px;
+  gap: 1.5rem;
 }
 
-.custom-radio {
-  border: 1px solid #154580;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-content: center;
+.avatar {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
+  border: 3px solid #3b82f6;
+  background: #444;
+  object-fit: cover;
 }
 
-.custom-radio,
-span {
-  transition: 0.5s ease;
-  color: #154580;
+.restaurant-info h2 {
+  margin: 0;
+  font-size: 1.75rem;
 }
 
-.custom-radio span {
-  content: '';
-  width: 18px;
-  height: 18px;
+.meta {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+/* FORMULÁRIO */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #e5e5e5;
+}
+
+/* STAR RATING */
+.rating-group .star-rating {
+  display: flex;
+  gap: 0.25rem;
+}
+.star {
+  font-size: 2rem;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.star.filled {
+  color: #facc15;
+}
+
+/* TEXTAREA */
+textarea {
+  background: #2c2c2f;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-size: 1rem;
+  resize: vertical;
+  transition: outline 0.2s ease;
+}
+textarea:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ERROS */
+.error {
+  color: #f87171;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* BOTÕES */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-primary:disabled {
+  background: #575757;
+  cursor: not-allowed;
+}
+.btn-primary:not(:disabled):hover {
+  background: #2563eb;
+}
+
+.btn-secondary {
   background: transparent;
-  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
 }
 
-input[type='radio']:checked+.custom-radio {
-  border-color: #154580;
-}
-
-input[type='radio']:checked+.custom-radio span {
-  background: #154580;
-}
-
-
-option[type='radio']:checked+.custom-radio {
-border-color: #154580;
-}
-
-option[type='radio']:checked+.custom-radio span {
-background: #154580;
+/* RESPONSIVIDADE */
+@media (max-width: 640px) {
+  .card {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+  .star {
+    font-size: 1.5rem;
+  }
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
 }

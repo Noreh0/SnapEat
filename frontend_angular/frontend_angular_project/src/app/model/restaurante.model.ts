@@ -10,4 +10,7 @@ export interface restauranteModel {
   Cidade: string;
   Endereco: string;
   NotaMedia?: number;
+  imagem_url?: string;
+  mediaAvaliacoes?: number;      // <-- adicione
+  totalAvaliacoes?: number;     
 }

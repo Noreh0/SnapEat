@@ -1,0 +1,49 @@
+<section class="cardapio-container" *ngIf="restaurante">
+  <header class="cardapio-header">
+    <h2>Cardápio de {{ restaurante.Nome }}</h2>
+  </header>
+
+  <!-- busca por nome de prato -->
+  <div class="cardapio-filtros">
+    <div class="filtro-box">
+      <input
+        type="search"
+        class="filtro-input"
+        placeholder="Buscar prato..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
+      />
+      <i class="icon-search"></i>
+    </div>
+  </div>
+
+  <!-- grid de pratos -->
+  <div *ngIf="filteredPratos.length; else semPratos" class="cards-grid">
+    <div *ngFor="let p of filteredPratos" class="prato-card">
+      <div class="card-banner">
+        <img
+          *ngIf="p.imagem_url"
+          [src]="p.imagem_url"
+          alt="{{ p.Nome }}"
+          class="prato-img"
+        />
+      </div>
+      <div class="card-content">
+        <h3 class="prato-nome">{{ p.Nome }}</h3>
+        <p class="prato-descricao">{{ p.descricao }}</p>
+        <p class="prato-preco">R$ {{ p.preco | number:'1.2-2' }}</p>
+        <!-- BOTÃO AQUI -->
+        <button
+          class="btn-primary avaliar-btn"
+          [routerLink]="['/prato', p.ID, 'avaliacoes', 'criar']"
+        >
+          <i class="fa fa-star"></i> Avaliar Prato
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #semPratos>
+    <p class="sem-pratos">Nenhum prato encontrado.</p>
+  </ng-template>
+</section>

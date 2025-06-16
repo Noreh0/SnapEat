@@ -1,0 +1,39 @@
+<section class="pratos-list-page">
+  <div class="page-header">
+    <h1>Pratos</h1>
+    <button class="btn-primary" routerLink="/restaurante/{{restauranteId}}/pratos/criar">
+      + Novo Prato
+    </button>
+  </div>
+
+  <div class="filter">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      placeholder="Buscar prato..."
+      (ngModelChange)="onSearch()"
+    />
+  </div>
+
+  <div class="pratos-grid">
+    <div *ngFor="let p of pratos" class="prato-card">
+      <img
+        *ngIf="p.imagem_url"
+        [src]="p.imagem_url"
+        alt="{{ p.Nome }}"
+        class="prato-img"
+      />
+      <h2>{{ p.Nome }}</h2>
+      <p class="descricao">{{ p.descricao }}</p>
+      <p class="preco">R$ {{ p.preco | number:'1.2-2' }}</p>
+      <div class="actions">
+        <button class="btn-secondary" (click)="editPrato(p)">
+          Editar
+        </button>
+        <button class="btn-secondary" (click)="deletePrato(p.ID)">
+          Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

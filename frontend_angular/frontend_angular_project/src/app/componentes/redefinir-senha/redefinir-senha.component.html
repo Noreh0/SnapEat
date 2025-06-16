@@ -1,0 +1,47 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h2>Redefinir Senha</h2>
+      <p>Escolha uma nova senha para sua conta.</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <div class="form-group">
+        <label for="nova_senha">Nova senha</label>
+        <input
+          id="nova_senha"
+          type="password"
+          formControlName="nova_senha"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="confirmar">Confirmar senha</label>
+        <input
+          id="confirmar"
+          type="password"
+          formControlName="confirmar"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <!-- ...existing code... -->
+      <div class="error" *ngIf="form.errors?.['senhasDiferentes']">
+        As senhas não coincidem.
+      </div>
+      <!-- ...existing code... -->
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="form.invalid"
+      >
+        Redefinir
+      </button>
+    </form>
+
+    <div class="feedback success" *ngIf="mensagem">{{ mensagem }}</div>
+    <div class="feedback error"   *ngIf="erro">{{ erro }}</div>
+  </div>
+</section>

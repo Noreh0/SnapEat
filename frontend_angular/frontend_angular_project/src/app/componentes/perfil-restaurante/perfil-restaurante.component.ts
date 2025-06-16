@@ -1,10 +1,10 @@
-// perfil-restaurante.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AvaliacaoModel } from '../../model/avaliacao.model';
 import { RestauranteService } from '../../services/restaurante.service';
-import { AvaliacaoService }  from '../../services/avaliacao.service';
-import { JwtHelperService }  from '@auth0/angular-jwt';
+import { AvaliacaoService } from '../../services/avaliacao.service';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { AutenticacaoService } from '../../services/autenticacao.service';
 
 @Component({
   selector: 'app-perfil-restaurante',
@@ -13,17 +13,35 @@ import { JwtHelperService }  from '@auth0/angular-jwt';
 })
 export class PerfilRestauranteComponent implements OnInit {
   id!: number;
-  Nome = '';
-  Email = '';
-  Nota = 0;
-  listaAvaliacao: AvaliacaoModel[] = [];
+  restaurante!: {
+    id: number;
+    Nome: string;
+    tipo_restaurante: string;
+    CNPJ: string;
+    descricao: string;
+    email: string;
+    imagem_url?: string;
+    //avatarUrl?: string;
+    mediaAvaliacoes: number;
+    totalAvaliacoes: number;
+  };
+  mediaAval = 0;
+  totalAval = 0;
+  avaliacoes: Array<{
+    clienteNome: string;
+    Nota: number;
+    Comentario: string;
+    data: string;
+  }> = [];
+  isOwner = false;
 
   constructor(
     private jwtHelper: JwtHelperService,
-    private restoService: RestauranteService,
-    private avalService:  AvaliacaoService,
+    private svc: RestauranteService,
+    private avalService: AvaliacaoService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private auth: AutenticacaoService
   ) {}
 
   ngOnInit(): void {
@@ -39,10 +57,27 @@ export class PerfilRestauranteComponent implements OnInit {
     }
 
     // Busca dados do restaurante
-    this.restoService.buscarPorId(this.id).subscribe({
+    this.svc.buscarPorId(this.id).subscribe({
       next: r => {
-        this.Nome  = r.Nome;
-        this.Email = r.email;
+        this.restaurante = {
+          id: r.ID,
+          Nome: r.Nome,
+          tipo_restaurante: r.tipo_restaurante,
+          CNPJ: r.CNPJ,
+          descricao: r.descricao,
+          email: r.email,
+          imagem_url: r.imagem_url,
+          // avatarUrl: r.avatarUrl, // Removido pois não existe em restauranteModel
+          mediaAvaliacoes: r.NotaMedia ?? 0,
+          totalAvaliacoes: r.totalAvaliacoes ?? 0,
+        };
+        console.log('usuarioAtual:', this.auth.usuarioAtual);
+        console.log('restaurante:', r);
+        this.mediaAval = this.restaurante.mediaAvaliacoes;
+        this.totalAval = this.restaurante.totalAvaliacoes;
+        // Verifica se é o dono
+        this.isOwner =
+          Number(this.auth.usuarioAtual?.sub) === r.ID;
       },
       error: () => {
         alert('Restaurante não encontrado!');
@@ -50,23 +85,41 @@ export class PerfilRestauranteComponent implements OnInit {
       }
     });
 
-    // Lista avaliações associadas (use listarPorIdRestaurante)
+    // Lista avaliações associadas (use buscarPorRestaurante)
     this.avalService.buscarPorRestaurante(this.id)
       .subscribe({
         next: (lista: AvaliacaoModel[]) => {
-          this.listaAvaliacao = lista;
+          // Adapte conforme seu backend retorna os campos
+          this.avaliacoes = lista
+            .map(a => ({
+              clienteNome: (a as any).clienteNome || 'Cliente',
+              Nota: a.Nota,
+              Comentario: a.Comentario || '',
+              data: (a as any).data || new Date().toISOString(),
+            }))
+            .sort(
+              (a, b) =>
+                new Date(b.data).getTime() - new Date(a.data).getTime()
+            )
+            .slice(0, 3);
         },
         error: err => console.error('Erro avaliações:', err)
       });
   }
 
+  renderStars(n: number): string {
+    const full = '★'.repeat(Math.round(n));
+    const empty = '☆'.repeat(5 - Math.round(n));
+    return full + empty;
+  }
+
   editarRestaurante(): void {
-    this.router.navigate(['/perfilRestaurante', this.id, 'editarRestaurante']);
+    this.router.navigate(['/perfil-restaurante', this.id, 'editarRestaurante']);
   }
 
   excluirRestaurante(): void {
     if (!confirm('Confirma exclusão do restaurante?')) return;
-    this.restoService.excluir(this.id).subscribe({
+    this.svc.excluir(this.id).subscribe({
       next: () => {
         localStorage.clear();
         this.router.navigate(['/login']);

@@ -1,0 +1,34 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h2>Recuperar Senha</h2>
+      <p>Digite o e-mail cadastrado para receber o link de redefinição.</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <div class="form-group">
+        <label for="email">E-mail cadastrado</label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          placeholder="seu@exemplo.com"
+        />
+        <div class="error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          Informe um e-mail válido.
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="form.invalid"
+      >
+        Enviar
+      </button>
+    </form>
+
+    <div class="feedback success" *ngIf="mensagem">{{ mensagem }}</div>
+    <div class="feedback error"   *ngIf="erro">{{ erro }}</div>
+  </div>
+</section>

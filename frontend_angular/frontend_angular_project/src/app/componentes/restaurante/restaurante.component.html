@@ -1,13 +1,82 @@
-<div class="restaurante modelo modelo1 ff-roboto-mono profile-summary" [ngClass]="larguraRestaurante()" *ngIf="restaurante">
-  <img class="container-img" src="../../../assets/images/usuario.png"alt="Foto usuário"/>
-  <span>
-<h3 class="nome">{{ restaurante.Nome }}
-</h3>
-<b translate>{{ restaurante.tipo_restaurante}}</b><br/>
-<p translate> {{ restaurante.descricao}}</p>
-</span>
-<span class="spacer"></span>
-<button routerLink="/perfilRestaurante/{{ restaurante.email }}" translate>Btn Ir Restaurante</button>
-<button routerLink="/perfilRestaurante/{{ restaurante.email }}/criaAvaliacao" translate>Btn Fazer Avaliacao</button>
+<section class="perfil-restaurante-page" *ngIf="restaurante">
+  <div class="rest-card">
 
-</div>
+    <!-- cabeçalho do restaurante (igual antes) -->
+    <header class="rest-header">
+      <div class="rest-avatar-container">
+        <img
+          [src]="restaurante.imagem_url ? 'http://localhost:5000' + restaurante.imagem_url : 'assets/images/default-restaurant.png'"
+          alt="{{ restaurante.Nome }}"
+          class="rest-avatar"
+        />
+      </div>
+      <div class="rest-info">
+        <h1 class="rest-name">{{ restaurante.Nome }}</h1>
+        <p class="rest-meta">
+          {{ restaurante.tipo_restaurante | titlecase }}
+          <span class="rest-separator">·</span>
+          CNPJ: {{ restaurante.CNPJ }}
+        </p>
+        <p class="rest-Endereco">Localização - {{ restaurante.Endereco }}</p>
+        <p class="rest-description">{{ restaurante.descricao }}</p>
+        <p class="rest-rating">
+          {{ mediaAval | number:'1.1-1' }} ★ ({{ totalAval }} opiniões)
+        </p>
+      </div>
+    </header>
+
+    <!-- botões padrão -->
+    <!-- ... -->
+  <div class="rest-actions">
+    <button class="btn-secondary" routerLink="/menu">Voltar ao Menu</button>
+
+    <!-- 🆕 BOTÃO CARDÁPIO -->
+    <button
+      class="btn-secondary"
+      routerLink="/restaurante/{{ restaurante.ID }}/cardapio"
+    >
+      Cardápio
+    </button>
+
+    <button
+      class="btn-primary"
+      [routerLink]="['/perfilRestaurante', restaurante.ID, 'criaAvaliacao']"
+    >
+      Avaliar este Restaurante
+    </button>
+  </div>
+  <!-- ... -->
+
+
+    <!-- ----- FILTRO POR NOTA ----- -->
+    <div class="filter-container">
+      <label for="filterNota">Filtrar por nota:</label>
+      <select
+        id="filterNota"
+        class="form-select"
+        [(ngModel)]="selectedFilter"
+        (ngModelChange)="filterAvaliacoes()"
+      >
+        <option [ngValue]="0">Todas</option>
+        <option *ngFor="let n of [5,4,3,2,1]" [ngValue]="n">
+          {{ n }} estrela{{ n>1?'s':'' }}
+        </option>
+      </select>
+    </div>
+
+    <!-- ----- LISTA DE AVALIAÇÕES ----- -->
+    <section class="avaliacoes-section">
+      <div *ngIf="filteredAvaliacoes.length === 0" class="sem-avaliacoes">
+        Ainda não há avaliações com essa nota.
+      </div>
+      <div class="eval-list">
+        <div *ngFor="let a of filteredAvaliacoes" class="avaliacao-card">
+          <div class="eval-header">
+            <span class="stars">{{ renderStars(a.Nota) }}</span>
+          </div>
+          <p class="comentario">{{ a.Comentario }}</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

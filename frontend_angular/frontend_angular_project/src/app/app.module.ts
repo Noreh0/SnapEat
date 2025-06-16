@@ -53,6 +53,15 @@ import { RodapeComponent } from './componentes/rodape/rodape.component';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { GraficoComponent } from './componentes/grafico/grafico.component';
 import { DashboardRestauranteComponent } from './componentes/dashboard-restaurante/dashboard-restaurante.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { PratosListComponent } from './componentes/pratos-list/pratos-list.component';
+import { PratoFormComponent } from './componentes/prato-form/prato-form.component';
+import { PratoEditComponent } from './componentes/prato-edit/prato-edit.component';
+import { CardapioComponent } from './componentes/cardapio/cardapio.component';
+import { AvaliacaoPratoListComponent } from './componentes/avaliacao-prato-list/avaliacao-prato-list.component';
+import { AvaliacaoPratoFormComponent } from './componentes/avaliacao-prato-form/avaliacao-prato-form.component';
+import { RecuperarSenhaComponent } from './componentes/recuperar-senha/recuperar-senha.component';
+import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir-senha.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -74,6 +83,14 @@ import { DashboardRestauranteComponent } from './componentes/dashboard-restauran
     EditarAvaliacaoComponent,
     GraficoComponent,
     DashboardRestauranteComponent,
+    PratosListComponent,
+    PratoFormComponent,
+    PratoEditComponent,
+    CardapioComponent,
+    AvaliacaoPratoListComponent,
+    AvaliacaoPratoFormComponent,
+    RecuperarSenhaComponent,
+    RedefinirSenhaComponent,
   ],
   imports: [
     JwtModule.forRoot({
@@ -130,7 +147,8 @@ import { DashboardRestauranteComponent } from './componentes/dashboard-restauran
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
     multi: true,
-  }
+  },
+  provideAnimationsAsync()
 ],
 
   bootstrap: [AppComponent],

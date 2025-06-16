@@ -59,8 +59,9 @@ export class AvaliacaoComponent implements OnInit {
   }
   excluirAvaliacao() {
     if (this.avaliacao.ID) {
-      this.service_avaliacao.excluir(this.avaliacao.ID!).subscribe(() => {
-        window.location.reload();
+      this.service_avaliacao.excluir(this.avaliacao.ID!).subscribe({
+        next: () => window.location.reload(),
+        error: err => alert('Erro ao excluir avaliação: ' + err.error?.message || err.message)
       });
     }
   }

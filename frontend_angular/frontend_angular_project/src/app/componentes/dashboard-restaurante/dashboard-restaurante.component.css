@@ -1,11 +1,159 @@
-.container {
-  padding: 20px;
+/* 1. FUNDO E LAYOUT GERAL */
+.dashboard-restaurante-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(to right, #1c1c1f, #111113);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
 }
 
-.card {
-  background-color: #f8f9fa;
+/* 2. HEADER CARD */
+.dash-header-card {
+  width: 100%;
+  max-width: 800px;
+  background-color: #202024;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 1.5rem 2rem;
+}
+
+.rest-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.rest-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
+  background-color: #444;
+}
+
+.rest-meta h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #f3f3f3;
+}
+
+.rest-meta p {
+  margin: 0.25rem 0 0;
+  color: #d1d5db;
+}
+
+/* 3. SEÇÃO DE AVALIAÇÕES */
+.recent-section {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.recent-section h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #ffffff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.no-evals {
+  color: #9ca3af;
+  font-size: 1rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* 4. LISTA E CARDS DE AVALIAÇÃO */
+.eval-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.eval-card {
+  background-color: #202024;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.eval-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cliente {
+  font-weight: 600;
+  color: #f3f3f3;
+}
+
+.stars {
+  color: #facc15; /* amarelo */
+  font-size: 1rem;
+}
+
+.date {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.comentario {
+  margin: 0.5rem 0 1rem;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+/* 5. BOTÃO RESPONDER */
+.btn-reply {
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-reply:hover {
+  background-color: #2563eb;
+}
+
+/* 6. RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .dash-header-card,
+  .recent-section {
+    max-width: 90%;
+    padding: 1rem;
+  }
+  .rest-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .eval-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rest-avatar {
+    width: 60px;
+    height: 60px;
+  }
+  .rest-meta h1 {
+    font-size: 1.5rem;
+  }
+  .stars {
+    font-size: 0.9rem;
+  }
 }

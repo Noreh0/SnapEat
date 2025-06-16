@@ -35,6 +35,13 @@ export class LoginComponent implements OnInit {
       this.irParaHome(tipo);
     }
   }
+  loginComGoogle() {
+    // apenas um mock — se quiser realmente implementar, use a biblioteca OAuth do Google.
+    alert('Funcionalidade “Login com Google” ainda não implementada.');
+  }
+  abrirRecuperarSenha() {
+    this.router.navigate(['/recuperar-senha']);
+  }
 
   login(): void {
     if (this.carregando) return;
@@ -65,7 +72,7 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('tipo', tipo);
 
         // 4) Redireciona conforme tipo
-        this.irParaHome(tipo);
+        this.irParaHome(tipo, id);
         this.carregando = false;
       },
       error: (err) => {
@@ -76,9 +83,9 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  private irParaHome(tipo: string | null) {
-    if (tipo === 'restaurante') {
-      this.router.navigate(['/dashboard-restaurante']);
+  private irParaHome(tipo: string | null, id?: number | string) {
+    if (tipo === 'restaurante' && id) {
+      this.router.navigate(['/dashboard-restaurante', id]);
     } else {
       // padrão cliente ou null
       this.router.navigate(['/menu']);

@@ -17,18 +17,24 @@ export class AutenticacaoService {
   ) {}
 
   login(email: string, senha: string) {
-  return this.http.post<{ access_token: string, tipo: string }>(`${this.base}/auth/login`, { email, senha })
-    .pipe(
-      tap(res => {
-        localStorage.setItem('token', res.access_token);
-        // Decodifica o token e salva o tipo e id no localStorage
-        const jwtHelper = new JwtHelperService();
-        const payload = jwtHelper.decodeToken(res.access_token);
-        localStorage.setItem('tipo', res.tipo); // <- do backend
-        localStorage.setItem('id', payload.id);
-      })
-    );
-}
+    return this.http.post<{ access_token: string, tipo: string }>(`${this.base}/auth/login`, { email, senha })
+      .pipe(
+        tap(res => {
+          localStorage.setItem('token', res.access_token);
+          const jwtHelper = new JwtHelperService();
+          const payload = jwtHelper.decodeToken(res.access_token);
+          localStorage.setItem('tipo', res.tipo);
+          localStorage.setItem('id', payload.id);
+          this.authState.next(true); // <-- ADICIONE ESTA LINHA
+        })
+      );
+  }
+  recuperarSenha(email: string) {
+    return this.http.post<{message: string}>(`${this.base}/auth/recuperar-senha`, { email });
+  }
+  redefinirSenha(token: string, novaSenha: string) {
+    return this.http.post<{message: string}>(`${this.base}/auth/redefinir-senha/${token}`, { nova_senha: novaSenha });
+  }
 
 
   logout() {
@@ -46,6 +52,12 @@ export class AutenticacaoService {
     })
   );
 }
+  get usuarioAtual() {
+    const token = this.getToken();
+    if (!token) return null;
+    const payload = this.jwtHelper.decodeToken(token);
+    return payload;
+  }
 
 
 
@@ -56,9 +68,10 @@ export class AutenticacaoService {
 
 
   getDecodedToken() {
-    const token = localStorage.getItem('token');
-    return token ? this.jwtHelper.decodeToken(token) : null;
-  }
+  const token = this.getToken();
+  if (!token) return null;
+  return this.jwtHelper.decodeToken(token);
+}
 
   getToken(): string | null {
     return localStorage.getItem('token');

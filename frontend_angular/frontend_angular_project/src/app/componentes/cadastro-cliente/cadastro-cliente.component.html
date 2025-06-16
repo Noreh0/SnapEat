@@ -1,111 +1,280 @@
+<section class="cadastro-cliente-page">
+  <div class="form-card">
+    <!-- === CABEÇALHO === -->
+    <header class="form-header">
+      <h1 translate>Cadastro de Cliente</h1>
+    </header>
 
-<body>
-    <section class="container cadastro-cliente ff-inter">
-        <header class="header">
-            <h1 translate>Cadastro</h1>
-        </header>
-        <form [formGroup]="formulario">
-    
-            <div>
-                <label for="nome" translate>Nome<b>*</b></label><br/>
-            <input type="textarea" class="input" id="Nome"  formControlName="Nome" [placeholder]="ValidaPlaceholderNome()">
-            <div class="mensagem_erro"  *ngIf="formulario.get('Nome')?.errors && formulario.get('Nome')?.touched" translate>
-                Campos
-            </div>
-            </div>
-    
-            <div>
-                <label for="CPF" translate>Validacao pessoa<b>*</b></label><br/>
-                <div>
-                    <input  type="text" class="input" id="CPF"  formControlName="CPF" mask="000.000.000-00" [placeholder]="ValidaPlaceholderCPF()">
-                </div>
-    
-    
-            <div class="mensagem_erro"  *ngIf="formulario.get('CPF')?.errors?.['required'] && formulario.get('CPF')?.touched" translate>
-                Campos
-            </div>
-            <div class="mensagem_erro"  *ngIf="formulario.get('CPF')?.errors?.['minlength'] " translate>
-                Validacao CPF
-            </div>
-            </div>
-    
-    
-            <div>
-                <label for="email">Email<b>*</b></label><br/>
-            <input matInput type="email" class="input" id="email" formControlName="email" [placeholder]="ValidaPlaceholderEmail()" >
-            <div class="mensagem_erro"  *ngIf="formulario.get('email')?.errors?.['required'] && formulario.get('email')?.touched" translate>
-                Campos
-            </div>
-            <div class="mensagem_erro"  *ngIf="formulario.get('email')?.errors?.['email']" translate>
-                Validacao Email
-            </div>
-            </div>
-    
-    
-            <div>
-                <label for="senha" translate>Senha<b>*</b></label><br/>
-                <input matInput [type]="hide ? 'password' : 'text'" formControlName="senha" [placeholder]="ValidaPlaceholderSenha()">
-                <button class="botao_img"(click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide" >
-                 <img class="imagem" src="../../../assets/images/olho_senha.png" alt="olho"/>
-                </button>
-            <div class="mensagem_erro"  *ngIf="formulario.get('senha')?.errors?.['required'] && formulario.get('senha')?.touched" translate>
-                Campos
-            </div>
-            <div class="dica-senha" style="font-size: 0.85rem; color: #555;">
-                A senha deve conter pelo menos <strong>8 caracteres</strong>, incluindo:
-                <ul>
-                    <li>Uma letra maiúscula (A-Z)</li>
-                    <li>Uma letra minúscula (a-z)</li>
-                    <li>Um número (0-9)</li>
-                </ul>
-            </div>
-            <div class="mensagem_erro"  *ngIf="formulario.get('senha')?.errors?.['pattern']" translate>
-                Validacao Senha
-            </div>
-            </div>
-    
-    
-            <div>
-                <label for="autoria" translate>Confirme sua senha<b>*</b></label><br/>
-            <input type="password" class="input" id="senha"  formControlName="confirmasenha" [placeholder]="ValidaPlaceholderConfirma()" >
-            <div class="mensagem_erro"  *ngIf="formulario.get('confirmasenha')?.errors?.['required'] && formulario.get('confirmasenha')?.touched" translate>
-                Campos
-            </div>
-            <div class="mensagem_erro"  *ngIf="formulario.get('confirmasenha')?.errors?.['equalTo']" translate>
-                Validacao confirmar
-            </div>
-            </div>
-    
-            <table class="tabela"><tr>
-                <td><div style="width: 100%;">
-    
-            <label for="cidade" translate>Cidade<b>*</b></label> <br/>
-                  <input type="text" class="input" id="Cidade" formControlName="Cidade" [placeholder]="ValidaPlaceholderCidade()" >
-                  <div class="mensagem_erro"  *ngIf="formulario.get('Cidade')?.errors && formulario.get('Cidade')?.touched" translate>
-                    Campos
-                </div>
-                </div></td>
-                <td><div style="width: 100%;">
-    
-                    <label for="telefone" translate>Telefone<b>*</b></label><br/>
-                    <div>
-            <input type="text" class="input" id="telefone" formControlName="telefone"  mask="(00) 0 0000-0000" [placeholder]="ValidaPlaceholderTelefone()" >
+    <!-- === FORMULÁRIO REATIVO === -->
+    <form [formGroup]="formulario" (ngSubmit)="salvarCliente()" novalidate>
+      <!-- —— NOME —— -->
+      <div class="form-group">
+        <label for="Nome" translate>Nome<b>*</b></label>
+        <input
+          type="text"
+          id="Nome"
+          class="form-input"
+          formControlName="Nome"
+          placeholder="Digite seu nome completo"
+        />
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('Nome')?.hasError('required') &&
+            formulario.get('Nome')?.touched
+          "
+          translate
+        >
+          O nome é obrigatório.
         </div>
-            <div class="mensagem_erro"  *ngIf="formulario.get('telefone')?.errors?.['required'] && formulario.get('telefone')?.touched" translate>
-                Campos
-            </div>
-            <div class="mensagem_erro"  *ngIf="formulario.get('telefone')?.errors?.['minlength'] " translate>
-                Validacao Telefone
-            </div>
-                </div></td>
-    
-              </tr></table>
-    
-            <div class="acoes">
-                <button  [disabled]="!formulario.valid" (click)="salvarCliente()" [ngClass]="habilitarBotao()" translate>Salvar</button>
-                <button class="botao" translate>Cancelar</button>
-            </div>
-        </form>
-    </section>
-    </body>
-    
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('Nome')?.hasError('minlength') &&
+            formulario.get('Nome')?.touched
+          "
+          translate
+        >
+          O nome precisa ter ao menos 3 caracteres.
+        </div>
+      </div>
+
+      <!-- —— CPF —— -->
+      <div class="form-group">
+        <label for="CPF" translate>CPF<b>*</b></label>
+        <input
+          type="text"
+          id="CPF"
+          class="form-input"
+          formControlName="CPF"
+          mask="000.000.000-00"
+          placeholder="000.000.000-00"
+        />
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('CPF')?.hasError('required') &&
+            formulario.get('CPF')?.touched
+          "
+          translate
+        >
+          O CPF é obrigatório.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('CPF')?.hasError('minlength') &&
+            formulario.get('CPF')?.touched
+          "
+          translate
+        >
+          CPF incompleto.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('CPF')?.hasError('cpfInvalido') &&
+            formulario.get('CPF')?.touched
+          "
+          translate
+        >
+          CPF inválido.
+        </div>
+      </div>
+
+      <!-- —— E-MAIL —— -->
+      <div class="form-group">
+        <label for="email" translate>Email<b>*</b></label>
+        <input
+          type="email"
+          id="email"
+          class="form-input"
+          formControlName="email"
+          placeholder="email@exemplo.com"
+        />
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('email')?.hasError('required') &&
+            formulario.get('email')?.touched
+          "
+          translate
+        >
+          O email é obrigatório.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('email')?.hasError('email') &&
+            formulario.get('email')?.touched
+          "
+          translate
+        >
+          Email inválido.
+        </div>
+      </div>
+
+      <!-- —— SENHA —— -->
+      <div class="form-group">
+        <label for="senha" translate>Senha<b>*</b></label>
+        <div class="senha-wrapper">
+          <input
+            [type]="hide ? 'password' : 'text'"
+            id="senha"
+            class="form-input input-com-icon"
+            formControlName="senha"
+            placeholder="Digite uma senha forte"
+          />
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="hide = !hide"
+            aria-label="Mostrar/ocultar senha"
+          >
+            <img
+              src="../../../assets/images/olho_senha.png"
+              alt="Mostrar senha"
+              class="password-icon"
+            />
+          </button>
+        </div>
+        <div class="password-hint">
+          A senha deve ter no mínimo 8 caracteres e conter:
+          <ul>
+            <li>1 letra maiúscula (A–Z)</li>
+            <li>1 letra minúscula (a–z)</li>
+            <li>1 número (0–9)</li>
+            <li>1 caractere especial (ex.: !&#64;#$%^&amp;*)</li>
+          </ul>
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('senha')?.hasError('required') &&
+            formulario.get('senha')?.touched
+          "
+          translate
+        >
+          A senha é obrigatória.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('senha')?.hasError('pattern') &&
+            formulario.get('senha')?.touched
+          "
+          translate
+        >
+          Senha fraca: inclua maiúscula, minúscula, número e caractere especial.
+        </div>
+      </div>
+
+      <!-- —— CONFIRMAÇÃO DE SENHA —— -->
+      <div class="form-group">
+        <label for="confirmasenha" translate>Confirme sua senha<b>*</b></label>
+        <input
+          type="password"
+          id="confirmasenha"
+          class="form-input"
+          formControlName="confirmasenha"
+          placeholder="Repita a senha"
+        />
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('confirmasenha')?.hasError('required') &&
+            formulario.get('confirmasenha')?.touched
+          "
+          translate
+        >
+          Confirmação de senha é obrigatória.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('confirmasenha')?.hasError('mismatch') &&
+            formulario.get('confirmasenha')?.touched
+          "
+          translate
+        >
+          As senhas não coincidem.
+        </div>
+      </div>
+
+      <!-- —— CIDADE —— -->
+      <div class="form-group">
+        <label for="Cidade" translate>Cidade<b>*</b></label>
+        <input
+          type="text"
+          id="Cidade"
+          class="form-input"
+          formControlName="Cidade"
+          placeholder="Digite seu município"
+        />
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('Cidade')?.hasError('required') &&
+            formulario.get('Cidade')?.touched
+          "
+          translate
+        >
+          A cidade é obrigatória.
+        </div>
+      </div>
+
+      <!-- —— TELEFONE —— -->
+      <div class="form-group">
+        <label for="telefone" translate>Telefone<b>*</b></label>
+        <input
+          type="text"
+          id="telefone"
+          class="form-input"
+          formControlName="telefone"
+          mask="(00) 0 0000-0000"
+          placeholder="(99) 9 9999-9999"
+        />
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('telefone')?.hasError('required') &&
+            formulario.get('telefone')?.touched
+          "
+          translate
+        >
+          O telefone é obrigatório.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            formulario.get('telefone')?.hasError('minlength') &&
+            formulario.get('telefone')?.touched
+          "
+          translate
+        >
+          Telefone incompleto.
+        </div>
+      </div>
+
+      <!-- —— AÇÕES (BOTÕES) —— -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="!formulario.valid"
+          translate
+        >
+          Salvar
+        </button>
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="cancelarCadastro()"
+          translate
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

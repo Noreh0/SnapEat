@@ -1,0 +1,59 @@
+.prato-form-page {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(90deg, #1c1c1f, #111113);
+}
+.form-card {
+  background: #202024;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.form-header h1 {
+  margin: 0 0 1.5rem;
+  font-size: 2rem;
+}
+.form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+.form-input,
+.form-textarea {
+  background: #2c2c2f;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-size: 1rem;
+}
+.form-textarea {
+  resize: vertical;
+}
+.form-input:focus,
+.form-textarea:focus {
+  outline: 2px solid #3b82f6;
+}
+.preview-img {
+  margin-top: 0.5rem;
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.error {
+  margin-top: 0.25rem;
+  color: #f87171;
+  font-size: 0.875rem;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}

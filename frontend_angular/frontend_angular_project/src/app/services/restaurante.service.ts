@@ -31,11 +31,12 @@ export class RestauranteService {
   listar_tabela(): Observable<restauranteModel[]> {
     return this.http.get<restauranteModel[]>(this.API);
   }
+  
 
-  criar(restaurante: restauranteModel): Observable<restauranteModel> {
+  cadastrar(restaurante: restauranteModel): Observable<restauranteModel> {
     const url = `${this.API}/auth/cadastro/restaurante`;             //  ↑ barra a mais e rota deve bater com @api.route('/cadastro/restaurante')
     return this.http.post<restauranteModel>(url, restaurante);
-}
+  }
 
 
   // DELETE /restaurante/:id
@@ -57,6 +58,13 @@ export class RestauranteService {
   editar(id: number, data: restauranteModel): Observable<restauranteModel> {
     return this.http.put<restauranteModel>(
       `${this.API}/restaurante/${id}`, data
+    );
+  }
+  uploadImagem(id: number, file: File) {
+    const formData = new FormData();
+    formData.append('imagem', file);
+    return this.http.post<{ imagem_url: string }>(
+      `${this.API}/restaurante/${id}/upload-imagem`, formData
     );
   }
 

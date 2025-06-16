@@ -1,21 +1,93 @@
-<h2>{{ Nome }}</h2>
-<p>Email: {{ Email }}</p>
-<p>Nota média: {{ Nota }}</p>
+<section class="perfil-restaurante-page" *ngIf="restaurante">
+  <div class="perfil-card">
 
-<button routerLink="/menu">Voltar</button>
+    <!-- ===== CABEÇALHO COM AVATAR + META INICIAL ===== -->
+    <div class="perfil-header">
+      <img
+        [src]="restaurante.imagem_url ? 'http://localhost:5000' + restaurante.imagem_url : 'assets/images/default-restaurant.png'"
+        alt="Logo {{ restaurante.Nome }}"
+        class="resto-imagem"
+      />
+      <div class="perfil-meta">
+        <h1 class="perfil-nome">{{ restaurante.Nome }}</h1>
+        <p class="perfil-tipo">{{ restaurante.tipo_restaurante | titlecase }}</p>
+        <p class="perfil-cnpj">CNPJ: {{ restaurante.CNPJ }}</p>
+        <p class="perfil-rating">
+          {{ mediaAval | number:'1.1-1' }} ★ ({{ totalAval }} avaliações)
+        </p>
+      </div>
+    </div>
 
-<button
-  *ngIf="id>0"
-  [routerLink]="['/perfilRestaurante', id, 'editarRestaurante']">
-  Editar Restaurante
-</button>
+    <!-- ===== BOTÕES DE AÇÃO ===== -->
+    <div class="perfil-actions">
+      <button class="btn-secondary" routerLink="/menu">Menu</button>
+      <button class="btn-primary" routerLink="/dashboard-restaurante/{{ restaurante.id }}">
+        Meu Painel
+      </button>
+      <button
+        *ngIf="isOwner"
+        class="btn-secondary"
+        [routerLink]="['/perfilRestaurante', restaurante.id, 'editarRestaurante']"
+      >
+        Editar
+      </button>
+      <button
+        *ngIf="isOwner"
+        class="btn-secondary"
+        (click)="excluirRestaurante()"
+      >
+        Excluir
+      </button>
+      <button
+        class="btn-secondary"
+        routerLink="/restaurante/{{ restaurante.id }}/pratos"
+      >
+        Meus Pratos
+      </button>
+      <button
+        *ngIf="isOwner"
+        class="btn-primary"
+        routerLink="/restaurante/{{ restaurante.id }}/pratos/criar"
+      >
+        Novo Prato
+      </button>
+    </div>
 
-<button (click)="excluirRestaurante()">Excluir Restaurante</button>
+    <!-- ===== DESCRIÇÃO ===== -->
+    <section class="perfil-descricao">
+      <h2>Sobre</h2>
+      <p>{{ restaurante.descricao || '— Nenhuma descrição fornecida —' }}</p>
+    </section>
 
+    <!-- ===== PREVIEW DE AVALIAÇÕES ===== -->
+    <section class="perfil-avaliacoes">
+      <h2>Últimas Avaliações</h2>
 
-<h3>Avaliações</h3>
-<ul>
-  <li *ngFor="let a of listaAvaliacao">
-    {{ a.Comentario }} — Nota: {{ a.Nota }}
-  </li>
-</ul>
+      <ng-container *ngIf="avaliacoes.length; else semAvaliacoes">
+        <div class="lista-avaliacoes">
+          <div
+            *ngFor="let a of avaliacoes | slice:0:3"
+            class="avaliacao-preview-card"
+          >
+            <div class="preview-header">
+              <span class="cliente">{{ a.clienteNome }}</span>
+              <span class="nota">{{ renderStars(a.Nota) }}</span>
+              <span class="data">{{ a.data | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <p class="comentario">{{ a.Comentario }}</p>
+          </div>
+        </div>
+        <button
+          class="btn-link"
+          routerLink="/dashboard-restaurante/{{ restaurante.id }}"
+        >
+          Ver todas as avaliações →
+        </button>
+      </ng-container>
+
+      <ng-template #semAvaliacoes>
+        <p class="sem-avaliacoes">Você ainda não recebeu avaliações.</p>
+      </ng-template>
+    </section>
+  </div>
+</section>

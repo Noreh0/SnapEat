@@ -1,161 +1,167 @@
-
-h1{
-  font-size: 50px;
-  color: white;
-  padding: 1rem;
-}
-.tabela{
-  width: 60%;
-}
-td {
-padding-right: 8px;
-}
-button{
-background: rgb(0, 0, 0);
-border-radius: 3px;
-box-shadow: inset 0 1px 0 hsla(0,0%,100%,.2);
-color: #ffffff;
-cursor: pointer;
-display: inline-block;
-font-family: 'ff-inter';
-font-size: 1rem;
-font-weight: 400;
-letter-spacing: .075em;
-line-height: 12px;
-margin: 1rem;
-width: 200px;
-height: 30px;
-padding: 9px 12px 8px;
-border-radius: 20px;
-text-transform: uppercase;
-
-}
-.editar-restaurante {
-  background-color: rgb(24, 24, 27);
-  padding: 2rem 0;
-  border-radius: 50px;
+/* 1. FUNDO E CONTEÚDO CENTRALIZADO */
+.editar-restaurante-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(to right, #1c1c1f, #111113);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-.editar-restaurante form {
-  border-radius: 20px;
-  border-color: white;
+/* 2. CARD */
+.form-card {
+  width: 100%;
+  max-width: 700px;
+  background: #202024;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  gap: 1.5rem;
 }
 
-.editar-restaurante form i {
-  margin-left: -30px;
-  cursor: pointer;
-}
-
-.editar-restaurante form label {
-  color: #ffffff;
-  font-size: larger;
-  font-weight: bold;
-  margin: 0 0 1rem;
-  padding: 1rem;
-}
-.editar-restaurante form .mensagem_erro {
-  font-size: 12px;
-  font-size: larger;
-  font-weight: bold;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  margin-left: 5px;
-  color: red;
-  margin-top: -25px;
-  margin-bottom: 20px;
-}
-.editar-restaurante form  .input {
-border: none;
-width: 50%;
-height: 30px;
-padding: 1rem 2rem;
-border-radius: 20px;
-margin: 0.5rem 0 2rem;
-}
-
-
-.editar-restaurante form .textarea {
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 20px;
-  margin: 0.5rem 0 2rem;
-}
-.editar-restaurante form  .select {
-  width: 54%;
-  height: 60px;
-  border-radius: 20px;
-  margin: 0.5rem 0 2rem;
-  padding: 0rem 2rem;
-  }
-.container-radio {
-  display: flex;
-  gap: 2.5rem;
-  flex-wrap: wrap;
-}
-
-.radio {
+/* 3. HEADER */
+.form-header h1 {
   margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
 }
 
-input[type='radio'] {
-  display: none;
-}
-
-.radio-modelo label {
+/* 4. FORM-GROUP */
+.form-group {
   display: flex;
-  align-items: center;
-  column-gap: 20px;
+  flex-direction: column;
+}
+.form-group label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #e5e5e5;
 }
 
-.custom-radio {
-  border: 1px solid #154580;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-content: center;
-  border-radius: 50%;
+/* 5. INPUTS, TEXTAREA, SELECT */
+.form-input,
+.form-textarea,
+.form-select {
+  background: #2c2c2f;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: outline 0.2s ease;
+}
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
-.custom-radio,
-span {
-  transition: 0.5s ease;
-  color: #154580;
+/* 6. SENHA COM ÍCONE */
+.senha-wrapper {
+  position: relative;
 }
-
-.custom-radio span {
-  content: '';
-  width: 18px;
-  height: 18px;
+.input-with-icon {
+  padding-right: 3rem;
+}
+.icon-btn {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
   background: transparent;
-  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.password-icon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+.icon-btn:hover .password-icon {
+  opacity: 1;
 }
 
-input[type='radio']:checked+.custom-radio {
-  border-color: #154580;
+/* 7. HINT DE SENHA */
+.password-hint {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin: 0.25rem 0 0.5rem;
 }
 
-input[type='radio']:checked+.custom-radio span {
-  background: #154580;
+/* 8. MENSAGENS DE ERRO */
+.error {
+  color: #f87171;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
-.botao_desabilitado{
-background-color: #575757;
-border-radius: 3px;
-box-shadow: inset 0 1px 0 hsla(0,0%,100%,.2);
-color: #ffffff;
-cursor: pointer;
-display: inline-block;
-font-family:'ff-inter';
-font-size: 1rem;
-font-weight: 400;
-letter-spacing: .075em;
-line-height: 12px;
-margin: 1rem;
-width: 200px;
-height: 30px;
-padding: 9px 12px 8px;
-border-radius: 20px;
-text-transform: uppercase;
+/* 9. BOTÕES */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.btn-primary {
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: #fff;
+}
+.btn-primary:disabled {
+  background: #575757;
+  cursor: not-allowed;
+}
+.btn-primary:not(:disabled):hover {
+  background: #2563eb;
+}
+.btn-secondary {
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 10. RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .form-card {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+}
+@media (max-width: 480px) {
+  .form-header h1 {
+    font-size: 2rem;
+  }
+  .password-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RestauranteService } from '../../services/restaurante.service';
 import {
   FormBuilder,
   FormGroup,
@@ -20,15 +21,22 @@ export class CadastroAvaliacaoComponent implements OnInit {
   idRestaurante!: number;
   idCliente!: number;
   tipoUsuario!: string;
+  NomeRestaurante: string = '';
+  Categoria: string = '';
+  Cidade: string = '';
+  AvaliacaoMedia: number = 0;
+  TotalAvaliacoes: number = 0;
+
 
   constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private jwtHelper: JwtHelperService,
-    private serviceAvaliacao: AvaliacaoService,
-    private translate: TranslateService
-  ) {}
+  private fb: FormBuilder,
+  private route: ActivatedRoute,
+  private router: Router,
+  private jwtHelper: JwtHelperService,
+  private serviceAvaliacao: AvaliacaoService,
+  private restauranteService: RestauranteService, // <-- adicione aqui
+  private translate: TranslateService
+) {}
 
   ngOnInit(): void {
     // 1) Só clientes podem criar avaliação
@@ -45,6 +53,12 @@ export class CadastroAvaliacaoComponent implements OnInit {
 
     // 2) Pega id_restaurante da rota
     this.idRestaurante = Number(this.route.snapshot.paramMap.get('id_restaurante'));
+    this.restauranteService.buscarPorId(this.idRestaurante).subscribe(resto => {
+      this.NomeRestaurante = resto.Nome;
+      this.Categoria = resto.tipo_restaurante;
+      this.Cidade = resto.Cidade;
+    });
+
     if (!this.idRestaurante) {
       return;
     }
@@ -53,6 +67,28 @@ export class CadastroAvaliacaoComponent implements OnInit {
     this.formulario = this.fb.group({
       Nota: ['1', [Validators.required, Validators.min(1), Validators.max(5)]],
       Comentario: ['', [Validators.required, Validators.minLength(5)]],
+    });
+    this.inicializarFormulario();
+    this.restauranteService.buscarPorId(this.idRestaurante).subscribe((resto: any) => {
+    this.NomeRestaurante = resto.Nome;
+    this.Categoria = resto.tipo_restaurante;
+    this.Cidade = resto.Cidade;
+  });
+
+  this.serviceAvaliacao.buscarPorRestaurante(this.idRestaurante).subscribe((avals: any[]) => {
+    this.TotalAvaliacoes = avals.length;
+    if (avals.length > 0) {
+      this.AvaliacaoMedia = avals.reduce((acc: number, av: any) => acc + av.Nota, 0) / avals.length;
+    } else {
+      this.AvaliacaoMedia = 0;
+    }
+  });
+    
+  }
+  private inicializarFormulario() {
+    this.formulario = this.fb.group({
+      Nota: ['', [Validators.required]],
+      Comentario: ['', [Validators.required, Validators.minLength(10)]],
     });
   }
 

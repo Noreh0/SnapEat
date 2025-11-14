@@ -1,21 +1,22 @@
 <section class="auth-page">
   <div class="auth-card">
     <header class="auth-header">
-      <h2>Recuperar Senha</h2>
-      <p>Digite o e-mail cadastrado para receber o link de redefinição.</p>
+      <h2>{{ 'RECOVER_PASSWORD.TITLE' | translate }}</h2>
+      <p>{{ 'RECOVER_PASSWORD.SUBTITLE' | translate }}</p>
     </header>
 
     <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
       <div class="form-group">
-        <label for="email">E-mail cadastrado</label>
+        <label for="email">{{ 'RECOVER_PASSWORD.EMAIL_LABEL' | translate }}</label>
         <input
           id="email"
           formControlName="email"
           type="email"
-          placeholder="seu@exemplo.com"
+          [placeholder]="'RECOVER_PASSWORD.EMAIL_PLACEHOLDER' | translate"
+          class="form-control"
         />
         <div class="error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-          Informe um e-mail válido.
+          {{ 'RECOVER_PASSWORD.EMAIL_ERROR_INVALID' | translate }}
         </div>
       </div>
 
@@ -24,11 +25,20 @@
         class="btn-primary"
         [disabled]="form.invalid"
       >
-        Enviar
+        {{ 'RECOVER_PASSWORD.SUBMIT_BUTTON' | translate }}
       </button>
     </form>
 
-    <div class="feedback success" *ngIf="mensagem">{{ mensagem }}</div>
-    <div class="feedback error"   *ngIf="erro">{{ erro }}</div>
+    <!-- Mensagens de feedback -->
+    <div class="feedback success" *ngIf="mensagem">
+      <p>{{ mensagem }}</p>
+    </div>
+    
+    <div class="feedback error" *ngIf="erro">
+      <p>{{ erro }}</p>
+    </div>
+
+    <!-- Link de retorno -->
+    <a routerLink="/login" class="return-link">{{ 'RECOVER_PASSWORD.BACK_TO_LOGIN' | translate }}</a>
   </div>
 </section>

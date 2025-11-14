@@ -1,0 +1,73 @@
+<div class="filtro-avancado-container">
+  <button class="toggle-filtro" (click)="toggleFiltroAvancado()">
+    {{ mostrarFiltroAvancado ? ('ADVANCED_FILTER.HIDE_FILTERS' | translate) : ('ADVANCED_FILTER.SHOW_FILTERS' | translate) }}
+    <i class="icon" [ngClass]="{'icon-chevron-up': mostrarFiltroAvancado, 'icon-chevron-down': !mostrarFiltroAvancado}"></i>
+  </button>
+  
+  <div class="filtro-panel" [ngClass]="{'expanded': mostrarFiltroAvancado}">
+    <form [formGroup]="filtroForm" (ngSubmit)="aplicarFiltro()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="termo">{{ 'ADVANCED_FILTER.SEARCH_NAME_DESCRIPTION' | translate }}</label>
+          <input type="text" id="termo" formControlName="termo" [placeholder]="'ADVANCED_FILTER.SEARCH_PLACEHOLDER' | translate">
+        </div>
+        
+        <div class="form-group">
+          <label for="tipo_restaurante">{{ 'ADVANCED_FILTER.RESTAURANT_TYPE' | translate }}</label>
+          <select id="tipo_restaurante" formControlName="tipo_restaurante">
+            <option value="">{{ 'ADVANCED_FILTER.ALL_TYPES' | translate }}</option>
+            <option *ngFor="let tipo of tipos" [value]="tipo">{{tipo}}</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="estado">{{ 'ADVANCED_FILTER.STATE' | translate }}</label>
+          <select id="estado" formControlName="estado">
+            <option value="">{{ 'ADVANCED_FILTER.ALL_STATES' | translate }}</option>
+            <option *ngFor="let estado of estados" [value]="estado">{{estado}}</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="cidade">{{ 'ADVANCED_FILTER.CITY' | translate }}</label>
+          <input type="text" id="cidade" formControlName="cidade" [placeholder]="'ADVANCED_FILTER.CITY_PLACEHOLDER' | translate">
+        </div>
+        
+        <div class="form-group">
+          <label for="bairro">{{ 'ADVANCED_FILTER.NEIGHBORHOOD' | translate }}</label>
+          <input type="text" id="bairro" formControlName="bairro" [placeholder]="'ADVANCED_FILTER.NEIGHBORHOOD_PLACEHOLDER' | translate">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group location-group">
+          <label>
+            <input type="checkbox" [checked]="usarLocalizacaoAtual" (change)="toggleLocalizacaoAtual()"> 
+            {{ 'ADVANCED_FILTER.USE_CURRENT_LOCATION' | translate }}
+          </label>
+          
+          <div *ngIf="usarLocalizacaoAtual" class="raio-container">
+            <label for="raio_km">{{ 'ADVANCED_FILTER.SEARCH_RADIUS' | translate:{radius: filtroForm.get('raio_km')?.value} }}</label>
+            <input type="range" id="raio_km" formControlName="raio_km" min="1" max="50" step="1">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="ordenar_por">{{ 'ADVANCED_FILTER.SORT_BY' | translate }}</label>
+          <select id="ordenar_por" formControlName="ordenar_por">
+            <option value="distancia">{{ 'ADVANCED_FILTER.SORT_DISTANCE' | translate }}</option>
+            <option value="avaliacao">{{ 'ADVANCED_FILTER.SORT_RATING' | translate }}</option>
+            <option value="nome">{{ 'ADVANCED_FILTER.SORT_NAME' | translate }}</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="actions">
+        <button type="submit" class="btn-aplicar">{{ 'ADVANCED_FILTER.APPLY_FILTERS' | translate }}</button>
+        <button type="button" class="btn-limpar" (click)="limparFiltros()">{{ 'ADVANCED_FILTER.CLEAR_FILTERS' | translate }}</button>
+      </div>
+    </form>
+  </div>
+</div>

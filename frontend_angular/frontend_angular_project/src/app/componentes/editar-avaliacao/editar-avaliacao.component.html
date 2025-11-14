@@ -1,83 +1,117 @@
-<section class="edit-eval-page" *ngIf="formulario && restaurante">
-  <div class="card">
+<div class="card" *ngIf="formulario && restaurante">
+  <!-- Cabeçalho com informações do restaurante -->
+  <header class="card-header">
+    <img 
+      [src]="restaurante.imagem_url || defaultAvatar"
+      alt="Logo do restaurante {{ restaurante.Nome }}" 
+      class="restaurant-image"
+      (error)="handleImageError($event)"
+    >
+    <div class="restaurant-info">
+      <h2>{{ restaurante.Nome }}</h2>
+      <p>{{ restaurante.tipo_restaurante | titlecase }} &middot; {{ restaurante.Cidade }}</p>
+    </div>
+  </header>
 
-    <!-- HEADER DO RESTAURANTE -->
-    <header class="card-header">
-      <img
-        [src]="restaurante.avatarUrl || defaultAvatar"
-        alt="{{ restaurante.Nome }}"
-        class="avatar"
-      />
-      <div class="restaurant-info">
-        <h2>{{ restaurante.Nome }}</h2>
-        <p class="meta">
-          {{ restaurante.tipo_restaurante | titlecase }}
-          <span>·</span>
-          CNPJ: {{ restaurante.CNPJ }}
-        </p>
-        <p class="meta">
-          Avaliação média:
-          <strong>{{ restaurante.mediaAvaliacoes | number:'1.1-1' }}</strong>
-          ({{ restaurante.totalAvaliacoes }} opiniões)
-        </p>
+  <!-- Formulário de Edição -->
+  <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+    <!-- Campo de Nota (Estrelas) -->
+    <div class="form-group">
+      <label translate>Sua nota</label>
+      <div class="star-rating">
+        <span *ngFor="let s of [1, 2, 3, 4, 5]">
+          <i 
+            class="star" 
+            [class.filled]="formulario.get('Nota')?.value >= s" 
+            (click)="setRating(s)">★</i>
+        </span>
       </div>
-    </header>
+      <div class="error" *ngIf="f['Nota'].touched && f['Nota'].hasError('required')" translate>
+        A nota é obrigatória.
+      </div>
+    </div>
 
-    <!-- FORMULÁRIO -->
-    <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+    <!-- Campo de Comentário -->
+    <div class="form-group">
+      <label translate>Seu comentário</label>
+      <textarea 
+        formControlName="Comentario" 
+        class="form-control"
+        rows="5" 
+        [placeholder]="ValidaPlaceholderComentario()">
+      </textarea>
+      <div class="error" *ngIf="f['Comentario'].touched && f['Comentario'].hasError('required')" translate>
+        O comentário é obrigatório.
+      </div>
+      <div class="error" *ngIf="f['Comentario'].touched && f['Comentario'].hasError('minlength')" translate>
+        O comentário precisa ter pelo menos 10 caracteres.
+      </div>
+    </div>
 
-      <!-- NOTA COMO ESTRELAS -->
-      <div class="form-group rating-group">
-        <label translate>Nota</label>
-        <div class="star-rating">
-          <ng-container *ngFor="let s of [1,2,3,4,5]">
-            <i
-              class="star"
-              [class.filled]="formulario.get('Nota')?.value >= s"
-              (click)="setRating(s)"
-            >★</i>
-          </ng-container>
-        </div>
-        <div class="error" *ngIf="f['Nota'].touched && f['Nota'].hasError('required')" translate>
-          Selecione uma nota.
+    <div class="form-group">
+      <label>Imagens (opcional - máximo 5)</label>
+      
+      <!-- Imagens existentes -->
+      <div class="imagens-existentes" *ngIf="avaliacao.imagens_urls && avaliacao.imagens_urls.length > 0">
+        <div class="imagem-item" *ngFor="let imagem of avaliacao.imagens_urls">
+          <img [src]="imagem" alt="Imagem da avaliação">
+          <button type="button" class="btn-remover-imagem" (click)="removerImagemExistente(imagem)">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
-
-      <!-- COMENTÁRIO -->
-      <div class="form-group">
-        <label translate>Comentário</label>
-        <textarea
-          formControlName="Comentario"
-          rows="4"
-          placeholder="Conte como foi sua experiência..."
-        ></textarea>
-        <div class="error" *ngIf="f['Comentario'].touched && f['Comentario'].hasError('required')" translate>
-          Comentário é obrigatório.
-        </div>
-        <div class="error" *ngIf="f['Comentario'].touched && f['Comentario'].hasError('minlength')" translate>
-          Mínimo de 10 caracteres.
+      <div class="imagens-preview" *ngIf="imagensPreview.length > 0">
+        <div class="imagem-preview-item" *ngFor="let preview of imagensPreview; let i = index">
+          <img [src]="preview" alt="Preview">
+          <button type="button" class="btn-remover-preview" (click)="removerImagem(i)">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
-
-      <!-- AÇÕES -->
-      <div class="form-actions">
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="formulario.invalid"
-          translate
-        >
-          Salvar
-        </button>
-        <button
-          type="button"
-          class="btn-secondary"
-          (click)="cancel()"
-          translate
-        >
-          Cancelar
-        </button>
+      
+      <!-- Input de upload -->
+      <div class="upload-area" *ngIf="imagensSelecionadas.length < 5">
+        <input 
+          type="file" 
+          id="imagens-upload"
+          accept="image/*" 
+          multiple 
+          (change)="onImageSelect($event)"
+          style="display: none;">
+        <label for="imagens-upload" class="upload-label">
+          <i class="fas fa-camera"></i>
+          <span>Adicionar fotos ({{ imagensSelecionadas.length }}/5)</span>
+        </label>
       </div>
-    </form>
-  </div>
-</section>
+      <small class="form-text">
+        Formatos aceitos: JPG, PNG, GIF, WEBP (máx. 5MB por imagem)
+      </small>
+    </div>
+    <app-tags-selector 
+      [restauranteId]="avaliacao.ID_Restaurante"
+      [tagsExistentes]="avaliacoesTags"
+      (tagsChanged)="onTagsChanged($event)">
+    </app-tags-selector>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" translate>
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="!formulario.valid" translate>
+        Salvar Alterações
+      </button>
+    </div>
+    <div class="loading-overlay" *ngIf="isSubmitting">
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-message">
+          <h3 *ngIf="!uploadingImages">Atualizando sua avaliação...</h3>
+          <h3 *ngIf="uploadingImages">Enviando imagens...</h3>
+          <p *ngIf="!uploadingImages">Estamos processando suas mudanças</p>
+          <p *ngIf="uploadingImages">Por favor, aguarde enquanto suas fotos são enviadas</p>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

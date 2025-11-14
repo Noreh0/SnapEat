@@ -1,91 +1,72 @@
 <section class="login-container">
   <div class="login-card">
-    <h1 class="login-card__title">Login</h1>
+    <h1 class="login-card__title">{{ 'LOGIN.TITLE' | translate }}</h1>
 
     <form [formGroup]="loginForm" (ngSubmit)="login()">
       <!-- Campo de Email -->
       <div class="login-card__field">
-        <label for="email">E-mail</label>
+        <label for="email">{{ 'LOGIN.EMAIL_LABEL' | translate }}</label>
         <input
           id="email"
           type="email"
           formControlName="email"
-          placeholder="Digite seu e-mail"
+          [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate"
           class="login-card__input"
         />
-        <div
-          class="login-card__error"
-          *ngIf="
-            loginForm.get('email')?.hasError('required') &&
-            loginForm.get('email')?.touched
-          "
-        >
-          Campo obrigatório
+        <div class="login-card__error"
+          *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
+          {{ 'LOGIN.ERROR_EMAIL_REQUIRED' | translate }}
         </div>
-        <div
-          class="login-card__error"
-          *ngIf="loginForm.get('email')?.hasError('email')"
-        >
-          Formato de e-mail inválido
+        <div class="login-card__error" 
+          *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
+          {{ 'LOGIN.ERROR_EMAIL_INVALID' | translate }}
         </div>
       </div>
 
       <!-- Campo de Senha -->
       <div class="login-card__field">
-        <label for="senha">Senha</label>
+        <label for="senha">{{ 'LOGIN.PASSWORD_LABEL' | translate }}</label>
         <input
           id="senha"
           type="password"
           formControlName="senha"
-          placeholder="Digite sua senha"
+          [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
           class="login-card__input"
         />
-        <div
-          class="login-card__error"
-          *ngIf="
-            loginForm.get('senha')?.hasError('required') &&
-            loginForm.get('senha')?.touched
-          "
-        >
-          Campo obrigatório
+        <div class="login-card__error"
+          *ngIf="loginForm.get('senha')?.hasError('required') && loginForm.get('senha')?.touched">
+          {{ 'LOGIN.ERROR_PASSWORD_REQUIRED' | translate }}
         </div>
       </div>
 
-      <!-- Botão “Entrar” -->
-      <button
-        type="submit"
-        class="login-card__btn-primary"
-        [disabled]="loginForm.invalid || carregando"
-      >
-        {{ carregando ? 'Carregando…' : 'Entrar' }}
+      <!-- Botão "Entrar" -->
+      <button type="submit" class="login-card__btn-primary" [disabled]="loginForm.invalid || carregando">
+        {{ (carregando ? 'LOGIN.BUTTON_SUBMITTING' : 'LOGIN.BUTTON_SUBMIT') | translate }}
       </button>
 
-      <!-- Botão “Entrar com Google” (mock) -->
-      <button
-        type="button"
-        class="login-card__btn-google"
-        (click)="loginComGoogle()"
-      >
-        <img
-          src="assets/images/google-logo.png"
-          alt="Google Logo"
-          class="login-card__btn-google-icon"
-        />
-        Entrar com Google
-      </button>
-
-      <!-- Exibe mensagem de erro do backend -->
+      <!-- Erro do backend -->
       <div class="login-card__error login-card__error-server" *ngIf="mensagemErro">
         {{ mensagemErro }}
       </div>
+
+      <!-- Separador e botão do Google -->
+      <div class="social-login">
+        <button type="button" class="btn-google" (click)="loginComGoogle()">
+          <img src="assets/images/google-logo.png" alt="Google Logo">
+          <span>{{ 'LOGIN.CONTINUE_WITH_GOOGLE' | translate }}</span>
+        </button>
+      </div>
     </form>
 
+    <!-- Links -->
     <div class="login-card__links">
-      <a routerLink="/cadastroCliente">Cadastre-se como Cliente</a>
-      <span>|</span>
-      <a routerLink="/cadastroRestaurante">Cadastre-se como Restaurante</a>
-      <span>|</span>
-      <a (click)="abrirRecuperarSenha()" style="cursor:pointer;">Esqueci minha senha</a>
+      <a routerLink="/cadastroCliente">{{ 'LOGIN.CREATE_CLIENT_ACCOUNT' | translate }}</a>
+      <span>•</span>
+      <a routerLink="/cadastroRestaurante">{{ 'LOGIN.REGISTER_RESTAURANT' | translate }}</a>
+      <span>•</span>
+      <a (click)="abrirRecuperarSenha()" style="cursor:pointer;">
+        {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
+      </a>
     </div>
   </div>
 </section>

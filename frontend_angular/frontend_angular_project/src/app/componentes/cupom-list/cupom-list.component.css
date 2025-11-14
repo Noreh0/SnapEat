@@ -1,0 +1,465 @@
+/* Using global theme variables from themes.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Variáveis de fonte - Sistema Deezer */
+:host {
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
+}
+.cupons-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--bg-primary);
+  min-height: 100vh;
+  font-family: var(--fonte-primaria);
+}
+
+/* === Cabeçalho === */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.header-content h1 {
+  font-family: var(--fonte-primaria);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  font-family: var(--fonte-primaria);
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* === Estados de carregamento e erro === */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 2rem;
+  border-left: 4px solid #c0392b;
+}
+
+.error-message h3 {
+  color: #c0392b;
+  margin: 0 0 1rem 0;
+}
+
+/* === Estado vazio === */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-family: var(--fonte-primaria);
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* === Grid de cupons === */
+.cupons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* === Card do cupom === */
+.cupom-card {
+  background-color: var(--bg-card);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.cupom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.cupom-card.ativo {
+  border-color: var(--color-accent);
+}
+
+.cupom-card.inativo {
+  opacity: 0.7;
+  border-color: #95a5a6;
+}
+
+.cupom-card.expirado,
+.cupom-card.esgotado {
+  opacity: 0.6;
+  border-color: #c0392b;
+}
+
+/* === Cabeçalho do cupom === */
+.cupom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cupom-titulo {
+  font-family: var(--fonte-primaria);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.cupom-codigo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.codigo-label {
+  color: var(--text-secondary);
+}
+
+.codigo-valor {
+  background-color: var(--bg-secondary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-family: var(--fonte-primaria);
+  font-weight: 600;
+  color: var(--color-primary);
+  border: 1px solid var(--border-color);
+}
+
+/* === Status badge === */
+.status-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.ativo {
+  background-color: rgba(106, 123, 83, 0.2);
+  color: var(--color-accent);
+}
+
+.status-badge.inativo {
+  background-color: rgba(149, 165, 166, 0.2);
+  color: #95a5a6;
+}
+
+.status-badge.expirado,
+.status-badge.esgotado {
+  background-color: rgba(192, 57, 43, 0.2);
+  color: #c0392b;
+}
+
+/* === Corpo do cupom === */
+.cupom-body {
+  padding: 1.5rem;
+}
+
+.desconto-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.desconto-valor {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.pontos-info {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.pontos-icon {
+  color: #FFD700;
+  font-size: 1.2rem;
+}
+
+/* === Detalhes === */
+.cupom-detalhes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detalhe .label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detalhe .valor {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.cupom-descricao {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+  font-style: italic;
+}
+
+/* === Ações do cupom === */
+.cupom-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+.cupom-actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-edit {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.btn-edit:hover:not(:disabled) {
+  background-color: #586744;
+}
+
+.btn-edit:disabled {
+  background-color: #B0B8A4;
+  cursor: not-allowed;
+}
+
+.btn-toggle.btn-activate {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-toggle.btn-deactivate {
+  background-color: #f39c12;
+  color: white;
+}
+
+.btn-toggle:hover {
+  opacity: 0.8;
+}
+
+.btn-delete {
+  background-color: #c0392b;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #a93226;
+}
+
+/* === Estatísticas === */
+.cupons-stats {
+  margin-top: 2rem;
+}
+
+.stats-card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.stats-card h4 {
+  font-family: var(--fonte-primaria);
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* === Botões gerais === */
+.btn-primary, .btn-secondary {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--fonte-primaria);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* === Responsividade === */
+@media (max-width: 768px) {
+  .cupons-container {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .cupons-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cupom-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .desconto-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .cupom-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .cupom-actions button {
+    width: 100%;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

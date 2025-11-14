@@ -1,7 +1,5 @@
-<!-- perfil-cliente.component.html -->
-
 <section class="perfil-cliente-container">
-  <!-- 1) Card principal com avatar + informações -->
+  <!-- Card principal -->
   <div class="perfil-cliente-card">
     <!-- Avatar -->
     <div class="perfil-cliente-card__avatar-wrapper">
@@ -11,70 +9,149 @@
         class="perfil-cliente-card__avatar"
       />
     </div>
-    <!-- Informações básicas (nome, email e botões) -->
+
+    <!-- Informações -->
     <div class="perfil-cliente-card__info">
       <h2 class="perfil-cliente-card__name">{{ Nome }}</h2>
       <p class="perfil-cliente-card__email">{{ Email }}</p>
+
+      <!-- Botões inteligentes -->
       <div class="perfil-cliente-card__actions">
-        <button class="perfil-btn--editar" (click)="editarCliente()">Editar Perfil</button>
-        <button class="perfil-btn--excluir" (click)="excluirCliente()">Excluir Perfil</button>
+        <div class="dropdown" 
+             (mouseenter)="showDropdown = true" 
+             (mouseleave)="hideDropdownWithDelay()">
+          <button class="dropdown-toggle">
+            Ações
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <ul class="dropdown-menu" 
+              [style.display]="showDropdown ? 'block' : 'none'"
+              (mouseenter)="cancelHideDropdown()" 
+              (mouseleave)="hideDropdownWithDelay()">
+            <li><a (click)="editarCliente(); hideDropdown()">Editar Perfil</a></li>
+            <li><a (click)="verMeusCupons(); hideDropdown()">Meus Cupons</a></li>
+            <li><a (click)="excluirCliente(); hideDropdown()">Excluir Perfil</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 2) Seção “Minhas Avaliações” -->
+  <!-- Minhas Avaliações -->
   <div class="perfil-cliente-avaliacoes">
     <h3 class="perfil-cliente-avaliacoes__titulo">Minhas Avaliações</h3>
 
-    <!-- 2.1) Mensagem caso não haja avaliações -->
-    <div
-      *ngIf="listaAvaliacao.length === 0"
-      class="perfil-cliente-avaliacoes__vazio"
-    >
+    <!-- Filtro de busca -->
+    <div *ngIf="listaAvaliacao.length > 0" class="avaliacoes-filtro">
+      <div class="filtro-busca">
+        <input 
+          type="text" 
+          [(ngModel)]="filtroTexto"
+          (input)="filtrarAvaliacoes()"
+          placeholder="Buscar por comentário, nota ou restaurante..."
+        />
+      </div>
+      <button 
+        class="filtro-limpar" 
+        (click)="limparFiltro()"
+        [disabled]="!filtroTexto"
+      >
+        Limpar
+      </button>
+    </div>
+
+    <!-- Contador de resultados -->
+    <div *ngIf="listaAvaliacao.length > 0 && filtroTexto" class="contador-resultados">
+      <i class="fas fa-info-circle"></i>
+      {{ listaAvaliacaoFiltrada.length }} de {{ listaAvaliacao.length }} avaliações encontradas
+    </div>
+
+    <div *ngIf="listaAvaliacao.length === 0" class="perfil-cliente-avaliacoes__vazio">
       Você ainda não fez nenhuma avaliação.
     </div>
 
-    <!-- 2.2) Lista de avaliações, quando houver -->
-    <ul *ngIf="listaAvaliacao.length > 0" class="perfil-cliente-avaliacoes__lista">
-      <li
-        *ngFor="let aval of listaAvaliacao"
-        class="perfil-cliente-avaliacoes__item"
-      >
-        <!-- Box de texto da avaliação -->
+    <!-- Mostrar mensagem quando não há resultados no filtro -->
+    <div *ngIf="listaAvaliacao.length > 0 && listaAvaliacaoFiltrada.length === 0" class="perfil-cliente-avaliacoes__vazio">
+      <i class="fas fa-search"></i>
+      Nenhuma avaliação encontrada para "{{ filtroTexto }}".
+    </div>
+
+    <ul *ngIf="listaAvaliacaoFiltrada.length > 0" class="perfil-cliente-avaliacoes__lista">
+      <li *ngFor="let aval of listaAvaliacaoFiltrada" class="perfil-cliente-avaliacoes__item">
         <div class="avaliacao-item__texto">
-          <span class="avaliacao-item__nota">
-            <strong>Nota:</strong> {{ aval.Nota }}
-          </span>
-          <span class="avaliacao-item__comentario">
-            <strong>Comentário:</strong> {{ aval.Comentario }}
-          </span>
-          <span class="avaliacao-item__restaurante">
-            <strong>Restaurante:</strong>
-            <!-- Caso queira exibir o nome do restaurante, pode adicionar propriedade no model -->
-            {{ aval.ID_Restaurante || '—' }}
-          </span>
-          <!--<span class="avaliacao-item__data">
-            <strong>Data:</strong>
-            {{ aval.criado_em ? (avaliacaoDataPipe(avaliacaoData(av al.criado_em))) : '—' }}
-          </span>-->
+          <span><strong>Nota:</strong> {{ aval.Nota }}</span>
+          <span><strong>Comentário:</strong> {{ aval.Comentario }}</span>
+          <span><strong>Restaurante:</strong> {{ aval.Nome_Restaurante || 'Carregando...' }}</span>
         </div>
 
-        <!-- Botões “Editar” e “Excluir” -->
+        <!-- Botões individuais -->
         <div class="avaliacao-item__botoes">
-          <button
-            class="avaliacao-btn--editar"
-            (click)="irParaEditarAvaliacao(aval.ID!)"
-          >
-            ✏️ Editar
-          </button>
-          <button
-            class="avaliacao-btn--excluir"
-            (click)="removerAvaliacao(aval.ID!)"
-          >
-            🗑️ Excluir
-          </button>
+          <button class="avaliacao-btn--editar" (click)="irParaEditarAvaliacao(aval.ID!)">Editar</button>
+          <button class="avaliacao-btn--excluir" (click)="abrirModalExclusaoAvaliacao(aval.ID!)">Excluir</button>
         </div>
       </li>
     </ul>
   </div>
 </section>
+
+<!-- Modal de Confirmação de Exclusão do Perfil -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelarExclusao()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>⚠️ Confirmar Exclusão do Perfil</h3>
+      <button class="modal-close" (click)="cancelarExclusao()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <p>Tem certeza de que deseja excluir sua conta <strong>"{{ Nome }}"</strong>?</p>
+      <div class="warning-box">
+        <p><strong>⚠️ Esta ação não pode ser desfeita!</strong></p>
+        <ul>
+          <li>Todas as suas avaliações serão removidas</li>
+          <li>Seus cupons serão perdidos</li>
+          <li>Seu histórico de pontos será excluído</li>
+          <li>Você será deslogado automaticamente</li>
+          <li>Não será possível recuperar os dados</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelarExclusao()">
+        Cancelar
+      </button>
+      <button class="btn-delete" (click)="confirmarExclusao()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Excluir Minha Conta</span>
+        <span *ngIf="isDeleting" class="loading-spinner">Excluindo...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão de Avaliação -->
+<div class="modal-overlay" *ngIf="showDeleteAvaliacaoModal" (click)="cancelarExclusaoAvaliacao()">
+  <div class="modal-content modal-content-small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🗑️ Excluir Avaliação</h3>
+      <button class="modal-close" (click)="cancelarExclusaoAvaliacao()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <p>Tem certeza de que deseja excluir esta avaliação?</p>
+      <div class="warning-box warning-box-small">
+        <p><strong>⚠️ Esta ação não pode ser desfeita!</strong></p>
+        <p>Sua avaliação será removida permanentemente.</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelarExclusaoAvaliacao()">
+        Cancelar
+      </button>
+      <button class="btn-delete" (click)="confirmarExclusaoAvaliacao()" [disabled]="isDeletingAvaliacao">
+        <span *ngIf="!isDeletingAvaliacao">Excluir</span>
+        <span *ngIf="isDeletingAvaliacao" class="loading-spinner">Excluindo...</span>
+      </button>
+    </div>
+  </div>
+</div>

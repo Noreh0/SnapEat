@@ -1,47 +1,74 @@
 <section class="auth-page">
   <div class="auth-card">
     <header class="auth-header">
-      <h2>Redefinir Senha</h2>
-      <p>Escolha uma nova senha para sua conta.</p>
+      <h2>{{ 'RESET_PASSWORD.TITLE' | translate }}</h2>
+      <p>{{ 'RESET_PASSWORD.SUBTITLE' | translate }}</p>
     </header>
 
-    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+    <!-- Mostrar erro se o token for inválido -->
+    <div class="feedback error" *ngIf="!tokenValido">
+      <p>{{ 'RESET_PASSWORD.INVALID_TOKEN_TITLE' | translate }}</p>
+      <p>{{ 'RESET_PASSWORD.INVALID_TOKEN_SUBTITLE' | translate }}</p>
+      <button class="btn-secondary" routerLink="/recuperar-senha">
+        {{ 'RESET_PASSWORD.REQUEST_NEW_LINK_BUTTON' | translate }}
+      </button>
+      <button class="btn-secondary" routerLink="/login" style="margin-top: 10px">
+        {{ 'RESET_PASSWORD.BACK_TO_LOGIN_BUTTON' | translate }}
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate *ngIf="tokenValido">
+      <!-- Nova senha -->
       <div class="form-group">
-        <label for="nova_senha">Nova senha</label>
+        <label for="nova_senha">{{ 'RESET_PASSWORD.NEW_PASSWORD_LABEL' | translate }}</label>
         <input
           id="nova_senha"
           type="password"
           formControlName="nova_senha"
-          placeholder="••••••••"
+          [placeholder]="'RESET_PASSWORD.NEW_PASSWORD_PLACEHOLDER' | translate"
         />
+        <div class="error" *ngIf="form.get('nova_senha')?.invalid && form.get('nova_senha')?.touched">
+          {{ 'RESET_PASSWORD.NEW_PASSWORD_ERROR_MINLENGTH' | translate }}
+        </div>
       </div>
 
+      <!-- Confirmar senha -->
       <div class="form-group">
-        <label for="confirmar">Confirmar senha</label>
+        <label for="confirmar">{{ 'RESET_PASSWORD.CONFIRM_PASSWORD_LABEL' | translate }}</label>
         <input
           id="confirmar"
           type="password"
           formControlName="confirmar"
-          placeholder="••••••••"
+          [placeholder]="'RESET_PASSWORD.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
         />
+        <div class="error" *ngIf="form.errors?.['senhasDiferentes'] && form.get('confirmar')?.touched">
+          {{ 'RESET_PASSWORD.CONFIRM_PASSWORD_ERROR_MISMATCH' | translate }}
+        </div>
       </div>
 
-      <!-- ...existing code... -->
-      <div class="error" *ngIf="form.errors?.['senhasDiferentes']">
-        As senhas não coincidem.
-      </div>
-      <!-- ...existing code... -->
-
+      <!-- Botão de ação -->
       <button
         type="submit"
         class="btn-primary"
         [disabled]="form.invalid"
       >
-        Redefinir
+        {{ 'RESET_PASSWORD.SUBMIT_BUTTON' | translate }}
       </button>
     </form>
 
-    <div class="feedback success" *ngIf="mensagem">{{ mensagem }}</div>
-    <div class="feedback error"   *ngIf="erro">{{ erro }}</div>
+    <!-- Feedback ao usuário -->
+    <div class="feedback success" *ngIf="mensagem">
+      <p>{{ mensagem }}</p>
+      <p>{{ 'RESET_PASSWORD.REDIRECTING_MESSAGE' | translate }}</p>
+    </div>
+    
+    <div class="feedback error" *ngIf="erro">
+      <p>{{ erro }}</p>
+    </div>
+
+    <!-- Link de retorno -->
+    <a routerLink="/login" *ngIf="tokenValido && !mensagem" style="display: block; text-align: center; margin-top: 20px; color: var(--warm-terracotta); text-decoration: none; font-weight: 500;">
+      {{ 'RESET_PASSWORD.CANCEL_AND_BACK_TO_LOGIN' | translate }}
+    </a>
   </div>
 </section>

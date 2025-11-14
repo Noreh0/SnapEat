@@ -1,8 +1,10 @@
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AutenticacaoService } from '../../services/autenticacao.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { AutenticacaoService } from '../../services/autenticacao.service';
+import { FirebaseAuthService } from '../../services/firebase-auth.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -18,8 +20,15 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AutenticacaoService,
     private jwtHelper: JwtHelperService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private firebaseAuth: FirebaseAuthService,
+    private translate: TranslateService
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      senha: ['', [Validators.required]]
+    });
+  }
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -35,9 +44,43 @@ export class LoginComponent implements OnInit {
       this.irParaHome(tipo);
     }
   }
-  loginComGoogle() {
-    // apenas um mock — se quiser realmente implementar, use a biblioteca OAuth do Google.
-    alert('Funcionalidade “Login com Google” ainda não implementada.');
+  async loginComGoogle() {
+    try {
+      this.carregando = true;
+      this.mensagemErro = '';
+      
+      console.log('Iniciando login com Google...');
+      const result = await this.firebaseAuth.loginWithGoogle();
+      console.log('Login com Google resultado:', result);
+      
+      // Se o login requer informações adicionais
+      if (result && result.requiresAdditionalInfo) {
+        console.log('Redirecionamento para completar cadastro será feito pelo serviço');
+        // O serviço já faz o redirecionamento, não precisamos fazer nada aqui
+        return;
+      } 
+      
+      // Se chegou aqui, o login foi bem-sucedido
+      const tipo = localStorage.getItem('tipo');
+      const id = localStorage.getItem('id');
+      console.log(`Redirecionando usuário tipo: ${tipo}, id: ${id}`);
+      
+      if (tipo && id) {
+        this.irParaHome(tipo, Number(id));
+      } else {
+        console.error('Tipo ou ID não encontrados após login');
+        this.translate.get('LOGIN.ERROR_PROCESSING_INFO').subscribe((res: string) => {
+          this.mensagemErro = res;
+        });
+      }
+    } catch (error: any) {
+      console.error('Erro ao fazer login com Google:', error);
+      this.translate.get('LOGIN.ERROR_GOOGLE_LOGIN').subscribe((res: string) => {
+        this.mensagemErro = res;
+      });
+    } finally {
+      this.carregando = false;
+    }
   }
   abrirRecuperarSenha() {
     this.router.navigate(['/recuperar-senha']);
@@ -48,7 +91,9 @@ export class LoginComponent implements OnInit {
     this.mensagemErro = null;
 
     if (this.loginForm.invalid) {
-      this.mensagemErro = 'Preencha e-mail e senha corretamente.';
+      this.translate.get('LOGIN.ERROR_FILL_FIELDS').subscribe((res: string) => {
+        this.mensagemErro = res;
+      });
       return;
     }
 
@@ -77,11 +122,14 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         console.error('Falha na autenticação', err);
-        this.mensagemErro = 'E-mail ou senha inválidos.';
+        this.translate.get('LOGIN.ERROR_INVALID_CREDENTIALS').subscribe((res: string) => {
+          this.mensagemErro = res;
+        });
         this.carregando = false;
       },
     });
   }
+  
 
   private irParaHome(tipo: string | null, id?: number | string) {
     if (tipo === 'restaurante' && id) {

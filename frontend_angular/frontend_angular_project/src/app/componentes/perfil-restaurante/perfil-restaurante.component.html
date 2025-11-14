@@ -1,13 +1,32 @@
 <section class="perfil-restaurante-page" *ngIf="restaurante">
   <div class="perfil-card">
 
-    <!-- ===== CABEÇALHO COM AVATAR + META INICIAL ===== -->
+    <!-- Cabeçalho -->
     <div class="perfil-header">
-      <img
-        [src]="restaurante.imagem_url ? 'http://localhost:5000' + restaurante.imagem_url : 'assets/images/default-restaurant.png'"
-        alt="Logo {{ restaurante.Nome }}"
-        class="resto-imagem"
-      />
+      <div class="image-container">
+  <!-- Loading spinner -->
+        <div class="image-placeholder" *ngIf="imageLoading">
+          <div class="spinner"></div>
+        </div>
+        
+        <!-- Imagem principal -->
+        <img
+          [src]="restaurante.imagem_url"
+          alt="{{ restaurante.Nome }}"
+          class="rest-avatar"
+          [ngClass]="{'hidden': imageLoading}"
+          (error)="handleImageError()"
+          (load)="handleImageLoad()"
+        />
+        
+        <!-- Fallback para imagem padrão em caso de erro -->
+        <img 
+          *ngIf="imageError" 
+          src="assets/images/default-restaurant.png" 
+          alt="Imagem padrão" 
+          class="rest-avatar"
+        />
+      </div>
       <div class="perfil-meta">
         <h1 class="perfil-nome">{{ restaurante.Nome }}</h1>
         <p class="perfil-tipo">{{ restaurante.tipo_restaurante | titlecase }}</p>
@@ -18,57 +37,68 @@
       </div>
     </div>
 
-    <!-- ===== BOTÕES DE AÇÃO ===== -->
+    <!-- Botões de ação -->
     <div class="perfil-actions">
-      <button class="btn-secondary" routerLink="/menu">Menu</button>
-      <button class="btn-primary" routerLink="/dashboard-restaurante/{{ restaurante.id }}">
+
+      <button class="btn-primary" [routerLink]="['/dashboard-restaurante', restaurante.id]">
         Meu Painel
       </button>
+
+      <!-- Grupo de ações inteligentes -->
+      <div class="dropdown" *ngIf="isOwner" 
+           (mouseenter)="showDropdownImmediate()" 
+           (mouseleave)="hideDropdownDelayed()">
+        <button class="btn-secondary dropdown-toggle" 
+                (click)="showDropdown = !showDropdown">Ações ▾</button>
+        <ul class="dropdown-menu" 
+            [class.show]="showDropdown"
+            (mouseenter)="showDropdownImmediate()"
+            (mouseleave)="hideDropdownDelayed()">
+          <li>
+            <a [routerLink]="['/restaurante', restaurante.id, 'denuncias']">
+              Denúncias
+              <span *ngIf="pendentesDenuncias > 0">({{ pendentesDenuncias }})</span>
+            </a>
+          </li>
+          <li><a [routerLink]="['/editar-restaurante', restaurante.id]">Editar</a></li>
+          <li><a (click)="excluirRestaurante()">Excluir</a></li>
+        </ul>
+      </div>
+
       <button
-        *ngIf="isOwner"
         class="btn-secondary"
-        [routerLink]="['/perfilRestaurante', restaurante.id, 'editarRestaurante']"
-      >
-        Editar
-      </button>
-      <button
-        *ngIf="isOwner"
-        class="btn-secondary"
-        (click)="excluirRestaurante()"
-      >
-        Excluir
-      </button>
-      <button
-        class="btn-secondary"
-        routerLink="/restaurante/{{ restaurante.id }}/pratos"
-      >
+        [routerLink]="['/restaurante', restaurante.id, 'pratos']">
         Meus Pratos
       </button>
+
+      <button
+        *ngIf="isOwner"
+        class="btn-secondary"
+        [routerLink]="['/restaurante', restaurante.id, 'cupons']">
+        Meus Cupons
+      </button>
+
       <button
         *ngIf="isOwner"
         class="btn-primary"
-        routerLink="/restaurante/{{ restaurante.id }}/pratos/criar"
-      >
+        [routerLink]="['/restaurante', restaurante.id, 'pratos', 'criar']">
         Novo Prato
       </button>
     </div>
 
-    <!-- ===== DESCRIÇÃO ===== -->
+    <!-- Descrição -->
     <section class="perfil-descricao">
       <h2>Sobre</h2>
       <p>{{ restaurante.descricao || '— Nenhuma descrição fornecida —' }}</p>
     </section>
 
-    <!-- ===== PREVIEW DE AVALIAÇÕES ===== -->
+    <!-- Avaliações -->
     <section class="perfil-avaliacoes">
       <h2>Últimas Avaliações</h2>
 
       <ng-container *ngIf="avaliacoes.length; else semAvaliacoes">
         <div class="lista-avaliacoes">
-          <div
-            *ngFor="let a of avaliacoes | slice:0:3"
-            class="avaliacao-preview-card"
-          >
+          <div *ngFor="let a of avaliacoes | slice:0:3" class="avaliacao-preview-card">
             <div class="preview-header">
               <span class="cliente">{{ a.clienteNome }}</span>
               <span class="nota">{{ renderStars(a.Nota) }}</span>
@@ -77,10 +107,7 @@
             <p class="comentario">{{ a.Comentario }}</p>
           </div>
         </div>
-        <button
-          class="btn-link"
-          routerLink="/dashboard-restaurante/{{ restaurante.id }}"
-        >
+        <button class="btn-link" routerLink="/dashboard-restaurante/{{ restaurante.id }}">
           Ver todas as avaliações →
         </button>
       </ng-container>
@@ -91,3 +118,36 @@
     </section>
   </div>
 </section>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelarExclusao()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>⚠️ Confirmar Exclusão</h3>
+      <button class="modal-close" (click)="cancelarExclusao()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <p>Tem certeza de que deseja excluir o restaurante <strong>"{{ restaurante.Nome }}"</strong>?</p>
+      <div class="warning-box">
+        <p><strong>⚠️ Esta ação não pode ser desfeita!</strong></p>
+        <ul>
+          <li>Todos os pratos serão removidos</li>
+          <li>Todas as avaliações serão perdidas</li>
+          <li>Todos os cupons serão excluídos</li>
+          <li>Você será deslogado automaticamente</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelarExclusao()">
+        Cancelar
+      </button>
+      <button class="btn-delete" (click)="confirmarExclusao()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Excluir Restaurante</span>
+        <span *ngIf="isDeleting" class="loading-spinner">Excluindo...</span>
+      </button>
+    </div>
+  </div>
+</div>

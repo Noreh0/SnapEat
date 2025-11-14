@@ -1,176 +1,738 @@
-/* 1. FUNDO DA PÁGINA */
+/*
+  ===================================================
+   1. GLOBAIS: PALETA DE CORES E FONTES
+  ===================================================
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+:host {
+  /* Tipografia padronizada no estilo Deezer */
+  --fonte-primaria: 'Inter', sans-serif;
+  --fonte-secundaria: 'Poppins', sans-serif;
+  --fonte-mono: 'Roboto', sans-serif;
+  --fonte-titulos: var(--fonte-secundaria);
+  --fonte-corpo: var(--fonte-primaria);
+  
+  /* Estilos */
+  --radius: 16px;
+  --radius-sm: 8px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Garantir que o componente responda às mudanças de tema */
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+  ===================================================
+   2. CONTAINER PRINCIPAL DA PÁGINA
+  ===================================================
+*/
 .cadastro-restaurante-page {
   min-height: 100vh;
-  padding: 2rem;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(to right, #1c1c1f, #111113);
+  padding: 3rem 1.5rem;
+  background-color: var(--bg-primary);
+  font-family: var(--fonte-primaria);
+  position: relative;
 }
 
-/* 2. CARD */
-.form-card {
-  background-color: #202024;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  padding: 2rem;
+/* Padrão de fundo sutil (opcional) */
+.cadastro-restaurante-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 600px;
-  color: #ffffff;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(217, 119, 70, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(106, 156, 137, 0.03) 0%, transparent 50%);
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* 3. HEADER */
+/*
+  ===================================================
+   3. CARD DO FORMULÁRIO
+  ===================================================
+*/
+.form-card {
+  position: relative;
+  z-index: 1;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-medium);
+  padding: 2.5rem 3rem;
+  width: 100%;
+  max-width: 700px;
+  color: var(--text-primary);
+  transition: var(--transition);
+}
+
+.form-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+/*
+  ===================================================
+   4. CABEÇALHO
+  ===================================================
+*/
 .form-header {
   text-align: center;
-  margin-bottom: 1.5rem;
-}
-.form-header h1 {
-  font-size: 2.5rem;
-  margin: 0;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
 }
 
-/* 4. GRUPOS DE INPUT */
+.form-header h1 {
+  font-family: var(--fonte-secundaria);
+  font-size: 2.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/*
+  ===================================================
+   5. GRUPOS DE FORMULÁRIO
+  ===================================================
+*/
 .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.5rem;
 }
+
 .form-group label {
-  font-size: 1.1rem;
+  font-family: var(--fonte-primaria);
+  font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #e5e5e5;
+  color: var(--text-primary);  /* Mudado de text-secondary para text-primary para melhor contraste */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* 5. INPUTS E TEXTAREA */
+.form-group label b {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/*
+  ===================================================
+   6. INPUTS, SELECTS E TEXTAREA
+  ===================================================
+*/
 .form-input,
 .form-textarea,
 .form-select {
-  padding: 0.75rem 1rem;
-  background-color: #2c2c2f;
-  border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 1rem;
+  font-family: var(--fonte-primaria);
+  padding: 0.85rem 1rem;
+  background-color: var(--bg-secondary);  /* Usa a variável do tema */
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 400;
   width: 100%;
   box-sizing: border-box;
-  transition: outline 0.2s ease;
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease,
+              opacity 0.3s ease;
 }
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text-muted);  /* Usa a variável do tema para placeholder */
+  font-weight: 300;
+}
+
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
 }
 
-/* 6. SELECT (seta custom) */
+.form-input:hover:not(:focus),
+.form-textarea:hover:not(:focus),
+.form-select:hover:not(:focus) {
+  border-color: var(--color-primary);  /* Usa a cor primária para hover */
+  opacity: 0.8;
+}
+
+/* Textarea específico */
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: var(--fonte-primaria);
+  line-height: 1.5;
+}
+
+/* Select customizado */
 .form-select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23fff'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
-  background-size: 12px 8px;
+  background-size: 16px;
+  padding-right: 2.5rem;
+  cursor: pointer;
 }
 
-/* 7. SENHA COM ÍCONE */
+/* Ícone do select para tema claro */
+:root .form-select,
+.theme-light .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* Ícone do select para tema escuro */
+.theme-dark .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e0e0e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/*
+  ===================================================
+   7. SENHA COM ÍCONE
+  ===================================================
+*/
 .senha-wrapper {
   position: relative;
+  width: 100%;
 }
+
 .input-with-icon {
   padding-right: 3rem;
 }
+
 .icon-btn {
   position: absolute;
   top: 50%;
-  right: 0.75rem;
+  right: 0.5rem;
   transform: translateY(-50%);
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 0.5rem;
+  color: var(--text-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
 }
+
+.icon-btn:hover {
+  background-color: rgba(217, 119, 70, 0.1);
+  color: var(--color-primary);
+}
+
 .password-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   opacity: 0.7;
   transition: opacity 0.2s ease;
+  color: var(--text-secondary);
 }
+
 .icon-btn:hover .password-icon {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+/*
+  ===================================================
+   8. TOOLTIP DE SENHA
+  ===================================================
+*/
+.password-hint-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);  /* Mudado para text-primary para melhor visibilidade */
+}
+
+.info-icon {
+  position: relative;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(217, 119, 70, 0.1);
+  transition: var(--transition);
+}
+
+.info-icon:hover {
+  background: rgba(217, 119, 70, 0.2);
+  transform: scale(1.1);
+}
+
+.info-svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+  transition: var(--transition);
+}
+
+.info-icon:hover .info-svg {
+  color: var(--color-primary-hover);
+}
+
+.info-icon .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: 280px;
+  background: var(--bg-tertiary);  /* Usa variável do tema */
+  color: var(--text-primary);      /* Usa variável do tema */
+  border: 1px solid var(--border-color);  /* Adiciona borda para melhor definição */
+  text-align: left;
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  position: absolute;
+  left: 120%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease;
+  box-shadow: var(--shadow-medium);
+  z-index: 100;
+  font-family: var(--fonte-primaria);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.info-icon .tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 8px solid transparent;
+  border-right-color: var(--bg-tertiary);  /* Usa variável do tema */
+}
+
+.info-icon .tooltip ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.25rem;
+}
+
+.info-icon .tooltip li {
+  margin-bottom: 0.25rem;
+}
+
+.info-icon:hover .tooltip,
+.info-icon:focus .tooltip {
+  visibility: visible;
   opacity: 1;
 }
 
-/* 8. DICA DE SENHA */
-.password-hint {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin: -0.5rem 0 0.5rem;
-  line-height: 1.3;
+.info-text {
+  font-size: 0.8rem;
+  color: var(--text-primary);  /* Mudado para text-primary para melhor contraste */
 }
 
-/* 9. ERROS */
+/*
+  ===================================================
+   9. MENSAGENS DE ERRO
+  ===================================================
+*/
 .error {
-  color: #f87171;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+  font-family: var(--fonte-primaria);
+  color: var(--error-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  animation: slideDown 0.3s ease;
 }
 
-/* 10. BOTÕES */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error::before {
+  content: '⚠';
+  font-size: 0.9rem;
+}
+
+/*
+  ===================================================
+   10. PREVIEW DE IMAGEM
+  ===================================================
+*/
+.preview-img {
+  margin-top: 1rem;
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-color);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+
+/* Input de arquivo customizado */
+input[type="file"] {
+  font-family: var(--fonte-primaria);
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  font-family: var(--fonte-primaria);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  margin-right: 1rem;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: var(--color-primary-hover);
+}
+
+/*
+  ===================================================
+   11. BOTÕES DE AÇÃO
+  ===================================================
+*/
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 2rem;
-}
-.btn-primary {
-  background-color: #3b82f6;
-  color: #fff;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.btn-primary:disabled {
-  background-color: #575757;
-  cursor: not-allowed;
-}
-.btn-primary:not(:disabled):hover {
-  background-color: #2563eb;
-}
-.btn-secondary {
-  background: transparent;
-  border: 2px solid #fff;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
 }
 
-/* 11. RESPONSIVIDADE */
-@media (max-width: 640px) {
-  .form-card {
-    max-width: 90%;
-    padding: 1.5rem;
+.btn-primary,
+.btn-secondary {
+  font-family: var(--fonte-primaria);
+  border: 2px solid transparent;
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(217, 119, 70, 0.2);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: linear-gradient(135deg, var(--color-primary-hover) 0%, #a85530 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 70, 0.3);
+}
+
+.btn-primary:disabled {
+  background: #d1d5db;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: rgba(217, 119, 70, 0.05);
+  transform: translateY(-2px);
+}
+
+/*
+  ===================================================
+   12. ESTADOS DE FOCO E ACESSIBILIDADE
+  ===================================================
+*/
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+.form-select:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.icon-btn:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/*
+  ===================================================
+   13. ANIMAÇÕES
+  ===================================================
+*/
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-card {
+  animation: fadeIn 0.4s ease;
+}
+
+.form-group {
+  animation: fadeIn 0.5s ease backwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.05s; }
+.form-group:nth-child(2) { animation-delay: 0.1s; }
+.form-group:nth-child(3) { animation-delay: 0.15s; }
+.form-group:nth-child(4) { animation-delay: 0.2s; }
+.form-group:nth-child(5) { animation-delay: 0.25s; }
+.form-group:nth-child(6) { animation-delay: 0.3s; }
+.form-group:nth-child(7) { animation-delay: 0.35s; }
+.form-group:nth-child(8) { animation-delay: 0.4s; }
+
+/*
+  ===================================================
+   14. LOADING STATE NO BOTÃO
+  ===================================================
+*/
+.btn-primary:disabled::after {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 0.5rem;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+  ===================================================
+   15. RESPONSIVIDADE
+  ===================================================
+*/
+@media (max-width: 768px) {
+  .cadastro-restaurante-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-card {
+    padding: 2rem 1.5rem;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+
   .form-header h1 {
     font-size: 2rem;
   }
-  .password-icon {
-    width: 20px;
-    height: 20px;
-  }
+
   .form-actions {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
+
   .btn-primary,
   .btn-secondary {
     width: 100%;
-    text-align: center;
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .info-icon .tooltip {
+    left: auto;
+    right: 0;
+    width: 240px;
+  }
+
+  .info-icon .tooltip::before {
+    right: 1rem;
+    left: auto;
+    border-right-color: transparent;
+    border-bottom-color: var(--text-primary);
+    top: auto;
+    bottom: 100%;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    font-size: 0.9rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .password-hint-info {
+    font-size: 0.8rem;
+  }
+}
+
+/*
+  ===================================================
+   16. REGRAS ESPECÍFICAS PARA TEMA ESCURO
+  ===================================================
+*/
+.theme-dark .form-input,
+.theme-dark .form-textarea,
+.theme-dark .form-select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.theme-dark .form-input::placeholder,
+.theme-dark .form-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.theme-dark .form-group label {
+  color: var(--text-primary);
+}
+
+.theme-dark .password-hint-info {
+  color: var(--text-primary);
+}
+
+.theme-dark .info-text {
+  color: var(--text-primary);
+}
+
+.theme-dark .error {
+  color: var(--error-color);
+}
+
+/* Melhor contraste para o ícone de informação no tema escuro */
+.theme-dark .info-icon {
+  background: rgba(232, 139, 90, 0.2);  /* Usa cor primária do tema escuro */
+}
+
+/* Melhor contraste para botões no tema escuro */
+.theme-dark .btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.theme-dark .btn-secondary:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Garantir que os placeholders tenham boa visibilidade no tema escuro */
+.theme-dark .form-input::placeholder,
+.theme-dark .form-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;  /* Melhor visibilidade */
+}
+
+/* Ícones SVG para tema escuro */
+.theme-dark .password-icon {
+  color: var(--text-secondary);
+}
+
+.theme-dark .icon-btn:hover .password-icon {
+  color: var(--color-primary);
+}
+
+.theme-dark .info-svg {
+  color: var(--color-primary);
+}
+
+.theme-dark .info-icon:hover .info-svg {
+  color: var(--color-primary-hover);
+}
+
+.theme-dark .info-icon {
+  background: rgba(232, 139, 90, 0.15);  /* Cor primária do tema escuro com transparência */
+}
+
+.theme-dark .info-icon:hover {
+  background: rgba(232, 139, 90, 0.25);
+}
+
+/*
+  ===================================================
+   17. PRINT STYLES
+  ===================================================
+*/
+@media print {
+  .cadastro-restaurante-page::before {
+    display: none;
+  }
+
+  .form-card {
+    box-shadow: none;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    display: none;
   }
 }

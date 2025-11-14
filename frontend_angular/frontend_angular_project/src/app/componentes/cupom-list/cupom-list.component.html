@@ -1,0 +1,148 @@
+<div class="cupons-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Gerenciar Cupons</h1>
+      <p class="subtitle">Gerencie os cupons de desconto do seu restaurante</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="voltar()">
+        ← Voltar
+      </button>
+      <button class="btn-primary" (click)="novoCupom()">
+        + Novo Cupom
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Carregando cupons...</p>
+  </div>
+
+  <!-- Erro -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <h3>Erro ao carregar cupons</h3>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="carregarCupons()">
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Cupons -->
+  <div *ngIf="!loading && !error" class="cupons-grid">
+    <!-- Estado vazio -->
+    <div *ngIf="cupons.length === 0" class="empty-state">
+      <div class="empty-icon">🎫</div>
+      <h3>Nenhum cupom criado</h3>
+      <p>Crie seu primeiro cupom de desconto para fidelizar seus clientes!</p>
+      <button class="btn-primary" (click)="novoCupom()">
+        Criar Primeiro Cupom
+      </button>
+    </div>
+
+    <!-- Cards dos cupons -->
+    <div *ngFor="let cupom of cupons" class="cupom-card" [ngClass]="getStatusClass(cupom)">
+      <div class="cupom-header">
+        <div class="cupom-info">
+          <h3 class="cupom-titulo">{{ cupom.titulo }}</h3>
+          <div class="cupom-codigo">
+            <span class="codigo-label">Código:</span>
+            <span class="codigo-valor">{{ cupom.codigo }}</span>
+          </div>
+        </div>
+        <div class="cupom-status">
+          <span class="status-badge" [ngClass]="getStatusClass(cupom)">
+            {{ getStatusLabel(cupom) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="cupom-body">
+        <div class="desconto-info">
+          <div class="desconto-valor">{{ formatarDesconto(cupom) }}</div>
+          <div class="pontos-info">
+            <span class="pontos-icon">★</span>
+            <span>{{ cupom.pontos_necessarios }} pontos</span>
+          </div>
+        </div>
+
+        <div class="cupom-detalhes">
+          <div class="detalhe" *ngIf="cupom.valor_minimo && cupom.valor_minimo > 0">
+            <span class="label">Valor mínimo:</span>
+            <span class="valor">R$ {{ cupom.valor_minimo | number:'1.2-2' }}</span>
+          </div>
+          
+          <div class="detalhe">
+            <span class="label">Validade:</span>
+            <span class="valor">{{ formatarData(cupom.data_validade) }}</span>
+          </div>
+          
+          <div class="detalhe">
+            <span class="label">Usos:</span>
+            <span class="valor">{{ cupom.usos_restantes }}/{{ cupom.max_usos }}</span>
+          </div>
+        </div>
+
+        <p class="cupom-descricao" *ngIf="cupom.descricao">
+          {{ cupom.descricao }}
+        </p>
+      </div>
+
+      <div class="cupom-actions">
+        <button 
+          class="btn-edit" 
+          (click)="editarCupom(cupom.ID!)"
+          [disabled]="isExpiradoOuInativo(cupom)"
+          title="Editar cupom"
+        >
+          ✏️ Editar
+        </button>
+
+        <button 
+          class="btn-toggle" 
+          (click)="toggleAtivoCupom(cupom)"
+          [ngClass]="cupom.ativo ? 'btn-deactivate' : 'btn-activate'"
+          title="{{ cupom.ativo ? 'Desativar' : 'Ativar' }} cupom"
+        >
+          {{ cupom.ativo ? '⏸️ Desativar' : '▶️ Ativar' }}
+        </button>
+
+        <button 
+          class="btn-delete" 
+          (click)="excluirCupom(cupom)"
+          title="Excluir cupom permanentemente"
+        >
+          🗑️ Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estatísticas dos cupons (opcional) -->
+  <div *ngIf="cupons.length > 0 && !loading" class="cupons-stats">
+    <div class="stats-card">
+      <h4>Estatísticas</h4>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number">{{ cupons.length }}</span>
+          <span class="stat-label">Total de Cupons</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ cuponsAtivos }}</span>
+          <span class="stat-label">Ativos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ cuponsExpirados }}</span>
+          <span class="stat-label">Expirados</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ totalUsosRealizados }}</span>
+          <span class="stat-label">Total Usado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,111 +1,290 @@
-<section class="menu-container">
-  <header class="menu-header">
-    <h2>Menu de Restaurantes</h2>
-  </header>
-
-  <!-- FILTROS -->
-  <div class="menu-filtros">
-    <!-- Campo de busca por nome -->
-    <div class="filtro-box">
-      <input
-        type="search"
-        class="filtro-input"
-        [placeholder]="ValidaPlaceholderProcura()"
-        [(ngModel)]="filtro"
-        (keyup)="pesquisarRestaurantes()"
-      />
-      <i class="icon-search"></i>
+<section class="menu-container" [@containerFadeIn]>
+  <!-- Sistema de mensagens de feedback -->
+  <div class="feedback-system">
+    <div class="message-success" *ngIf="mostrarMensagem && mensagemSucesso" [@messageSlide]>
+      <i class="fas fa-check-circle"></i>
+      {{ mensagemSucesso }}
+      <button class="close-message" (click)="fecharMensagem()">×</button>
     </div>
-
-    <!-- Select de tipo de cozinha -->
-    <div class="filtro-box">
-      <select
-        class="filtro-select"
-        [(ngModel)]="filtro_tipo"
-        (change)="filtrarRestaurantes()"
-      >
-        <option value="Nenhum" translate>Nenhum</option>
-        <option value="Arabe" translate>Árabe</option>
-        <option value="Brasileira" translate>Brasileira</option>
-        <option value="Carnes" translate>Carnes</option>
-        <option value="Chinesa" translate>Chinesa</option>
-        <option value="Francesa" translate>Francesa</option>
-        <option value="Frangos" translate>Frangos</option>
-        <option value="Italiana" translate>Italiana</option>
-        <option value="Japonesa" translate>Japonesa</option>
-        <option value="Lanches" translate>Lanches</option>
-        <option value="Mexicana" translate>Mexicana</option>
-        <option value="Peixes" translate>Peixes</option>
-        <option value="Pizzaria" translate>Pizzaria</option>
-        <option value="Saudável" translate>Saudável</option>
-        <option value="Vegana" translate>Vegana</option>
-        <option value="Vegetariana" translate>Vegetariana</option>
-      </select>
-      <i class="icon-filter"></i>
+    <div class="message-error" *ngIf="mostrarMensagem && mensagemErro" [@messageSlide]>
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ mensagemErro }}
+      <button class="close-message" (click)="fecharMensagem()">×</button>
     </div>
   </div>
 
-  <!-- LISTA DE RESTAURANTES -->
-  <div *ngIf="listaRestaurante.length > 0; else SemRestaurante" class="cards-grid">
-    <div *ngFor="let resto of listaRestaurante" class="restaurante-card">
-      <!-- IMAGEM / ÍCONE (pode ser placeholder ou foto real) -->
-      <div class="card-banner">
-        <img
-          [src]="resto.imagem_url ? 'http://localhost:5000' + resto.imagem_url : 'assets/images/default-restaurant.png'"
-          alt="Logo {{ resto.Nome }}"
-          class="resto-imagem"
+  <!-- Indicador de conectividade -->
+  <div class="connectivity-indicator" *ngIf="!online" [@messageSlide]>
+    <i class="fas fa-wifi"></i>
+    <span>Sem conexão com a internet</span>
+    <button class="retry-btn" (click)="tentarReconectar()" [disabled]="tentandoReconectar">
+      <i class="fas fa-redo" [class.fa-spin]="tentandoReconectar"></i>
+      {{ tentandoReconectar ? 'Reconectando...' : 'Tentar novamente' }}
+    </button>
+  </div>
+
+  <!-- Loading inicial -->
+  <div *ngIf="carregandoInicial" class="loading-initial" [@loadingPulse]>
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <i class="fas fa-utensils fa-spin"></i>
+      </div>
+      <h3>Carregando restaurantes...</h3>
+      <p>Estamos buscando os melhores estabelecimentos para você</p>
+    </div>
+  </div>
+
+  <!-- Erro de carregamento inicial -->
+  <div *ngIf="!carregandoInicial && erroCarregamento" class="error-initial" [@messageSlide]>
+    <div class="error-content">
+      <i class="fas fa-exclamation-circle"></i>
+      <h3>Erro ao carregar</h3>
+      <p>{{ erroCarregamento }}</p>
+      <button class="retry-btn" (click)="recarregarDados()">
+        <i class="fas fa-redo"></i>
+        Tentar novamente
+      </button>
+    </div>
+  </div>
+
+  <!-- ✅ Só mostrar para clientes -->
+  <div *ngIf="isCliente && !carregandoInicial && !erroCarregamento" [@containerFadeIn]>
+    <header class="menu-header" [@filterAnimation]>
+      <h2>{{ 'MENU.TITLE' | translate }}</h2>
+    </header>
+
+    <!-- Filtros -->
+    <div class="menu-filtros" [@filterAnimation]>
+      <div class="filtro-box">
+        <input
+          type="search"
+          class="filtro-input"
+          [placeholder]="'MENU.SEARCH_PLACEHOLDER' | translate"
+          [(ngModel)]="filtro"
+          (input)="pesquisarRestaurantes()"
+          [disabled]="carregandoFiltros"
         />
+        <i class="icon-search" *ngIf="!carregandoFiltros"></i>
+        <i class="fas fa-spinner fa-spin icon-loading" *ngIf="carregandoFiltros"></i>
       </div>
 
+      <div class="filtro-box">
+        <select
+          class="filtro-select"
+          [(ngModel)]="filtro_tipo"
+          (change)="filtrarRestaurantes()"
+          [disabled]="carregandoFiltros"
+        >
+          <option value="">{{ 'MENU.ALL_TYPES' | translate }}</option>
+          <option *ngFor="let t of tipos" [value]="t">{{ t | titlecase }}</option>
+        </select>
+        <i class="icon-filter" *ngIf="!carregandoFiltros"></i>
+        <i class="fas fa-spinner fa-spin icon-loading" *ngIf="carregandoFiltros"></i>
+      </div>
+      
+      <!-- Indicador de filtros ativos -->
+      <div class="filter-indicator" *ngIf="filtro || filtro_tipo" [@filterAnimation]>
+        <span>Filtros ativos:</span>
+        <span class="filter-tag" *ngIf="filtro">
+          Busca: "{{ filtro }}"
+          <button (click)="filtro = ''; pesquisarRestaurantes()">×</button>
+        </span>
+        <span class="filter-tag" *ngIf="filtro_tipo">
+          Tipo: {{ filtro_tipo | titlecase }}
+          <button (click)="filtro_tipo = ''; filtrarRestaurantes()">×</button>
+        </span>
+      </div>
+    </div>
+    <!-- Adicione abaixo dos filtros simples e antes da seção de recomendados -->
+
+  <app-filtro-avancado (filtroAplicado)="aplicarFiltroAvancado($event)"></app-filtro-avancado>
+
+    <div *ngIf="buscaAvancadaRealizada" class="collapsible-section">
+    <div class="section-header" (click)="toggleBuscaAvancada()">
+      <div class="section-header-content">
+        <h3>{{ 'MENU.SEARCH_RESULTS_TITLE' | translate }}</h3>
+        <span class="section-badge">{{ resultadosBuscaAvancada.length }}</span>
+      </div>
+      <span class="collapse-icon" [class.collapsed]="!secaoBuscaExpandida">
+        <i class="fas fa-chevron-down"></i>
+      </span>
+    </div>
+    
+    <div class="section-content" [class.collapsed]="!secaoBuscaExpandida">
+      <div *ngIf="carregandoBusca" class="loading">{{ 'MENU.LOADING_SEARCH' | translate }}</div>
+      
+      <div *ngIf="!carregandoBusca && resultadosBuscaAvancada.length === 0" class="sem-resultados">
+        {{ 'MENU.NO_SEARCH_RESULTS' | translate }}
+      </div>
+      
+      <div *ngIf="resultadosBuscaAvancada.length > 0" class="cards-grid">
+        <div *ngFor="let resto of resultadosBuscaAvancada" class="restaurante-card">
+          <div class="card-banner">
+            <img [src]="getImageUrl(resto.imagem_url)" alt="Banner do restaurante {{ resto.nome_fantasia }}" class="resto-imagem">
+          </div>
+          <div class="card-content">
+            <div class="card-header">
+              <h4 class="resto-nome">{{ resto.nome_fantasia }}</h4>
+              <span class="resto-tipo">{{ resto.tipo_restaurante }}</span>
+            </div>
+            <p class="resto-descricao">{{ resto.descricao }}</p>
+            <app-restaurant-tags-badges [tags]="resto.tags_conquistadas || []"></app-restaurant-tags-badges>
+            <div class="card-actions">
+              <button class="btn-ver-perfil" [routerLink]="['/restaurante', resto.ID]">{{ 'MENU.VIEW_PROFILE_BUTTON' | translate }}</button>
+              <button class="btn-avaliar" [routerLink]="['/avaliar', resto.ID]">{{ 'MENU.RATE_BUTTON' | translate }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Recomendados (colapsável) -->
+  <div class="collapsible-section">
+    <div class="section-header" (click)="toggleRecomendados()">
+      <div class="section-header-content">
+        <h3>{{ 'MENU.RECOMMENDED_SUBTITLE' | translate }}</h3>
+        <span class="section-badge">{{ recomendados.length }}</span>
+      </div>
+      <span class="collapse-icon" [class.collapsed]="!secaoRecomendadosExpandida">
+        <i class="fas fa-chevron-down"></i>
+      </span>
+    </div>
+    
+    <div class="section-content" [class.collapsed]="!secaoRecomendadosExpandida" *ngIf="secaoRecomendadosExpandida" [@sectionToggle]>
+      <!-- Loading de recomendados -->
+      <div *ngIf="carregandoRecomendados" class="loading-section">
+        <i class="fas fa-heart fa-spin"></i>
+        <span>Carregando recomendações personalizadas...</span>
+      </div>
+      
+      <!-- Erro de recomendados -->
+      <div *ngIf="erroRecomendados && !carregandoRecomendados" class="error-section">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ erroRecomendados }}</span>
+        <button class="retry-small" (click)="carregarRecomendacoes(listaRestaurante)">
+          <i class="fas fa-redo"></i>
+        </button>
+      </div>
+      
+      <div *ngIf="!carregandoRecomendados && !erroRecomendados && recomendados.length > 0; else SemRecomendados" class="cards-grid" [@cardsAnimation]>
+        <div *ngFor="let resto of recomendados; trackBy: trackByRestauranteId" class="restaurante-card">
+          <div class="card-banner">
+            <img [src]="getImageUrl(resto.imagem_url)" alt="Banner do restaurante {{ resto.nome_fantasia }}" class="resto-imagem">
+          </div>
+          <div class="card-content">
+            <div class="card-header">
+              <h4 class="resto-nome">{{ resto.nome_fantasia }}</h4>
+              <span class="resto-tipo">{{ resto.tipo_restaurante }}</span>
+            </div>
+            <p class="resto-descricao">{{ resto.descricao }}</p>
+            <app-restaurant-tags-badges [tags]="resto.tags_conquistadas || []"></app-restaurant-tags-badges>
+            <div class="card-actions">
+              <button class="btn-ver-perfil" [routerLink]="['/restaurante', resto.ID]">{{ 'MENU.VIEW_PROFILE_BUTTON' | translate }}</button>
+              <button class="btn-avaliar" [routerLink]="['/avaliar', resto.ID]">{{ 'MENU.RATE_BUTTON' | translate }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #SemRecomendados>
+        <p class="sem-resultados">{{ 'MENU.NO_RECOMMENDED_RESULTS' | translate }}</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- ✅ Próximos de Você (colapsável) -->
+  <div class="collapsible-section">
+    <div class="section-header" (click)="toggleProximos()">
+      <div class="section-header-content">
+        <h3>{{ 'MENU.NEARBY_SUBTITLE' | translate }}</h3>
+        <span class="section-badge">{{ restaurantesProximos.length }}</span>
+      </div>
+      <span class="collapse-icon" [class.collapsed]="!secaoProximosExpandida">
+        <i class="fas fa-chevron-down"></i>
+      </span>
+    </div>
+    
+    <div class="section-content" [class.collapsed]="!secaoProximosExpandida" *ngIf="secaoProximosExpandida" [@sectionToggle]>
+      <div *ngIf="carregandoProximos" class="loading-section">
+        <i class="fas fa-map-marker-alt fa-pulse"></i>
+        <span>{{ 'MENU.LOADING_NEARBY' | translate }}</span>
+      </div>
+      
+      <div *ngIf="erroProximos && !carregandoProximos" class="error-section">
+        <i class="fas fa-location-arrow"></i>
+        <span>{{ erroProximos }}</span>
+        <button class="retry-small" (click)="buscarRestaurantesProximos()">
+          <i class="fas fa-redo"></i>
+          Tentar novamente
+        </button>
+      </div>
+      
+      <div *ngIf="!carregandoProximos && !erroProximos && restaurantesProximos.length > 0" class="cards-grid" [@cardsAnimation]>
+        <div *ngFor="let resto of restaurantesProximos; trackBy: trackByRestauranteId" class="restaurante-card">
+          <div class="card-banner">
+            <img [src]="getImageUrl(resto.imagem_url)" alt="Banner do restaurante {{ resto.nome_fantasia }}" class="resto-imagem">
+          </div>
+          <div class="card-content">
+            <div class="card-header">
+              <h4 class="resto-nome">{{ resto.nome_fantasia }}</h4>
+              <span class="resto-tipo">{{ resto.tipo_restaurante }}</span>
+            </div>
+            <p class="resto-descricao">{{ resto.descricao }}</p>
+            <app-restaurant-tags-badges [tags]="resto.tags_conquistadas || []"></app-restaurant-tags-badges>
+            <div class="card-actions">
+              <button class="btn-ver-perfil" [routerLink]="['/restaurante', resto.ID]">{{ 'MENU.VIEW_PROFILE_BUTTON' | translate }}</button>
+              <button class="btn-avaliar" [routerLink]="['/avaliar', resto.ID]">{{ 'MENU.RATE_BUTTON' | translate }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="menu-divider" />
+
+  <!-- Lista completa (sem colapsar) -->
+  <h3 class="menu-section-title">{{ 'MENU.ALL_RESTAURANTS_SUBTITLE' | translate }}</h3>
+  
+  <!-- Indicador de total de restaurantes -->
+  <div class="total-indicator" *ngIf="listaRestauranteFiltrada.length > 0" [@filterAnimation]>
+    <span>{{ listaRestauranteFiltrada.length }} restaurante(s) disponível(eis)</span>
+  </div>
+  
+  <div *ngIf="listaRestaurante.length > 0; else SemRestaurante" class="cards-grid" [@cardsAnimation]>
+    <div *ngFor="let resto of listaRestauranteFiltrada; trackBy: trackByRestauranteId" class="restaurante-card">
+      <div class="card-banner">
+        <img [src]="getImageUrl(resto.imagem_url)" alt="Banner do restaurante {{ resto.nome_fantasia }}" class="resto-imagem">
+      </div>
       <div class="card-content">
-        <!-- TÍTULO E TIPO/CIDADE -->
         <div class="card-header">
-          <h3 class="resto-nome">{{ resto.Nome }}</h3>
+          <h4 class="resto-nome">{{ resto.nome_fantasia }}</h4>
           <span class="resto-tipo">{{ resto.tipo_restaurante }}</span>
         </div>
-
-        <!-- DESCRIÇÃO (limitada a 2 linhas) -->
         <p class="resto-descricao">{{ resto.descricao }}</p>
-        <!--
-        <div class="resto-rating">
-          <ng-container *ngFor="let star of Array(5); let i = index">
-            <i [class.filled]="i < resto.mediaNotas" class="icon-star"></i>
-          </ng-container>
-          <span class="media-valor">{{ resto.mediaNotas.toFixed(1) }}</span>
-        </div>
-        -->
-
-        <!-- CNPJ / Cidade / Telefone (informações rápidas) -->
-        <div class="resto-info-rapida">
-          <span><strong>CNPJ:</strong> {{ resto.CNPJ }}</span>
-          <span><strong>Cidade:</strong> {{ resto.Cidade }}</span>
-        </div>
-
-        <!-- BOTÕES DE AÇÃO -->
+        <app-restaurant-tags-badges [tags]="resto.tags_conquistadas || []"></app-restaurant-tags-badges>
         <div class="card-actions">
-          <button
-            *ngIf="tipoDoUsuario === 'cliente'"
-            class="btn-ver-perfil"
-            [routerLink]="['/restaurante', resto.ID]"
-          >
-            Ver Perfil
-          </button>
-
-          <button
-            *ngIf="tipoDoUsuario === 'cliente'"
-            class="btn-avaliar"
-            [routerLink]="['/perfilRestaurante', resto.ID, 'criaAvaliacao']"
-          >
-            Avaliar
-          </button>
+          <button class="btn-ver-perfil" [routerLink]="['/restaurante', resto.ID]">{{ 'MENU.VIEW_PROFILE_BUTTON' | translate }}</button>
+          <button class="btn-avaliar" [routerLink]="['/avaliar', resto.ID]">{{ 'MENU.RATE_BUTTON' | translate }}</button>
         </div>
       </div>
     </div>
+    </div>
+    <ng-template #SemRestaurante>
+      <p>{{ 'MENU.NO_RESTAURANTS_FOUND' | translate }}</p>
+    </ng-template>
   </div>
 
-  <ng-template #SemRestaurante>
-    <div class="sem-restaurante">
-      <p translate>Nenhum restaurante encontrado.</p>
+  <!-- ✅ Mensagem para restaurantes que tentarem acessar -->
+  <div *ngIf="isRestaurante" class="acesso-negado">
+    <div class="acesso-negado-content">
+      <i class="fas fa-store-alt"></i>
+      <h2>Acesso Restrito</h2>
+      <p>Como restaurante, você não tem acesso ao menu de outros restaurantes.</p>
+      <p>Redirecionando para seu dashboard...</p>
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
     </div>
-  </ng-template>
+  </div>
 </section>

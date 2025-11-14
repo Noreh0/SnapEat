@@ -1,0 +1,43 @@
+<div class="modal-overlay" 
+     *ngIf="mostrar" 
+     (click)="cancelar()"
+     [@fadeIn]>
+  
+  <div class="modal-container" 
+       (click)="pararPropagacao($event)"
+       [@slideIn]>
+    
+    <!-- Cabeçalho do Modal -->
+    <div class="modal-header" [ngClass]="'header-' + dados.tipo">
+      <div class="modal-icon">
+        <i [class]="dados.icone || getIconeDefault()"></i>
+      </div>
+      <h3>{{ dados.titulo }}</h3>
+      <button class="btn-fechar" (click)="cancelar()" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Conteúdo do Modal -->
+    <div class="modal-content">
+      <p [innerHTML]="dados.mensagem"></p>
+    </div>
+
+    <!-- Rodapé com Botões -->
+    <div class="modal-footer">
+      <button class="btn btn-cancelar" 
+              (click)="cancelar()" 
+              type="button">
+        {{ dados.textoBotaoCancelar || 'Cancelar' }}
+      </button>
+      
+      <button class="btn btn-confirmar" 
+              [ngClass]="'btn-' + dados.tipo"
+              (click)="confirmar()" 
+              type="button">
+        {{ dados.textoBotaoConfirmar || 'Confirmar' }}
+      </button>
+    </div>
+
+  </div>
+</div>

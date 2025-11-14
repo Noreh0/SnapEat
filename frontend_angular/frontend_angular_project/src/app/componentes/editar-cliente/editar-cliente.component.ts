@@ -8,6 +8,8 @@ import {
   AbstractControl,
   ValidationErrors
 } from '@angular/forms';
+import { clienteModel } from '../../model/cliente.model';
+import { generate } from 'rxjs';
 
 @Component({
   selector: 'app-editar-cliente',
@@ -16,7 +18,9 @@ import {
 })
 export class EditarClienteComponent implements OnInit {
   formulario!: FormGroup;
+  cliente!: clienteModel; // Armazenar o objeto completo do cliente
   hideSenha = true;
+  defaultAvatar = 'assets/images/usuario.png';
 
   constructor(
     private fb: FormBuilder,
@@ -42,40 +46,21 @@ export class EditarClienteComponent implements OnInit {
   private iniciarFormulario() {
     this.formulario = this.fb.group(
       {
-        Nome: [
-          '',
-          [Validators.required, Validators.minLength(3)],
-        ],
-        CPF: [
-          '',
+        Nome: ['', [Validators.required, Validators.minLength(3)]],
+        CPF: ['', [Validators.required, this.cpfValidator]],
+        email: ['', [Validators.required, Validators.email]],
+        senha: ['',
           [
-            Validators.required,
-            this.cpfValidator, // já valida o tamanho e formato
-          ],
-        ],
-        email: [
-          '',
-          [Validators.required, Validators.email],
-        ],
-        senha: [
-          '',
-          [
-            Validators.required,
-            // Regex: mínimo 8, pelo menos 1 maiúscula, 1 minúscula, 1 número, 1 caractere especial
+            // A senha não é obrigatória na edição, mas se for preenchida, deve ser forte
             Validators.pattern(
               /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&\*])[A-Za-z\d!@#\$%\^&\*]{8,}$/
             ),
           ],
         ],
-        confirmasenha: ['', [Validators.required]],
+        confirmasenha: [''],
         Cidade: ['', [Validators.required]],
-        telefone: [
-          '',
-          [
-            Validators.required,
-            this.telefoneValidator,
-          ],
-        ],
+        telefone: ['', [Validators.required, this.telefoneValidator]],
+        rede_social: ['', [this.urlValidator]] // Campo opcional para link da rede social
       },
       {
         validators: [this.senhasIguaisValidator],
@@ -96,22 +81,23 @@ export class EditarClienteComponent implements OnInit {
   }
 
   this.clienteService.buscarPorId(Number(id)).subscribe({
-    next: (cliente) => {
-      this.formulario.patchValue({
-        Nome: cliente.Nome,
-        CPF: cliente.CPF,
-        email: cliente.email,
-        Cidade: cliente.Cidade,
-        telefone: cliente.telefone,
-      });
-      // Não preencha a senha!
-    },
-    error: () => {
-      alert('Erro ao carregar dados do cliente.');
-      this.router.navigate(['/login']);
-    }
-  });
-}
+      next: (cliente) => {
+        this.cliente = cliente; // Armazena o objeto cliente
+        this.formulario.patchValue({
+          Nome: cliente.Nome,
+          CPF: cliente.CPF,
+          email: cliente.email,
+          Cidade: cliente.Cidade,
+          telefone: cliente.telefone,
+          rede_social: cliente.rede_social || ''
+        });
+      },
+      error: () => {
+        alert('Erro ao carregar dados do cliente.');
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
   /**
    * Valida se a senha e a confirmação são iguais.
@@ -131,6 +117,9 @@ export class EditarClienteComponent implements OnInit {
       }
       return null;
     }
+  }
+  handleImageError(event: Event) {
+    (event.target as HTMLImageElement).src = this.defaultAvatar;
   }
 
   /**
@@ -192,21 +181,33 @@ export class EditarClienteComponent implements OnInit {
    * Quando o usuário clica para “Salvar Alterações”.
    * Caso o formulário seja válido, envia para o backend.
    */
+  // No método editarCliente():
   editarCliente() {
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
 
-    const dadosAtualizados = this.formulario.value;
-    dadosAtualizados.ID = Number(localStorage.getItem('id')); // ou outra fonte do ID
+    const dadosForm = this.formulario.value;
+    
+    // Só incluir a senha se ela foi preenchida
+    if (!dadosForm.senha) {
+      delete dadosForm.senha;
+      delete dadosForm.confirmasenha;
+    }
+
+    const dadosAtualizados = {
+      ...this.cliente, // Mantém ID e outros dados não editáveis
+      ...dadosForm, // Sobrescreve com os dados do formulário
+    };
 
     this.clienteService.editar(dadosAtualizados).subscribe({
       next: () => {
         alert('Perfil atualizado com sucesso!');
         this.router.navigate(['/perfilCliente', dadosAtualizados.ID]);
       },
-      error: () => {
+      error: (err) => {
+        console.error('Erro ao atualizar perfil:', err);
         alert('Erro ao atualizar perfil. Tente novamente.');
       }
     });
@@ -216,7 +217,23 @@ export class EditarClienteComponent implements OnInit {
    * Exemplo de função para trocar avatar (abre modal, etc).
    */
   onTrocarAvatar() {
-    // Abra seu modal de upload de imagem ou direcione para rota de edição de avatar
-    console.log('Clique em trocar avatar');
+    // Lógica para upload de imagem
+    // Ex: this.router.navigate(['/perfil/upload-foto']);
+    alert('Funcionalidade de upload de foto a ser implementada.');
+  }
+
+  // Validador customizado para URLs de rede social
+  urlValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null; // Campo opcional
+    }
+
+    const urlPattern = /^(https?:\/\/)?(www\.)?(instagram\.com|facebook\.com|twitter\.com|x\.com|linkedin\.com|tiktok\.com|youtube\.com|github\.com|snapchat\.com)\/.*$/i;
+    
+    if (!urlPattern.test(control.value)) {
+      return { invalidUrl: true };
+    }
+    
+    return null;
   }
 }

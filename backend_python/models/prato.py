@@ -1,9 +1,11 @@
 from sql_alchemy import banco
+from sqlalchemy import func, desc
 from flask import jsonify
+from datetime import datetime
 
 # ...existing code...
 class pratoModel(banco.Model):
-    __tablename__ = 'Prato'
+    __tablename__ = 'prato'
 
     ID = banco.Column(banco.Integer, primary_key=True)
     Nome = banco.Column(banco.String(100), nullable=False)
@@ -11,7 +13,7 @@ class pratoModel(banco.Model):
     preco = banco.Column(banco.Float, nullable=False)
     restaurante_id = banco.Column(
         banco.Integer,
-        banco.ForeignKey('Restaurante.ID'),
+        banco.ForeignKey('restaurante.ID'),
         nullable=False
     )
     imagem_url = banco.Column(banco.String(255))  # <-- troque para imagem_url
@@ -37,6 +39,30 @@ class pratoModel(banco.Model):
     def save_prato(self):
         banco.session.add(self)
         banco.session.commit()
+        
+    @classmethod
+    def top_rated(cls, restaurante_id: int, limit: int = 3, min_avaliacoes: int = 1):
+        from models.avaliacao_prato import avaliacaoPratoModel
+        q = (
+            banco.session.query(
+                cls,
+                func.avg(avaliacaoPratoModel.Nota).label('media'),
+                func.count(avaliacaoPratoModel.ID).label('total')
+            )
+            .join(avaliacaoPratoModel, avaliacaoPratoModel.ID_Prato == cls.ID)
+            .filter(cls.restaurante_id == restaurante_id)
+            .group_by(cls.ID)
+            .having(func.count(avaliacaoPratoModel.ID) >= min_avaliacoes)
+            .order_by(desc('media'), desc('total'), cls.Nome.asc())
+            .limit(limit)
+        )
+        resultados = []
+        for prato, media, total in q.all():
+            data = prato.json()
+            data['mediaAvaliacoes'] = float(f"{media:.1f}")
+            data['totalAvaliacoes'] = int(total)
+            resultados.append(data)
+        return resultados
 
     @classmethod
     def find_all(cls):

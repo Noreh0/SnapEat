@@ -1,280 +1,100 @@
-<section class="cadastro-cliente-page">
+<main class="page-container">
   <div class="form-card">
-    <!-- === CABEÇALHO === -->
     <header class="form-header">
-      <h1 translate>Cadastro de Cliente</h1>
+      <h1 class="titulo-principal">{{ 'REGISTER.TITLE' | translate }}</h1>
+      <p class="subtitulo">{{ 'REGISTER.SUBTITLE' | translate }}</p>
     </header>
 
-    <!-- === FORMULÁRIO REATIVO === -->
     <form [formGroup]="formulario" (ngSubmit)="salvarCliente()" novalidate>
-      <!-- —— NOME —— -->
-      <div class="form-group">
-        <label for="Nome" translate>Nome<b>*</b></label>
-        <input
-          type="text"
-          id="Nome"
-          class="form-input"
-          formControlName="Nome"
-          placeholder="Digite seu nome completo"
-        />
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('Nome')?.hasError('required') &&
-            formulario.get('Nome')?.touched
-          "
-          translate
-        >
-          O nome é obrigatório.
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Nome">{{ 'REGISTER.FULL_NAME' | translate }}*</label>
+          <input type="text" id="Nome" class="form-input" formControlName="Nome" [placeholder]="'REGISTER.FULL_NAME_PLACEHOLDER' | translate"/>
+          <div class="error-message" *ngIf="formulario.get('Nome')?.touched && formulario.get('Nome')?.errors">
+            <span *ngIf="formulario.get('Nome')?.hasError('required')">{{ 'REGISTER.ERROR_NAME_REQUIRED' | translate }}</span>
+            <span *ngIf="formulario.get('Nome')?.hasError('minlength')">{{ 'REGISTER.ERROR_NAME_MINLENGTH' | translate }}</span>
+          </div>
         </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('Nome')?.hasError('minlength') &&
-            formulario.get('Nome')?.touched
-          "
-          translate
-        >
-          O nome precisa ter ao menos 3 caracteres.
+
+        <div class="form-group">
+          <label for="CPF">{{ 'REGISTER.CPF' | translate }}*</label>
+          <input type="text" id="CPF" class="form-input" formControlName="CPF" mask="000.000.000-00" [placeholder]="'REGISTER.CPF_PLACEHOLDER' | translate"/>
+          <div class="error-message" *ngIf="formulario.get('CPF')?.touched && formulario.get('CPF')?.errors">
+             <span *ngIf="formulario.get('CPF')?.hasError('required')">{{ 'REGISTER.ERROR_CPF_REQUIRED' | translate }}</span>
+             <span *ngIf="formulario.get('CPF')?.hasError('cpfInvalido')">{{ 'REGISTER.ERROR_CPF_INVALID' | translate }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- —— CPF —— -->
-      <div class="form-group">
-        <label for="CPF" translate>CPF<b>*</b></label>
-        <input
-          type="text"
-          id="CPF"
-          class="form-input"
-          formControlName="CPF"
-          mask="000.000.000-00"
-          placeholder="000.000.000-00"
-        />
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('CPF')?.hasError('required') &&
-            formulario.get('CPF')?.touched
-          "
-          translate
-        >
-          O CPF é obrigatório.
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">{{ 'REGISTER.EMAIL' | translate }}*</label>
+          <input type="email" id="email" class="form-input" formControlName="email" [placeholder]="'REGISTER.EMAIL_PLACEHOLDER' | translate"/>
+          <div class="error-message" *ngIf="formulario.get('email')?.touched && formulario.get('email')?.errors">
+            <span *ngIf="formulario.get('email')?.hasError('required')">{{ 'REGISTER.ERROR_EMAIL_REQUIRED' | translate }}</span>
+            <span *ngIf="formulario.get('email')?.hasError('email')">{{ 'REGISTER.ERROR_EMAIL_INVALID' | translate }}</span>
+          </div>
         </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('CPF')?.hasError('minlength') &&
-            formulario.get('CPF')?.touched
-          "
-          translate
-        >
-          CPF incompleto.
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('CPF')?.hasError('cpfInvalido') &&
-            formulario.get('CPF')?.touched
-          "
-          translate
-        >
-          CPF inválido.
+
+        <div class="form-group">
+          <label for="telefone">{{ 'REGISTER.PHONE' | translate }}*</label>
+          <input type="text" id="telefone" class="form-input" formControlName="telefone" mask="(00) 0 0000-0000" [placeholder]="'REGISTER.PHONE_PLACEHOLDER' | translate"/>
+           <div class="error-message" *ngIf="formulario.get('telefone')?.touched && formulario.get('telefone')?.errors">
+            <span *ngIf="formulario.get('telefone')?.hasError('required')">{{ 'REGISTER.ERROR_PHONE_REQUIRED' | translate }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- —— E-MAIL —— -->
-      <div class="form-group">
-        <label for="email" translate>Email<b>*</b></label>
-        <input
-          type="email"
-          id="email"
-          class="form-input"
-          formControlName="email"
-          placeholder="email@exemplo.com"
-        />
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('email')?.hasError('required') &&
-            formulario.get('email')?.touched
-          "
-          translate
-        >
-          O email é obrigatório.
+      <div class="form-row">
+        <div class="form-group">
+          <label for="senha">{{ 'REGISTER.PASSWORD' | translate }}*</label>
+          <div class="input-wrapper">
+            <input [type]="hide ? 'password' : 'text'" id="senha" class="form-input" formControlName="senha" [placeholder]="'REGISTER.PASSWORD_PLACEHOLDER' | translate"/>
+            <button type="button" class="icon-btn" (click)="hide = !hide" [attr.aria-label]="'REGISTER.TOGGLE_PASSWORD' | translate">
+              <svg *ngIf="!hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" /><path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+              <svg *ngIf="hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 101.06-1.06l-1.745-1.745a10.029 10.029 0 003.3-4.38 1.651 1.651 0 000-1.185A10.004 10.004 0 009.999 3a9.956 9.956 0 00-4.744 1.194L3.28 2.22zM7.752 6.69l1.092 1.092a2.5 2.5 0 013.374 3.373l1.091 1.092a4 4 0 00-5.557-5.557z" clip-rule="evenodd" /><path d="M10.748 13.93l2.523 2.523a9.987 9.987 0 01-3.27.547c-4.257 0-7.893-2.66-9.336-6.41a1.651 1.651 0 010-1.186A10.007 10.007 0 012.839 6.02L1.723 4.904a.75.75 0 00-1.061 1.06l1.061 1.061A11.516 11.516 0 00.664 10.59 1.651 1.651 0 00.664 10.59z" /></svg>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="formulario.get('senha')?.touched && formulario.get('senha')?.errors">
+            {{ 'REGISTER.ERROR_PASSWORD_STRENGTH' | translate }}
+          </div>
         </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('email')?.hasError('email') &&
-            formulario.get('email')?.touched
-          "
-          translate
-        >
-          Email inválido.
+
+        <div class="form-group">
+          <label for="confirmasenha">{{ 'REGISTER.CONFIRM_PASSWORD' | translate }}*</label>
+          <input type="password" id="confirmasenha" class="form-input" formControlName="confirmasenha" [placeholder]="'REGISTER.CONFIRM_PASSWORD_PLACEHOLDER' | translate"/>
+          <div class="error-message" *ngIf="formulario.get('confirmasenha')?.touched && formulario.get('confirmasenha')?.errors">
+            {{ 'REGISTER.ERROR_PASSWORD_MISMATCH' | translate }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="Cidade">{{ 'REGISTER.CITY' | translate }}*</label>
+          <input type="text" id="Cidade" class="form-input" formControlName="Cidade" [placeholder]="'REGISTER.CITY_PLACEHOLDER' | translate"/>
+          <div class="error-message" *ngIf="formulario.get('Cidade')?.touched && formulario.get('Cidade')?.errors">
+            <span *ngIf="formulario.get('Cidade')?.hasError('required')">{{ 'REGISTER.ERROR_CITY_REQUIRED' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rede_social">{{ 'REGISTER.SOCIAL_MEDIA' | translate }}</label>
+          <input type="url" id="rede_social" class="form-input" formControlName="rede_social" [placeholder]="'REGISTER.SOCIAL_MEDIA_PLACEHOLDER' | translate"/>
+          <div class="error-message" *ngIf="formulario.get('rede_social')?.touched && formulario.get('rede_social')?.errors">
+            <span *ngIf="formulario.get('rede_social')?.hasError('invalidUrl')">{{ 'REGISTER.ERROR_SOCIAL_MEDIA_INVALID' | translate }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- —— SENHA —— -->
-      <div class="form-group">
-        <label for="senha" translate>Senha<b>*</b></label>
-        <div class="senha-wrapper">
-          <input
-            [type]="hide ? 'password' : 'text'"
-            id="senha"
-            class="form-input input-com-icon"
-            formControlName="senha"
-            placeholder="Digite uma senha forte"
-          />
-          <button
-            type="button"
-            class="icon-btn"
-            (click)="hide = !hide"
-            aria-label="Mostrar/ocultar senha"
-          >
-            <img
-              src="../../../assets/images/olho_senha.png"
-              alt="Mostrar senha"
-              class="password-icon"
-            />
-          </button>
-        </div>
-        <div class="password-hint">
-          A senha deve ter no mínimo 8 caracteres e conter:
-          <ul>
-            <li>1 letra maiúscula (A–Z)</li>
-            <li>1 letra minúscula (a–z)</li>
-            <li>1 número (0–9)</li>
-            <li>1 caractere especial (ex.: !&#64;#$%^&amp;*)</li>
-          </ul>
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('senha')?.hasError('required') &&
-            formulario.get('senha')?.touched
-          "
-          translate
-        >
-          A senha é obrigatória.
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('senha')?.hasError('pattern') &&
-            formulario.get('senha')?.touched
-          "
-          translate
-        >
-          Senha fraca: inclua maiúscula, minúscula, número e caractere especial.
-        </div>
-      </div>
-
-      <!-- —— CONFIRMAÇÃO DE SENHA —— -->
-      <div class="form-group">
-        <label for="confirmasenha" translate>Confirme sua senha<b>*</b></label>
-        <input
-          type="password"
-          id="confirmasenha"
-          class="form-input"
-          formControlName="confirmasenha"
-          placeholder="Repita a senha"
-        />
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('confirmasenha')?.hasError('required') &&
-            formulario.get('confirmasenha')?.touched
-          "
-          translate
-        >
-          Confirmação de senha é obrigatória.
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('confirmasenha')?.hasError('mismatch') &&
-            formulario.get('confirmasenha')?.touched
-          "
-          translate
-        >
-          As senhas não coincidem.
-        </div>
-      </div>
-
-      <!-- —— CIDADE —— -->
-      <div class="form-group">
-        <label for="Cidade" translate>Cidade<b>*</b></label>
-        <input
-          type="text"
-          id="Cidade"
-          class="form-input"
-          formControlName="Cidade"
-          placeholder="Digite seu município"
-        />
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('Cidade')?.hasError('required') &&
-            formulario.get('Cidade')?.touched
-          "
-          translate
-        >
-          A cidade é obrigatória.
-        </div>
-      </div>
-
-      <!-- —— TELEFONE —— -->
-      <div class="form-group">
-        <label for="telefone" translate>Telefone<b>*</b></label>
-        <input
-          type="text"
-          id="telefone"
-          class="form-input"
-          formControlName="telefone"
-          mask="(00) 0 0000-0000"
-          placeholder="(99) 9 9999-9999"
-        />
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('telefone')?.hasError('required') &&
-            formulario.get('telefone')?.touched
-          "
-          translate
-        >
-          O telefone é obrigatório.
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            formulario.get('telefone')?.hasError('minlength') &&
-            formulario.get('telefone')?.touched
-          "
-          translate
-        >
-          Telefone incompleto.
-        </div>
-      </div>
-
-      <!-- —— AÇÕES (BOTÕES) —— -->
       <div class="form-actions">
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="!formulario.valid"
-          translate
-        >
-          Salvar
+        <button type="button" class="btn-secundario" (click)="cancelarCadastro()">
+          {{ 'REGISTER.CANCEL_BUTTON' | translate }}
         </button>
-        <button
-          type="button"
-          class="btn-secondary"
-          (click)="cancelarCadastro()"
-          translate
-        >
-          Cancelar
+        <button type="submit" class="btn-primario" [disabled]="!formulario.valid">
+          {{ 'REGISTER.CREATE_ACCOUNT_BUTTON' | translate }}
         </button>
       </div>
     </form>
   </div>
-</section>
+</main>

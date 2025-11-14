@@ -1,218 +1,508 @@
-/* *****************************************
-   1. FUNDO DA PÁGINA (degradê escuro)
-   ***************************************** */
-.criar-avaliacao-page {
-  min-height: 100vh;
-  padding: 2rem;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+:host {
+  /* Variáveis de fonte - Sistema Deezer */
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
+  
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(to right, #1c1c1f, #111113);
-}
-
-/* *****************************************
-   2. CARD PRINCIPAL (estilo “TripAdvisor/Facebook”)
-   ***************************************** */
-.eval-card {
-  background-color: #202024;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  padding: 2rem;
+  min-height: 100vh;
   width: 100%;
-  max-width: 600px;
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: var(--fonte-primaria);
+}
+/* Substitua a seção de animação atual em criar-avaliacao.component.css por este código */
+/* ...existing styles... */
+
+/* Upload de Imagens */
+.imagens-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-/* *****************************************
-   3. CABEÇALHO: Logo e detalhes do restaurante
-   ***************************************** */
-.eval-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 2rem;
+.imagem-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
 }
 
-/* Agrupa avatar + texto */
-.rest-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-/* Avatar circular com borda azul */
-.rest-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+.imagem-preview-item img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 2px solid #3b82f6;
-  margin-right: 1rem;
-  background-color: #444;
 }
 
-/* Texto do restaurante */
-.rest-details h2 {
-  font-size: 1.75rem;
-  margin: 0;
-  color: #f3f3f3;
-}
-
-.rest-subtitle {
+.btn-remover-preview {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(192, 57, 43, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
   font-size: 0.9rem;
-  color: #9ca3af;
-  margin: 0.25rem 0;
 }
 
-.rest-rating {
-  font-size: 0.9rem;
-  color: #d1d5db;
-  margin: 0;
+.btn-remover-preview:hover {
+  background: rgba(192, 57, 43, 1);
+  transform: scale(1.1);
 }
 
-/* Título “Nova Avaliação” */
-.eval-header h1 {
-  font-size: 2.25rem;
-  margin: 0;
-  color: #ffffff;
+.upload-area {
+  margin-top: 1rem;
 }
 
-/* *****************************************
-   4. GRUPOS DE INPUTS (form-group)
-   ***************************************** */
-.form-group {
+.upload-label {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed var(--color-primary);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+  background: var(--bg-primary);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+}
+
+.upload-label i {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.upload-label span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.form-text {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .imagens-preview {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .upload-label {
+    padding: 1.5rem 1rem;
+  }
+  
+  .upload-label i {
+    font-size: 1.5rem;
+  }
+}
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(249, 246, 242, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.loading-container {
+  background-color: var(--bg-secondary);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+/* Mensagem de carregamento */
+.loading-message {
+  margin-top: 35px;
+  text-align: center;
+}
+
+.loading-message h3 {
+  font-family: var(--fonte-primaria);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.loading-message p {
+  font-family: var(--fonte-primaria);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Nova animação do hambúrguer */
+.burger-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.plate {
+  position: absolute;
+  bottom: 25px;
+  width: 140px;
+  height: 20px;
+  background: var(--bg-tertiary);
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.ingredient {
+  position: absolute;
+  width: 120px;
+  border-radius: 8px;
+  z-index: 2;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(-100px);
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+}
+
+.bread-bottom {
+  height: 25px;
+  background: linear-gradient(to bottom, #E3A84D 0%, #D99C41 100%);
+  border-radius: 8px 8px 30px 30px;
+  bottom: 45px;
+  animation-name: dropIngredient;
+  animation-delay: 0s;
+}
+
+.meat {
+  height: 20px;
+  background: linear-gradient(to bottom, #8B4513 0%, #5D2906 100%);
+  bottom: 70px;
+  animation-name: dropIngredient;
+  animation-delay: 0.4s;
+}
+
+.cheese {
+  height: 10px;
+  background: var(--warning-color);
+  bottom: 90px;
+  animation-name: dropIngredient;
+  animation-delay: 0.8s;
+}
+
+.tomato {
+  height: 8px;
+  background: var(--error-color);
+  bottom: 100px;
+  animation-name: dropIngredient;
+  animation-delay: 1.2s;
+}
+
+.lettuce {
+  height: 10px;
+  background: var(--color-secondary);
+  border-radius: 4px;
+  bottom: 110px;
+  z-index: 3;
+  box-shadow: 0 0 0 3px var(--color-secondary);
+  animation-name: dropIngredient;
+  animation-delay: 1.6s;
+}
+
+.bread-top {
+  height: 35px;
+  background: linear-gradient(to bottom, #E3A84D 0%, #D99C41 100%);
+  border-radius: 30px 30px 8px 8px;
+  bottom: 120px;
+  animation-name: dropIngredient;
+  animation-delay: 2s;
+}
+
+@keyframes dropIngredient {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ajuste para fazer a animação reiniciar */
+.burger-animation::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: resetAnimation 12s infinite;
+  opacity: 0;
+}
+
+@keyframes resetAnimation {
+  0%, 95% {
+    opacity: 0;
+  }
+  96% {
+    opacity: 0.01;
+  }
+  97% {
+    opacity: 0;
+  }
+  98% {
+    opacity: 0.01;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Para o caso de avaliações de pratos específicos, podemos ter variações */
+.pasta-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+/* Mensagens de loading com fade-in */
+.loading-message h3, .loading-message p {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.card-container {
+  width: 100%;
+  max-width: 650px;
+  background-color: var(--bg-secondary);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease-in-out;
+}
+
+/* --- Cabeçalho com informações do restaurante --- */
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.restaurant-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+}
+
+.restaurant-details h2 {
+  font-family: var(--fonte-primaria);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary); /* Marrom escuro, cor de café */
+  margin: 0 0 5px 0;
+}
+
+.restaurant-details p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.restaurant-details .rating-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rating-info .star-icon {
+  color: var(--color-primary); /* Terracota */
+  font-size: 1.1rem; /* Use um ícone de estrela aqui se preferir */
+}
+
+/* --- Formulário --- */
+.form-title {
+  font-family: var(--fonte-primaria);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 25px;
 }
 
 .form-group label {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #e5e5e5;
+  display: block;
+  font-family: var(--fonte-primaria);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  font-weight: 500;
 }
 
-/* 4.1. SELECT (nota) */
-.form-select {
-  padding: 0.75rem 1rem;
-  background-color: #2c2c2f;
-  border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 1rem;
+.form-control {
   width: 100%;
-  box-sizing: border-box;
-  appearance: none; /* remove estilo padrão do browser */
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23fff'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 12px 8px;
-  transition: outline 0.2s ease;
-}
-
-.form-select:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* 4.2. TEXTAREA (comentário) */
-.form-textarea {
-  padding: 0.75rem 1rem;
-  background-color: #2c2c2f;
-  border: none;
+  padding: 14px 18px;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  background-color: var(--bg-secondary);
+  font-family: var(--fonte-primaria);
   font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-  resize: vertical; /* redimensiona apenas verticalmente */
-  transition: outline 0.2s ease;
+  font-weight: 400;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.form-textarea:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
 }
 
-/* *****************************************
-   5. MENSAGENS DE ERRO
-   ***************************************** */
+textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+
 .error {
-  color: #f87171; /* vermelho suave */
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+  color: #c0392b;
+  font-size: 0.85rem;
+  padding-top: 6px;
 }
 
-/* *****************************************
-   6. BOTÕES (form-actions)
-   ***************************************** */
+/* --- Botões --- */
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 15px;
+  margin-top: 30px;
 }
 
-/* 6.1. BOTÃO “SALVAR” */
-.btn-primary {
-  background-color: #3b82f6; /* azul vivo */
-  color: #ffffff;
+.btn {
+  padding: 12px 25px;
   border: none;
-  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: var(--fonte-primaria);
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-secondary); /* Verde oliva, cor fria e sofisticada */
+  color: var(--bg-secondary);
+  box-shadow: 0 4px 15px rgba(106, 123, 83, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #586744;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 123, 83, 0.3);
 }
 
 .btn-primary:disabled {
-  background-color: #575757; /* cinza escuro quando desabilitado */
+  background-color: #B0B8A4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.btn-primary:not(:disabled):hover {
-  background-color: #2563eb; /* azul mais escuro no hover */
-}
-
-/* 6.2. BOTÃO “CANCELAR” */
 .btn-secondary {
   background-color: transparent;
-  border: 2px solid #ffffff;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  border-color: #DCD3C9;
 }
 
-/* *****************************************
-   7. RESPONSIVIDADE
-   ***************************************** */
-@media (max-width: 640px) {
-  .eval-card {
-    padding: 1.5rem;
-    max-width: 90%;
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+  :host {
+    padding: 20px 10px;
   }
-  .rest-avatar {
-    width: 60px;
-    height: 60px;
+  .card-container {
+    padding: 30px 25px;
   }
-  .rest-details h2 {
-    font-size: 1.5rem;
+  .header-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
   }
-  .eval-header h1 {
+  .restaurant-details h2 {
     font-size: 1.75rem;
   }
-  .form-group {
-    margin-bottom: 1rem;
+  .rating-info {
+    justify-content: center;
+  }
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  .btn {
+    width: 100%;
   }
 }

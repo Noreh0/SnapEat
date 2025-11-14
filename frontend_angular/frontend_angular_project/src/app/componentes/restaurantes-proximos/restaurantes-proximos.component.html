@@ -1,0 +1,100 @@
+<section class="nearby-page">
+  <div class="nearby-container">
+    <!-- Cabeçalho da página -->
+    <header class="page-header">
+      <h1>{{ 'NEARBY.TITLE' | translate }}</h1>
+      <p>{{ 'NEARBY.SUBTITLE' | translate }}</p>
+    </header>
+
+    <!-- Seção de filtros -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label class="filter-label" for="categoria">{{ 'NEARBY.CATEGORY_LABEL' | translate }}</label>
+        <select 
+          id="categoria"
+          class="filter-select"
+          [(ngModel)]="categoriaSelecionada" 
+          (change)="buscarProximos()"
+        >
+          <option value="">{{ 'NEARBY.ALL_CATEGORIES' | translate }}</option>
+          <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label" for="raio">{{ 'NEARBY.DISTANCE_LABEL' | translate }}</label>
+        <select
+          id="raio"
+          class="filter-select"
+          [(ngModel)]="raioKm"
+          (change)="buscarProximos()"
+        >
+          <option [value]="2">{{ 'NEARBY.DISTANCE_OPTION' | translate: { value: 2 } }}</option>
+          <option [value]="5">{{ 'NEARBY.DISTANCE_OPTION' | translate: { value: 5 } }}</option>
+          <option [value]="10">{{ 'NEARBY.DISTANCE_OPTION' | translate: { value: 10 } }}</option>
+          <option [value]="15">{{ 'NEARBY.DISTANCE_OPTION' | translate: { value: 15 } }}</option>
+        </select>
+      </div>
+
+      <button class="btn-refresh" (click)="buscarProximos()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <polyline points="23 20 23 14 17 14"></polyline>
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+        </svg>
+        {{ 'NEARBY.REFRESH_BUTTON' | translate }}
+      </button>
+    </div>
+
+    <!-- Mensagem de carregamento -->
+    <div class="loading-container" *ngIf="carregando">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">{{ 'NEARBY.LOADING_TEXT' | translate }}</p>
+    </div>
+
+    <!-- Mensagem de erro -->
+    <div class="error-message" *ngIf="erro">
+      {{ erro | translate }}
+    </div>
+
+    <!-- Grid de restaurantes -->
+    <div class="restaurants-grid" *ngIf="!carregando && !erro">
+      <div *ngIf="restaurantes.length === 0" class="no-results">
+        <p>{{ 'NEARBY.NO_RESULTS_TEXT' | translate }}</p>
+        <button class="btn-refresh" (click)="buscarProximos()">
+          {{ 'NEARBY.RETRY_BUTTON' | translate }}
+        </button>
+      </div>
+
+      <div 
+        *ngFor="let rest of restaurantes" 
+        class="restaurant-card"
+      >
+        <div class="card-image" [routerLink]="['/restaurante', rest.ID]">
+          <img 
+            [src]="rest.imagem_url || 'assets/images/default-restaurant.png'" 
+            [alt]="'NEARBY.RESTAURANT_PHOTO_ALT' | translate: { name: rest.nome }"
+            class="restaurant-img"
+            onerror="this.src='assets/images/default-restaurant.png'"
+          >
+          <div class="distance-badge">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            {{ 'NEARBY.DISTANCE_VALUE' | translate: { value: (rest.distancia_km | number:'1.1-1') } }}
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="restaurant-name">{{ rest.nome }}</h3>
+          <div class="restaurant-category">{{ rest.tipo_restaurante }}</div>
+          <p class="restaurant-description">{{ rest.descricao }}</p>
+          <div class="card-actions">
+            <button class="btn-ver-perfil" [routerLink]="['/restaurante', rest.ID]">{{ 'NEARBY.VIEW_PROFILE_BUTTON' | translate }}</button>
+            <button class="btn-avaliar" [routerLink]="['/avaliar', rest.ID]">{{ 'NEARBY.RATE_BUTTON' | translate }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

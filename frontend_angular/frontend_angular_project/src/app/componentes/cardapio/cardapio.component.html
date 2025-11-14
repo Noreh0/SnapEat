@@ -1,49 +1,304 @@
-<section class="cardapio-container" *ngIf="restaurante">
-  <header class="cardapio-header">
-    <h2>Cardápio de {{ restaurante.Nome }}</h2>
-  </header>
+<main class="page-container" [@pageAnimation]>
 
-  <!-- busca por nome de prato -->
-  <div class="cardapio-filtros">
-    <div class="filtro-box">
-      <input
-        type="search"
-        class="filtro-input"
-        placeholder="Buscar prato..."
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearch()"
-      />
-      <i class="icon-search"></i>
+  <!-- Sistema de Feedback -->
+  <div class="feedback-system">
+    <div 
+      *ngFor="let message of feedbackMessages" 
+      class="feedback-message feedback-message--{{message.type}}"
+      [@feedbackAnimation]>
+      <div class="feedback-content">
+        <div class="feedback-header">
+          <i class="feedback-icon" [ngClass]="{
+            'fas fa-check-circle': message.type === 'success',
+            'fas fa-exclamation-triangle': message.type === 'warning',
+            'fas fa-times-circle': message.type === 'error',
+            'fas fa-info-circle': message.type === 'info'
+          }"></i>
+          <h4 class="feedback-title">{{ message.title }}</h4>
+          <button 
+            class="feedback-close" 
+            (click)="closeFeedbackMessage(message.id)"
+            aria-label="Fechar mensagem">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <p class="feedback-text">{{ message.message }}</p>
+      </div>
     </div>
   </div>
 
-  <!-- grid de pratos -->
-  <div *ngIf="filteredPratos.length; else semPratos" class="cards-grid">
-    <div *ngFor="let p of filteredPratos" class="prato-card">
-      <div class="card-banner">
-        <img
-          *ngIf="p.imagem_url"
-          [src]="p.imagem_url"
-          alt="{{ p.Nome }}"
-          class="prato-img"
-        />
+  <!-- Indicador de Conectividade -->
+  <div class="connectivity-indicator" [class]="getConnectivityClass()">
+    <i class="fas" [ngClass]="{
+      'fa-wifi': isOnline,
+      'fa-wifi-slash': !isOnline
+    }"></i>
+    <span>{{ getConnectivityText() }}</span>
+  </div>
+
+  <!-- Overlay Global de Loading -->
+  <div class="global-loading-overlay" *ngIf="loadingState.geral">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
       </div>
-      <div class="card-content">
-        <h3 class="prato-nome">{{ p.Nome }}</h3>
-        <p class="prato-descricao">{{ p.descricao }}</p>
-        <p class="prato-preco">R$ {{ p.preco | number:'1.2-2' }}</p>
-        <!-- BOTÃO AQUI -->
-        <button
-          class="btn-primary avaliar-btn"
-          [routerLink]="['/prato', p.ID, 'avaliacoes', 'criar']"
-        >
-          <i class="fa fa-star"></i> Avaliar Prato
+      <h3>Carregando Cardápio</h3>
+      <p>Buscando pratos deliciosos para você</p>
+      <div class="loading-progress">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper" *ngIf="restaurante; else globalLoadingTemplate">
+
+    <header class="page-header">
+      <h1 class="page-title">Nosso Cardápio</h1>
+      <p class="page-subtitle">Sabores incríveis esperando por você no {{ restaurante.Nome }}</p>
+      
+      <!-- Botão de atualização -->
+      <button 
+        class="btn-refresh-global"
+        (click)="forceRefresh()"
+        [disabled]="isLoading()"
+        title="Atualizar cardápio">
+        <i class="fas" [ngClass]="{
+          'fa-sync-alt': !isLoading(),
+          'fa-spinner fa-spin': isLoading()
+        }"></i>
+        <span>Atualizar</span>
+      </button>
+    </header>
+
+    <!-- Seção de Destaques -->
+    <section class="destaques-section" *ngIf="destaques.length > 0 || loadingState.destaques">
+      <div class="section-header">
+        <h2 class="section-title">Destaques da Casa</h2>
+        <button 
+          class="btn-refresh" 
+          (click)="refreshDestaques()" 
+          [disabled]="loadingState.destaques || !isOnline"
+          [@buttonAnimation]="loadingState.destaques ? 'loading' : 'normal'"
+          title="Atualizar destaques">
+          <i class="fas" [ngClass]="{
+            'fa-sync-alt': !loadingState.destaques,
+            'fa-spinner fa-spin': loadingState.destaques
+          }"></i>
         </button>
       </div>
+      
+      <!-- Loading para Destaques -->
+      <div class="destaques-loading" *ngIf="loadingState.destaques && destaques.length === 0">
+        <div class="destaques-grid">
+          <div class="destaque-card-loading" *ngFor="let item of [1,2,3]">
+            <div class="loading-destaque-imagem shimmer-placeholder"></div>
+            <div class="loading-destaque-info">
+              <div class="shimmer-text shimmer-placeholder" style="width: 70%;"></div>
+              <div class="shimmer-text shimmer-placeholder" style="width: 40%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid de Destaques -->
+      <div class="destaques-grid" [@destaquesListAnimation]="destaques.length" *ngIf="destaques.length > 0">
+        <div 
+          *ngFor="let d of destaques; trackBy: trackByPratoId" 
+          class="destaque-card"
+          [@destaqueAnimation]
+          [class.loading]="loadingState.destaques">
+          <div class="destaque-imagem" [style.backgroundImage]="'url(' + d.imagem_url + ')'">
+            <div class="loading-overlay" *ngIf="loadingState.destaques">
+              <i class="fas fa-spinner fa-spin"></i>
+            </div>
+          </div>
+          <div class="destaque-info">
+            <h3 class="destaque-nome">{{ d.Nome }}</h3>
+            <p class="destaque-preco">R$ {{ d.preco | number:'1.2-2' }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Filtros -->
+    <section class="filtros-section">
+      <div class="filtros-header">
+        <h2 class="section-title">Todos os Pratos</h2>
+        <p class="pratos-count" *ngIf="!loadingState.pratos">
+          {{ filteredPratos.length }} de {{ pratos.length }} 
+          {{ pratos.length === 1 ? 'prato' : 'pratos' }}
+        </p>
+        <p class="pratos-count loading-text" *ngIf="loadingState.pratos">
+          <i class="fas fa-spinner fa-spin"></i>
+          Carregando pratos...
+        </p>
+      </div>
+      
+      <div class="filtro-wrapper">
+        <input
+          type="search"
+          class="filtro-input"
+          placeholder="Buscar pelo nome do prato..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()"
+          [disabled]="loadingState.pratos"
+        />
+        <i class="search-icon fas" [ngClass]="{
+          'fa-search': !searchTerm,
+          'fa-times': searchTerm
+        }" 
+        (click)="searchTerm ? limparBusca() : null"
+        [style.cursor]="searchTerm ? 'pointer' : 'default'"></i>
+        
+        <!-- Indicador de busca ativa -->
+        <div class="search-indicator" *ngIf="searchTerm">
+          <span>Buscando por: <strong>"{{ searchTerm }}"</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading para Pratos -->
+    <div class="pratos-loading" *ngIf="loadingState.pratos && filteredPratos.length === 0">
+      <div class="pratos-grid">
+        <div class="prato-card-loading" *ngFor="let item of [1,2,3,4,5,6]">
+          <div class="loading-prato-imagem shimmer-placeholder"></div>
+          <div class="loading-prato-info">
+            <div class="shimmer-text shimmer-placeholder" style="width: 80%;"></div>
+            <div class="shimmer-text shimmer-placeholder"></div>
+            <div class="shimmer-text shimmer-placeholder" style="width: 60%;"></div>
+            <div class="shimmer-text shimmer-placeholder" style="width: 40%;"></div>
+          </div>
+          <div class="loading-prato-actions">
+            <div class="shimmer-text shimmer-placeholder" style="height: 36px;"></div>
+            <div class="shimmer-text shimmer-placeholder" style="height: 36px;"></div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Grid de Pratos -->
+    <div 
+      *ngIf="filteredPratos.length > 0; else semPratos" 
+      class="pratos-grid" 
+      [@pratosListAnimation]="filteredPratos.length">
+      <article 
+        *ngFor="let p of filteredPratos; trackBy: trackByPratoId" 
+        class="prato-card"
+        [@pratoCardAnimation]>
+        <div class="prato-imagem-wrapper">
+          <img 
+            *ngIf="p.imagem_url" 
+            [src]="p.imagem_url" 
+            [alt]="p.Nome" 
+            class="prato-imagem"
+            loading="lazy" />
+          <div class="prato-overlay" *ngIf="!isOnline">
+            <i class="fas fa-wifi-slash"></i>
+          </div>
+        </div>
+        <div class="prato-info">
+          <h3 class="prato-nome">{{ p.Nome }}</h3>
+          <p class="prato-descricao">{{ p.descricao }}</p>
+          <p class="prato-preco">R$ {{ p.preco | number:'1.2-2' }}</p>
+        </div>
+        <div class="prato-actions">
+          <button 
+            *ngIf="isCliente" 
+            class="btn-secundario" 
+            (click)="verAvaliacoes(p)"
+            [disabled]="!isOnline"
+            title="Ver avaliações do prato">
+            <i class="fas fa-star"></i>
+            <span>Ver Avaliações</span>
+          </button>
+          <button 
+            *ngIf="isCliente" 
+            class="btn-primario" 
+            (click)="avaliarPrato(p)"
+            [disabled]="!isOnline"
+            [@buttonAnimation]
+            title="Avaliar este prato">
+            <i class="fas fa-plus"></i>
+            <span>Avaliar</span>
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <!-- Estado Vazio Aprimorado -->
+    <ng-template #semPratos>
+      <div class="estado-vazio" [@emptyStateAnimation] *ngIf="!loadingState.pratos">
+        <div class="empty-icon">
+          <i class="fas" [ngClass]="{
+            'fa-search': searchTerm,
+            'fa-utensils': !searchTerm && isOnline,
+            'fa-wifi-slash': !isOnline
+          }"></i>
+        </div>
+        
+        <h3 *ngIf="searchTerm">Nenhum prato encontrado</h3>
+        <h3 *ngIf="!searchTerm && isOnline">Cardápio vazio</h3>
+        <h3 *ngIf="!isOnline">Sem conexão</h3>
+        
+        <p *ngIf="searchTerm">
+          Não encontramos pratos com "<strong>{{ searchTerm }}</strong>". 
+          Tente outro termo de busca.
+        </p>
+        <p *ngIf="!searchTerm && isOnline">
+          Este restaurante ainda não possui pratos cadastrados no cardápio.
+        </p>
+        <p *ngIf="!isOnline">
+          Conecte-se à internet para visualizar o cardápio do restaurante.
+        </p>
+        
+        <div class="empty-actions">
+          <button 
+            *ngIf="searchTerm" 
+            class="btn-limpar-busca"
+            (click)="limparBusca()">
+            <i class="fas fa-times"></i>
+            Limpar Busca
+          </button>
+          
+          <button 
+            *ngIf="!isOnline" 
+            class="btn-reconectar"
+            (click)="forceRefresh()">
+            <i class="fas fa-sync-alt"></i>
+            Tentar Conectar
+          </button>
+        </div>
+      </div>
+    </ng-template>
   </div>
 
-  <ng-template #semPratos>
-    <p class="sem-pratos">Nenhum prato encontrado.</p>
+  <!-- Loading State Global -->
+  <ng-template #globalLoadingTemplate>
+    <div class="page-loading">
+      <div class="loading-header">
+        <div class="shimmer-title shimmer-placeholder"></div>
+        <div class="shimmer-text shimmer-placeholder" style="width: 60%;"></div>
+      </div>
+      
+      <div class="loading-sections">
+        <div class="loading-section">
+          <div class="shimmer-text shimmer-placeholder" style="width: 200px; height: 28px;"></div>
+          <div class="shimmer-destaques-grid">
+            <div class="shimmer-destaque" *ngFor="let item of [1,2,3]">
+              <div class="shimmer-destaque-img shimmer-placeholder"></div>
+              <div class="shimmer-destaque-info">
+                <div class="shimmer-text shimmer-placeholder"></div>
+                <div class="shimmer-text shimmer-placeholder" style="width: 60%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="loading-section">
+          <div class="shimmer-text shimmer-placeholder" style="width: 150px; height: 28px;"></div>
+          <div class="shimmer-filter shimmer-placeholder"></div>
+        </div>
+      </div>
+    </div>
   </ng-template>
-</section>
+</main>

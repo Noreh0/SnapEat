@@ -1,7 +1,164 @@
-<h1 style="color: white;">
-    {{Nome}}
-  </h1>
-  <div style="width: 60%; height: 60%; background-color: white;">
-    <canvas baseChart [datasets]="barChartData"   [labels]="barChartLabels"   [type]="barChartType" [legend]="barChartLegend"></canvas>
+<!-- Modificações no grafico.component.html para incluir controles interativos -->
+<div class="chart-container">
+  <div class="chart-header">
+    <h3 class="chart-title">
+      {{ tipoGrafico === 'mensal' ? 'Evolução Mensal de Notas' : 
+         tipoGrafico === 'pratos' ? 'Melhores Pratos Avaliados' : 
+         'Distribuição de Avaliações' }}
+    </h3>
+    
+    <!-- Controles de visualização para gráficos interativos -->
+    <div class="chart-controls" *ngIf="permitirInteracao && (tipoGrafico === 'historico' || tipoGrafico === 'mensal')">
+      <!-- Seleção de período -->
+      <div class="control-group">
+        <label>Período:</label>
+        <div class="btn-group">
+          <button class="control-btn" [class.active]="periodoSelecionado === 'ultimos7dias'" 
+                 (click)="alterarPeriodo('ultimos7dias')">7D</button>
+          <button class="control-btn" [class.active]="periodoSelecionado === 'ultimo30dias'" 
+                 (click)="alterarPeriodo('ultimo30dias')">30D</button>
+          <button class="control-btn" [class.active]="periodoSelecionado === 'ultimos3meses'" 
+                 (click)="alterarPeriodo('ultimos3meses')">3M</button>
+          <button class="control-btn" [class.active]="periodoSelecionado === 'ultimo6meses'" 
+                 (click)="alterarPeriodo('ultimo6meses')">6M</button>
+          <button class="control-btn" [class.active]="periodoSelecionado === 'ultimoAno'" 
+                 (click)="alterarPeriodo('ultimoAno')">1A</button>
+          <button class="control-btn" [class.active]="periodoSelecionado === 'personalizado'" 
+                 (click)="alterarPeriodo('personalizado')">Personalizado</button>
+        </div>
+      </div>
+      
+      <!-- Controle de datas personalizadas -->
+      <div class="custom-date-control" *ngIf="periodoSelecionado === 'personalizado'">
+        <form [formGroup]="dateForm">
+          <mat-form-field appearance="outline" class="date-picker">
+            <mat-label>De</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="start">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="date-picker">
+            <mat-label>Até</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="end">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+          
+          <button class="control-btn apply-btn" (click)="carregarDadosParaPeriodo()">Aplicar</button>
+        </form>
+      </div>
+      
+      <!-- Seleção de métricas -->
+      <!-- Modificar as chamadas de método para usar a nova função -->
+      <div class="control-group">
+        <label>Métricas:</label>
+        <div class="metrics-selection">
+          <div class="metric-checkbox" *ngFor="let metrica of metricasDisponiveis">
+            <label>
+              <input type="checkbox" [checked]="metrica.selecionado" 
+                    (change)="metrica.selecionado = !metrica.selecionado; carregarDadosComMetricas()">
+              <span>{{ metrica.nome }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+<!-- Modificar botão de aplicar período personalizado -->
+<button class="control-btn apply-btn" (click)="carregarDadosComMetricas()">Aplicar</button>
+      
+      <!-- Tipo de visualização -->
+      <div class="control-group">
+        <label>Visualização:</label>
+        <div class="btn-group">
+          <button class="control-btn" [class.active]="chartType === 'line' && !chartData.datasets[0]?.fill" 
+                 (click)="alternarTipoVisualizacao('linha')">
+            <i class="fas fa-chart-line"></i> Linha
+          </button>
+          <button class="control-btn" [class.active]="chartType === 'line' && chartData.datasets[0]?.fill" 
+                 (click)="alternarTipoVisualizacao('area')">
+            <i class="fas fa-chart-area"></i> Área
+          </button>
+          <button class="control-btn" [class.active]="chartType === 'bar'" 
+                 (click)="alternarTipoVisualizacao('barra')">
+            <i class="fas fa-chart-bar"></i> Barras
+          </button>
+        </div>
+      </div>
+      
+      <!-- Opções adicionais -->
+      <div class="control-group options-group">
+        <div class="option-checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="exibirLegenda" (change)="atualizarOpcoesGrafico()">
+            <span>Legenda</span>
+          </label>
+        </div>
+        <div class="option-checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="exibirGrade" (change)="atualizarOpcoesGrafico()">
+            <span>Grade</span>
+          </label>
+        </div>
+        <div class="option-checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="suavizarCurva" (change)="atualizarOpcoesGrafico()">
+            <span>Suavizar</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Comparação -->
+      <div class="control-group">
+        <label>Comparar com:</label>
+        <select [(ngModel)]="periodoComparacao" (change)="adicionarComparacao(periodoComparacao)">
+          <option [ngValue]="null">Nenhum</option>
+          <option value="periodoAnterior">Período Anterior</option>
+          <option value="mesmoPeríodoAnoPassado">Mesmo Período (Ano Passado)</option>
+        </select>
+      </div>
+      
+      <!-- Ações do gráfico -->
+      <div class="chart-actions">
+        <button class="control-btn" (click)="exportarDados('csv')">
+          <i class="fas fa-download"></i> CSV
+        </button>
+        <button class="control-btn" (click)="exportarDados('excel')">
+          <i class="fas fa-file-excel"></i> Excel
+        </button>
+        <button class="control-btn" (click)="salvarConfiguracao()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+    
+    <!-- Toggle existente para gráfico de avaliação -->
+    <div class="chart-toggle" *ngIf="tipoGrafico === 'avaliacao' && !permitirInteracao">
+      <button 
+        class="chart-toggle-btn" 
+        [class.active]="chartType === 'bar'" 
+        (click)="setChartType('bar')">
+        Barras
+      </button>
+      <button 
+        class="chart-toggle-btn" 
+        [class.active]="chartType === 'doughnut'" 
+        (click)="setChartType('doughnut')">
+        Rosca
+      </button>
+    </div>
+  </div>
+
+  <!-- Canvas para o gráfico -->
+  <div class="chart-canvas-container">
+    <canvas #chartCanvas baseChart
+      [type]="chartType"
+      [data]="chartData"
+      [options]="chartOptions"
+      [plugins]="chartPlugins"
+      (chartClick)="onChartClick($event)">
+    </canvas>
   </div>
   
+  <!-- Outras partes existentes do template... -->
+</div>

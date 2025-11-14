@@ -1,0 +1,153 @@
+<div class="container">
+  <h1>Complete seu Cadastro</h1>
+  <p>Faltam apenas alguns detalhes para mergulhar no mundo de sabores do SnapEats.</p>
+  
+  <div class="tipo-selector">
+    <button [class.active]="tipoUsuario === 'cliente'" (click)="tipoUsuario = 'cliente'; initForm()">
+      Sou Cliente
+    </button>
+    <button [class.active]="tipoUsuario === 'restaurante'" (click)="tipoUsuario = 'restaurante'; initForm()">
+      Sou Restaurante
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="form">
+    <!-- Campos comuns -->
+    <div class="form-group">
+      <label for="nome">Nome Completo / Razão Social</label>
+      <input id="nome" type="text" formControlName="nome" class="form-control">
+      <div class="error-message" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">
+        Este campo é obrigatório.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" class="form-control" readonly>
+    </div>
+
+    <!-- Campos específicos para cliente -->
+    <ng-container *ngIf="tipoUsuario === 'cliente'">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input id="cpf" type="text" formControlName="cpf" class="form-control" placeholder="000.000.000-00">
+          <div class="error-message" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.touched">
+            CPF inválido ou obrigatório.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="telefone-cliente">Telefone</label>
+          <input id="telefone-cliente" type="text" formControlName="telefone" class="form-control" placeholder="(00) 00000-0000">
+          <div class="error-message" *ngIf="form.get('telefone')?.invalid && form.get('telefone')?.touched">
+            Telefone é obrigatório.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cidade-cliente">Cidade</label>
+          <input id="cidade-cliente" type="text" formControlName="cidade" class="form-control">
+          <div class="error-message" *ngIf="form.get('cidade')?.invalid && form.get('cidade')?.touched">
+            Cidade é obrigatória.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="estado-cliente">Estado</label>
+          <input id="estado-cliente" type="text" formControlName="estado" class="form-control" placeholder="UF">
+          <div class="error-message" *ngIf="form.get('estado')?.invalid && form.get('estado')?.touched">
+            Estado é obrigatório.
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Campos específicos para restaurante -->
+    <ng-container *ngIf="tipoUsuario === 'restaurante'">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome_fantasia">Nome Fantasia</label>
+          <input id="nome_fantasia" type="text" formControlName="nome_fantasia" class="form-control">
+          <div class="error-message" *ngIf="form.get('nome_fantasia')?.invalid && form.get('nome_fantasia')?.touched">
+            Nome Fantasia é obrigatório.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cnpj">CNPJ</label>
+          <input id="cnpj" type="text" formControlName="cnpj" class="form-control" placeholder="00.000.000/0000-00">
+          <div class="error-message" *ngIf="form.get('cnpj')?.invalid && form.get('cnpj')?.touched">
+            CNPJ inválido ou obrigatório.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">Endereço Completo</label>
+        <input id="endereco" type="text" formControlName="endereco" class="form-control">
+        <div class="error-message" *ngIf="form.get('endereco')?.invalid && form.get('endereco')?.touched">
+          Endereço é obrigatório.
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cidade-rest">Cidade</label>
+          <input id="cidade-rest" type="text" formControlName="cidade" class="form-control">
+          <div class="error-message" *ngIf="form.get('cidade')?.invalid && form.get('cidade')?.touched">
+            Cidade é obrigatória.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="bairro">Bairro</label>
+          <input id="bairro" type="text" formControlName="bairro" class="form-control">
+          <div class="error-message" *ngIf="form.get('bairro')?.invalid && form.get('bairro')?.touched">
+            Bairro é obrigatório.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="estado-rest">Estado</label>
+          <input id="estado-rest" type="text" formControlName="estado" class="form-control" placeholder="UF">
+          <div class="error-message" *ngIf="form.get('estado')?.invalid && form.get('estado')?.touched">
+            Estado é obrigatório.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="telefone-rest">Telefone</label>
+          <input id="telefone-rest" type="text" formControlName="telefone" class="form-control" placeholder="(00) 0000-0000">
+          <div class="error-message" *ngIf="form.get('telefone')?.invalid && form.get('telefone')?.touched">
+            Telefone é obrigatório.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tipo_restaurante">Tipo de Culinária</label>
+          <select id="tipo_restaurante" formControlName="tipo_restaurante" class="form-control">
+            <option value="" disabled>Selecione uma especialidade</option>
+            <option *ngFor="let tipo of tiposRestaurante" [value]="tipo">{{ tipo }}</option>
+          </select>
+          <div class="error-message" *ngIf="form.get('tipo_restaurante')?.invalid && form.get('tipo_restaurante')?.touched">
+            A especialidade é obrigatória.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descricao">Descrição (opcional)</label>
+        <textarea id="descricao" formControlName="descricao" class="form-control" placeholder="Conte um pouco sobre seu restaurante..."></textarea>
+      </div>
+    </ng-container>
+
+    <div class="error-global" *ngIf="erro">{{ erro }}</div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit" [disabled]="carregando || form.invalid">
+        {{ carregando ? 'Salvando...' : 'Concluir Cadastro' }}
+      </button>
+    </div>
+  </form>
+</div>

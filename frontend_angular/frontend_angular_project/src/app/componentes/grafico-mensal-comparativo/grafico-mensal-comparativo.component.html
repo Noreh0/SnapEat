@@ -1,0 +1,133 @@
+<div class="grafico-mensal-container">
+  <div class="card">
+    <!-- Header Sofisticado -->
+    <div class="card-header">
+      <h3>📊 Análise Mensal Comparativa</h3>
+      <p class="subtitle">Compare desempenho e visualize métricas ponderadas</p>
+    </div>
+
+    <!-- Controles Compactos -->
+    <div class="controles" [formGroup]="filtroForm">
+      <!-- Período -->
+      <div class="filtro-row">
+        <div class="filtro-grupo">
+          <label>Período de Análise</label>
+          <div class="date-range">
+            <input 
+              type="date" 
+              formControlName="dataInicio" 
+              class="form-control"
+              [max]="filtroForm.get('dataFim')?.value | date:'yyyy-MM-dd'"
+            >
+            <span>até</span>
+            <input 
+              type="date" 
+              formControlName="dataFim" 
+              class="form-control"
+              [min]="filtroForm.get('dataInicio')?.value | date:'yyyy-MM-dd'"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas e Restaurantes -->
+      <div class="filtro-row">
+        <!-- Métricas Expansível -->
+        <div class="filtro-grupo">
+          <div class="lista-expansivel">
+            <div class="lista-header" 
+                 [class.expandida]="metricasExpandidas"
+                 (click)="toggleMetricasExpandidas()">
+              <div class="lista-titulo">
+                📊 Métricas Exibidas
+                <span class="lista-contador" *ngIf="hasMetricasSelecionadas">
+                  {{ metricasSelecionadasCount }}
+                </span>
+              </div>
+              <span class="lista-seta">▼</span>
+            </div>
+            <div class="lista-conteudo" [class.expandida]="metricasExpandidas">
+              <div class="metricas-toggle">
+                <label *ngFor="let metrica of metricas" class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    [checked]="metrica.checked"
+                    (change)="toggleMetrica(metrica.value)"
+                  >
+                  {{ metrica.label }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Restaurantes Expansível -->
+        <div class="filtro-grupo">
+          <div class="lista-expansivel">
+            <div class="lista-header" 
+                 [class.expandida]="restaurantesExpandidos"
+                 (click)="toggleRestaurantesExpandidos()">
+              <div class="lista-titulo">
+                🏪 Comparar Restaurantes
+                <span class="lista-contador" *ngIf="hasRestaurantesSelecionados">
+                  {{ restaurantesSelecionadosCount }}
+                </span>
+              </div>
+              <span class="lista-seta">▼</span>
+            </div>
+            <div class="lista-conteudo alta" [class.expandida]="restaurantesExpandidos">
+              <div class="restaurantes-lista" *ngIf="hasRestaurantesDisponiveis">
+                <div *ngFor="let rest of restaurantesDisponiveis" class="restaurante-item">
+                  <label class="checkbox-label">
+                    <input 
+                      type="checkbox"
+                      [checked]="isRestauranteSelecionado(rest.ID)"
+                      (change)="toggleRestauranteComparacao(rest.ID)"
+                    >
+                    {{ rest.Nome }}
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Mensagem quando não há restaurantes -->
+              <div *ngIf="!hasRestaurantesDisponiveis" class="empty-state">
+                <p style="font-size: 0.8rem; padding: 0.5rem;">
+                  Nenhum restaurante disponível para comparação
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="filtro-acoes">
+        <button 
+          (click)="aplicarFiltros()" 
+          class="btn btn-primary"
+          type="button"
+        >
+          Atualizar Análise
+        </button>
+      </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="chart-wrapper" *ngIf="hasChartData">
+      <canvas 
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="chartType"
+        aria-label="Gráfico de análise mensal comparativa"
+        role="img"
+      >
+      </canvas>
+    </div>
+
+    <!-- Estado Vazio Elegante -->
+    <div class="empty-state" *ngIf="!hasChartData">
+      <p>📈 Configure os filtros acima e clique em "Atualizar Análise" para visualizar os dados</p>
+    </div>
+  </div>
+</div>

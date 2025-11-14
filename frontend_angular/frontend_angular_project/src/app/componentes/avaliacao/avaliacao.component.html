@@ -1,26 +1,124 @@
-<div class="avaliacao modelo modelo1 ff-roboto-mono" *ngIf="ClienteComponent; else Restaurante">
-  <p class="nome" translate>Restaurante <b>{{ Nome_Restaurante }} </b></p>
-  <p class="nota" translate>Nota <b>{{ avaliacao.Nota }} </b></p>
-  <p class="comentario" translate>Comentario <b>{{ avaliacao.Comentario }}</b></p>
-  <p></p>
- <div class="acoes" *ngIf="get() == Email; else OutroPerfilCliente">
-   <button routerLink="/perfilCliente/{{id}}/editarAvaliacao/{{avaliacao.ID}}" translate>Btn Editar Avaliacao </button>
-   <button (click)="excluirAvaliacao()" translate> Btn Excluir Avaliacao</button>
+<!-- Mensagens de feedback -->
+<div class="feedback-container">
+  <div class="feedback-message feedback-sucesso" *ngIf="mostrarSucesso" [@slideInOut]>
+    <i class="fas fa-check-circle"></i>
+    {{ mensagemFeedback }}
+  </div>
+  <div class="feedback-message feedback-erro" *ngIf="mostrarErro" [@slideInOut]>
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ mensagemFeedback }}
   </div>
 </div>
+
+<div class="avaliacao-card" *ngIf="ClienteComponent; else Restaurante" [@fadeInUp]>
+  <div class="loading-overlay" *ngIf="carregandoRestaurante || excluindo" [@fadeIn]>
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>{{ excluindo ? 'Excluindo avaliação...' : 'Carregando dados...' }}</span>
+    </div>
+  </div>
+  
+  <p class="avaliacao-card__titulo">
+    Restaurante 
+    <b *ngIf="!carregandoRestaurante">{{ Nome_Restaurante }}</b>
+    <span class="loading-text" *ngIf="carregandoRestaurante">
+      <i class="fas fa-spinner fa-spin"></i> Carregando...
+    </span>
+  </p>
+  <p class="avaliacao-card__nota">Nota: <span>{{ avaliacao.Nota }}</span></p>
+  <p class="avaliacao-card__comentario">Comentário: <span>{{ avaliacao.Comentario }}</span></p>
+
+  <div class="avaliacao-card__imagens" *ngIf="avaliacao.tem_imagens && avaliacao.imagens_urls && avaliacao.imagens_urls.length > 0">
+    <h4>Fotos da avaliação:</h4>
+    <div class="imagens-grid">
+      <div class="imagem-item" *ngFor="let imagem of avaliacao.imagens_urls" (click)="abrirImagemModal(imagem)">
+        <img [src]="imagem" alt="Foto da avaliação" loading="lazy">
+      </div>
+    </div>
+  </div>
+  <!-- Botões para cliente dono da avaliação -->
+  <div class="avaliacao-card__acoes" *ngIf="get() == Email; else OutroPerfilCliente">
+    <button
+      class="btn btn-editar"
+      [disabled]="excluindo"
+      routerLink="/perfilCliente/{{id}}/editarAvaliacao/{{avaliacao.ID}}"
+      [@buttonHover]>
+      <i class="fas fa-edit"></i>
+      Editar
+    </button>
+    <button 
+      class="btn btn-excluir" 
+      [disabled]="excluindo"
+      (click)="excluirAvaliacao()"
+      [@buttonHover]>
+      <i class="fas fa-trash" *ngIf="!excluindo"></i>
+      <i class="fas fa-spinner fa-spin" *ngIf="excluindo"></i>
+      {{ excluindo ? 'Excluindo...' : 'Excluir' }}
+    </button>
+  </div>
+</div>
+
 <ng-template #Restaurante>
-<div class="avaliacao modelo modelo1 ff-roboto-mono" >
-  <p class="nome" translate >Cliente <b>{{ Nome_Cliente }}</b></p>
-  <p class="nota" translate>Nota <b>{{ avaliacao.Nota }}</b></p>
-  <p class="comentario" translate>Comentario <b>{{ avaliacao.Comentario }}</b></p>
-  <p></p>
- <div *ngIf="get() == Email; else OutroPerfilRestaurante">
+  <div class="avaliacao-card" [@fadeInUp]>
+    <div class="loading-overlay" *ngIf="carregandoCliente || denunciando" [@fadeIn]>
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>{{ denunciando ? 'Enviando denúncia...' : 'Carregando dados...' }}</span>
+      </div>
+    </div>
+    
+    <p class="avaliacao-card__titulo">
+      Cliente 
+      <b *ngIf="!carregandoCliente">{{ Nome_Cliente }}</b>
+      <span class="loading-text" *ngIf="carregandoCliente">
+        <i class="fas fa-spinner fa-spin"></i> Carregando...
+      </span>
+    </p>
+    <p class="avaliacao-card__nota">Nota: <span>{{ avaliacao.Nota }}</span></p>
+    <p class="avaliacao-card__comentario">Comentário: <span>{{ avaliacao.Comentario }}</span></p>
+
+    <div class="avaliacao-card__imagens" *ngIf="avaliacao.tem_imagens && avaliacao.imagens_urls && avaliacao.imagens_urls.length > 0">
+      <h4>Fotos da avaliação:</h4>
+      <div class="imagens-grid">
+        <div class="imagem-item" *ngFor="let imagem of avaliacao.imagens_urls" (click)="abrirImagemModal(imagem)">
+          <img [src]="imagem" alt="Foto da avaliação" loading="lazy">
+        </div>
+      </div>
+    </div>
+    <!-- Botão de denunciar -->
+    <div class="avaliacao-card__acoes" *ngIf="ClienteComponent && get() != Email">
+      <button 
+        class="btn btn-denunciar" 
+        [disabled]="denunciando || denunciaEnviada"
+        (click)="abrirDenuncia()"
+        [@buttonHover]>
+        <i class="fas fa-flag" *ngIf="!denunciando && !denunciaEnviada"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="denunciando"></i>
+        <i class="fas fa-check" *ngIf="denunciaEnviada"></i>
+        {{ denunciando ? 'Enviando...' : (denunciaEnviada ? 'Denunciada' : 'Denunciar') }}
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Botões de "Ver Perfil" -->
+<ng-template #OutroPerfilCliente>
+  <button class="btn btn-link" routerLink="/perfilRestaurante/{{EmailRestaurante}}">
+    Ver Restaurante
+  </button>
+</ng-template>
+
+<ng-template #OutroPerfilRestaurante>
+  <button class="btn btn-link" routerLink="/perfilCliente/{{Email}}">
+    Ver Cliente
+  </button>
+</ng-template>
+
+<div class="modal-imagem" *ngIf="imagemModalAberto" (click)="fecharImagemModal()" [@fadeIn]>
+  <div class="modal-imagem__conteudo" (click)="$event.stopPropagation()" [@zoomIn]>
+    <button class="modal-imagem__fechar" (click)="fecharImagemModal()" [@buttonHover]>
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="imagemSelecionada" alt="Imagem ampliada" [@imageLoad]>
   </div>
 </div>
-</ng-template>
-<ng-template #OutroPerfilCliente>
-<button routerLink="/perfilRestaurante/{{EmailRestaurante}}" translate>Btn Ver Perfil</button>
-</ng-template>
-<ng-template #OutroPerfilRestaurante>
-<button routerLink="/perfilCliente/{{Email}}" translate>Btn Ver Perfil</button>
-</ng-template>

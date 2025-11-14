@@ -1,0 +1,416 @@
+/* Using global theme variables from themes.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+:host {
+  /* Variáveis de fonte - Sistema Deezer */
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
+  
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-primary);
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: var(--fonte-primaria);
+}
+
+/* === Card principal === */
+.form-card {
+  width: 100%;
+  max-width: 1000px;
+  background-color: var(--bg-card);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+}
+
+/* === Cabeçalho === */
+.form-card-header {
+  margin-bottom: 35px;
+  text-align: center;
+}
+
+.form-card-header h1 {
+  font-family: var(--fonte-primaria);
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 10px 0;
+}
+
+.subtitle {
+  font-family: var(--fonte-primaria);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* === Layout do formulário === */
+.form-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 40px;
+}
+
+/* === Seção de preview do cupom === */
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.cupom-preview {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border-radius: 15px;
+  padding: 25px;
+  color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.cupom-preview::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  transform: rotate(45deg);
+}
+
+.preview-header {
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.preview-header h3 {
+  font-family: var(--fonte-primaria);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.codigo-label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+.preview-content {
+  position: relative;
+  z-index: 1;
+}
+
+.desconto-info {
+  margin-bottom: 15px;
+}
+
+.desconto-valor {
+  font-size: 2rem;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: block;
+}
+
+.pontos-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.star-icon {
+  font-size: 1.3rem;
+  color: #FFD700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.validade-info {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 15px;
+}
+
+.preview-descricao {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  opacity: 0.95;
+  margin: 0;
+  font-style: italic;
+}
+
+/* === Dicas === */
+.preview-tips {
+  background-color: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.preview-tips h4 {
+  font-family: var(--fonte-primaria);
+  margin: 0 0 15px 0;
+  color: var(--color-accent);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.preview-tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.preview-tips li {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* === Campos do formulário === */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  font-family: var(--fonte-primaria);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.required {
+  color: var(--color-primary);
+  margin-left: 2px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  font-family: var(--fonte-primaria);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-control::placeholder {
+  color: var(--text-placeholder);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
+}
+
+.form-control.error {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+}
+
+.form-control.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* === Grids de campos === */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* === Campos com prefixo/sufixo === */
+.input-with-prefix,
+.input-with-suffix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-prefix,
+.input-suffix {
+  position: absolute;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.input-prefix {
+  left: 16px;
+}
+
+.input-suffix {
+  right: 16px;
+}
+
+.input-with-prefix .form-control {
+  padding-left: 45px;
+}
+
+.input-with-suffix .form-control {
+  padding-right: 45px;
+}
+
+/* === Checkbox === */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.checkbox-label {
+  cursor: pointer;
+  margin: 0;
+  font-family: var(--fonte-primaria);
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+/* === Mensagens === */
+.error-message {
+  color: #c0392b;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  display: block;
+}
+
+.field-hint {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+  font-style: italic;
+}
+
+/* === Botões === */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--fonte-primaria);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(106, 123, 83, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #586744;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 123, 83, 0.3);
+}
+
+.btn-primary:disabled {
+  background-color: #B0B8A4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-secondary);
+  border-color: #DCD3C9;
+}
+
+/* === Responsividade === */
+@media (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-card {
+    padding: 30px 25px;
+  }
+  
+  .form-card-header h1 {
+    font-size: 2rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .cupom-preview {
+    margin-bottom: 0;
+  }
+  
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+}

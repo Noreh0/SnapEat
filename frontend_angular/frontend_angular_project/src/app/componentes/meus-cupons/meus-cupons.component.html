@@ -1,0 +1,184 @@
+<div class="meus-cupons-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Meus Cupons</h1>
+      <p class="subtitle">Cupons que você resgatou usando seus pontos de fidelidade</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="voltar()">
+        ← Voltar ao Perfil
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Carregando seus cupons...</p>
+  </div>
+
+  <!-- Erro -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <h3>Erro</h3>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="carregarMeusCupons()">
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div *ngIf="!loading && !error">
+    <!-- Filtro de busca -->
+    <div *ngIf="cuponsResgatados.length > 0" class="filtro-container">
+      <div class="filtro-busca">
+        <input 
+          type="text" 
+          [(ngModel)]="filtroTexto"
+          (input)="filtrarCupons()"
+          placeholder="Buscar por título, restaurante ou código..."
+        />
+        <button 
+          class="btn-limpar-filtro" 
+          (click)="limparFiltro()"
+          [disabled]="!filtroTexto"
+          title="Limpar busca"
+        >
+          ✖
+        </button>
+      </div>
+      
+      <!-- Contador de resultados -->
+      <div *ngIf="filtroTexto" class="contador-resultados">
+        {{ cuponsResgatadosFiltrados.length }} de {{ cuponsResgatados.length }} cupons encontrados
+      </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div *ngIf="cuponsResgatados.length > 0" class="estatisticas-card">
+      <h3>Resumo dos seus cupons</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number">{{ cuponsResgatados.length }}</span>
+          <span class="stat-label">Total Resgatado</span>
+        </div>
+        <div class="stat-item ativo">
+          <span class="stat-number">{{ cuponsAtivos }}</span>
+          <span class="stat-label">Prontos para Usar</span>
+        </div>
+        <div class="stat-item usado">
+          <span class="stat-number">{{ cuponsUsados }}</span>
+          <span class="stat-label">Já Utilizados</span>
+        </div>
+        <div class="stat-item expirado">
+          <span class="stat-number">{{ cuponsExpirados }}</span>
+          <span class="stat-label">Expirados</span>
+        </div>
+        <div class="stat-item pontos">
+          <span class="stat-number">{{ totalPontosUsados }}</span>
+          <span class="stat-label">Pontos Gastos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de cupons -->
+    <div class="cupons-grid">
+      <!-- Estado vazio -->
+      <div *ngIf="cuponsResgatados.length === 0" class="empty-state">
+        <div class="empty-icon">🎫</div>
+        <h3>Nenhum cupom resgatado</h3>
+        <p>Você ainda não resgatou nenhum cupom. Visite os restaurantes e troque seus pontos por descontos!</p>
+      </div>
+
+      <!-- Resultado vazio do filtro -->
+      <div *ngIf="cuponsResgatados.length > 0 && cuponsResgatadosFiltrados.length === 0" class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>Nenhum cupom encontrado</h3>
+        <p>Não foram encontrados cupons com o termo "{{ filtroTexto }}".</p>
+      </div>
+
+      <!-- Cards dos cupons -->
+      <div *ngFor="let cupom of cuponsResgatadosFiltrados" 
+           class="cupom-card" 
+           [ngClass]="getStatusClass(cupom)">
+        
+        <div class="cupom-header">
+          <div class="cupom-info">
+            <h3 class="cupom-titulo">{{ cupom.cupom_titulo }}</h3>
+            <p class="cupom-restaurante">{{ cupom.restaurante_nome }}</p>
+          </div>
+          <div class="cupom-status">
+            <span class="status-badge" [ngClass]="getStatusClass(cupom)">
+              {{ getStatusLabel(cupom) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="cupom-body">
+          <div class="desconto-info">
+            <div class="desconto-valor">{{ formatarDesconto(cupom) }}</div>
+            <div class="pontos-usados">
+              <span class="pontos-icon">★</span>
+              <span>{{ cupom.pontos_usados }} pontos usados</span>
+            </div>
+          </div>
+
+          <div class="cupom-detalhes">
+            <div class="detalhe codigo-resgate">
+              <span class="label">Código:</span>
+              <span class="codigo">{{ cupom.codigo_resgate }}</span>
+              <button class="btn-copiar" (click)="copiarCodigo(cupom.codigo_resgate)" title="Copiar código">
+                📋
+              </button>
+            </div>
+            
+            <div class="detalhe" *ngIf="cupom.valor_minimo && cupom.valor_minimo > 0">
+              <span class="label">Valor mínimo:</span>
+              <span class="valor">R$ {{ cupom.valor_minimo | number:'1.2-2' }}</span>
+            </div>
+            
+            <div class="detalhe">
+              <span class="label">Válido até:</span>
+              <span class="valor">{{ formatarData(cupom.data_validade) }}</span>
+            </div>
+            
+            <div class="detalhe">
+              <span class="label">Resgatado em:</span>
+              <span class="valor">{{ formatarDataHora(cupom.data_resgate) }}</span>
+            </div>
+
+            <div class="detalhe" *ngIf="cupom.usado && cupom.data_uso">
+              <span class="label">Usado em:</span>
+              <span class="valor">{{ formatarDataHora(cupom.data_uso) }}</span>
+            </div>
+          </div>
+
+          <p class="cupom-descricao" *ngIf="cupom.cupom_descricao">
+            {{ cupom.cupom_descricao }}
+          </p>
+
+          <!-- Instruções de uso -->
+          <div class="instrucoes-uso" *ngIf="!cupom.usado && !isExpirado(cupom)">
+            <div class="instrucao-item">
+              <span class="instrucao-icon">💡</span>
+              <span>Apresente este código no restaurante para usar o desconto</span>
+            </div>
+          </div>
+
+          <!-- Aviso de expiração -->
+          <div class="aviso-expiracao" *ngIf="!cupom.usado && isExpirado(cupom)">
+            <span class="aviso-icon">⚠️</span>
+            <span>Este cupom expirou e não pode mais ser usado</span>
+          </div>
+
+          <!-- Confirmação de uso -->
+          <div class="confirmacao-uso" *ngIf="cupom.usado">
+            <span class="confirmacao-icon">✅</span>
+            <span>Cupom utilizado com sucesso!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

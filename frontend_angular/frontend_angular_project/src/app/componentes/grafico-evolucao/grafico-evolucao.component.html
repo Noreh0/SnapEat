@@ -1,0 +1,83 @@
+<div class="grafico-evolucao-container">
+  <div class="card">
+    <!-- Header Compacto -->
+    <div class="card-header compact">
+      <h3>📈 Evolução das Avaliações</h3>
+    </div>
+
+    <!-- Controles Mais Compactos -->
+    <div class="controles compact" [formGroup]="filtroForm">
+      <div class="filtros-grid compact">
+        <!-- Período em uma linha -->
+        <div class="filtro-grupo inline">
+          <label>Período:</label>
+          <div class="date-range compact">
+            <input 
+              type="date" 
+              formControlName="dataInicio" 
+              class="form-control compact"
+              title="Data de início"
+            >
+            <span>até</span>
+            <input 
+              type="date" 
+              formControlName="dataFim" 
+              class="form-control compact"
+              title="Data de fim"
+            >
+          </div>
+        </div>
+
+        <!-- Tipo e Intervalo lado a lado -->
+        <div class="filtro-grupo inline">
+          <label>Tipo:</label>
+          <select 
+            formControlName="tipoComparacao" 
+            class="form-control compact"
+          >
+            <option *ngFor="let tipo of tiposComparacao" [value]="tipo.value">
+              {{ tipo.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filtro-grupo inline">
+          <label>Intervalo:</label>
+          <select 
+            formControlName="intervalo" 
+            class="form-control compact"
+          >
+            <option *ngFor="let intervalo of intervalos" [value]="intervalo.value">
+              {{ intervalo.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Botão de reset -->
+      <div class="filtro-acoes">
+        <button type="button" class="btn btn-secondary" (click)="resetarFiltros()">
+          🔄 Resetar
+        </button>
+      </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="chart-wrapper" *ngIf="chartData.datasets && chartData.datasets.length > 0">
+      <canvas 
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="chartType"
+        aria-label="Gráfico de evolução de avaliações"
+        role="img"
+      >
+      </canvas>
+    </div>
+
+    <!-- Estado Vazio -->
+    <div class="empty-state" *ngIf="!chartData.datasets || chartData.datasets.length === 0">
+      <p>📊 Sem dados disponíveis</p>
+    </div>
+  </div>
+</div>

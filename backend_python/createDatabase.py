@@ -1,6 +1,6 @@
-import mariadb
+import mysql.connector
 
-conexao = mariadb.connect(
+conexao = mysql.connector.connect(
     user='root',
     password='SnapEats17',
     host='localhost',

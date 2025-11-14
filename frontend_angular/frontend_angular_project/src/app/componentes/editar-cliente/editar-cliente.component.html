@@ -1,258 +1,106 @@
-<section class="editar-cliente-page">
-  <div class="form-card">
-    <!-- === CABEÇALHO: AVATAR + TÍTULO === -->
-    <header class="form-header">
-      <div class="profile-pic-container">
+<div class="form-card" *ngIf="formulario && cliente">
+  <header class="form-header">
+    <div class="profile-pic-container">
+      <img
+        [src]="cliente.imagem_url || defaultAvatar"
+        alt="Foto de perfil"
+        class="avatar"
+        (error)="handleImageError($event)"
+      />
+      <button
+        type="button"
+        class="edit-avatar-btn"
+        (click)="onTrocarAvatar()"
+        aria-label="Alterar foto de perfil"
+      >
         <img
-          src="../../../assets/images/usuario.png"
-          alt="Foto de perfil"
-          class="avatar"
+          src="assets/icons/camera-solid.svg"
+          alt="Ícone câmera"
+          class="camera-icon"
         />
-        <button
-          type="button"
-          class="edit-avatar-btn"
-          (click)="onTrocarAvatar()"
-          aria-label="Alterar foto de perfil"
-        >
-          <img
-            src="../../../assets/icons/camera-solid.svg"
-            alt="Ícone câmera"
-            class="camera-icon"
-          />
-        </button>
-      </div>
-      <h1 translate>Editar Perfil</h1>
-    </header>
+      </button>
+    </div>
+    <h1>Editar Perfil</h1>
+  </header>
 
-    <!-- === FORMULÁRIO REATIVO === -->
-    <form [formGroup]="formulario" (ngSubmit)="editarCliente()" novalidate>
-      <!-- ******** NOME ******** -->
+  <form [formGroup]="formulario" (ngSubmit)="editarCliente()" novalidate>
+    <div class="form-group">
+      <label for="Nome">Nome Completo</label>
+      <input id="Nome" type="text" formControlName="Nome" class="form-control">
+      <div class="error" *ngIf="formulario.get('Nome')?.invalid && formulario.get('Nome')?.touched">
+        Nome é obrigatório (mínimo 3 caracteres).
+      </div>
+    </div>
+
+    <div class="form-row">
       <div class="form-group">
-        <label for="Nome" translate>Nome</label>
-        <input
-          type="text"
-          id="Nome"
-          class="form-input"
-          formControlName="Nome"
-          placeholder="Digite seu nome completo"
-        />
-        <div
-          class="error"
-          *ngIf="formulario.get('Nome')?.hasError('required') && formulario.get('Nome')?.touched"
-          translate
-        >
-          O nome é obrigatório.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('Nome')?.hasError('minlength') && formulario.get('Nome')?.touched"
-          translate
-        >
-          O nome precisa ter ao menos 3 caracteres.
+        <label for="CPF">CPF</label>
+        <input id="CPF" type="text" formControlName="CPF" class="form-control" mask="000.000.000-00" readonly>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" class="form-control" readonly>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="Cidade">Cidade</label>
+        <input id="Cidade" type="text" formControlName="Cidade" class="form-control">
+        <div class="error" *ngIf="formulario.get('Cidade')?.invalid && formulario.get('Cidade')?.touched">
+          Cidade é obrigatória.
         </div>
       </div>
-
-      <!-- ******** CPF ******** -->
       <div class="form-group">
-        <label for="CPF" translate>CPF</label>
-        <input
-          type="text"
-          id="CPF"
-          class="form-input"
-          formControlName="CPF"
-          mask="000.000.000-00"
-          placeholder="000.000.000-00"
-        />
-        <div
-          class="error"
-          *ngIf="formulario.get('CPF')?.hasError('required') && formulario.get('CPF')?.touched"
-          translate
-        >
-          O CPF é obrigatório.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('CPF')?.hasError('minlength') && formulario.get('CPF')?.touched"
-          translate
-        >
-          CPF incompleto.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('CPF')?.hasError('cpfInvalido') && formulario.get('CPF')?.touched"
-          translate
-        >
-          CPF inválido.
+        <label for="telefone">Telefone</label>
+        <input id="telefone" type="text" formControlName="telefone" class="form-control" mask="(00) 0 0000-0000">
+        <div class="error" *ngIf="formulario.get('telefone')?.invalid && formulario.get('telefone')?.touched">
+          Telefone é obrigatório.
         </div>
       </div>
+    </div>
 
-      <!-- ******** EMAIL ******** -->
+    <div class="form-row">
       <div class="form-group">
-        <label for="email" translate>Email</label>
-        <input
-          type="email"
-          id="email"
-          class="form-input"
-          formControlName="email"
-          placeholder="email@exemplo.com"
-        />
-        <div
-          class="error"
-          *ngIf="formulario.get('email')?.hasError('required') && formulario.get('email')?.touched"
-          translate
-        >
-          O email é obrigatório.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('email')?.hasError('email') && formulario.get('email')?.touched"
-          translate
-        >
-          Email inválido.
+        <label for="rede_social">Link da Rede Social (opcional)</label>
+        <input type="url" id="rede_social" formControlName="rede_social" class="form-control" placeholder="https://www.instagram.com/seuusuario">
+        <div class="error" *ngIf="formulario.get('rede_social')?.invalid && formulario.get('rede_social')?.touched">
+          Link da rede social inválido. Use um link válido (Instagram, Facebook, Twitter/X, LinkedIn, TikTok, YouTube, GitHub, Snapchat).
         </div>
       </div>
+    </div>
 
-      <!-- ******** SENHA ******** -->
+    <hr style="border: none; border-top: 1px solid #EAE3DB; margin: 30px 0;">
+
+    <div class="form-row">
       <div class="form-group">
-        <label for="senha" translate>Senha</label>
+        <label for="senha">Nova Senha (opcional)</label>
         <div class="senha-wrapper">
-          <input
-            [type]="hideSenha ? 'password' : 'text'"
-            id="senha"
-            class="form-input input-com-icon"
-            formControlName="senha"
-            placeholder="Digite uma senha forte"
-          />
-          <button
-            type="button"
-            class="icon-btn"
-            (click)="hideSenha = !hideSenha"
-            aria-label="Mostrar/ocultar senha"
-          >
-            <img
-              src="../../../assets/images/olho_senha.png"
-              alt="Mostrar senha"
-              class="password-icon"
-            />
+          <input [type]="hideSenha ? 'password' : 'text'" id="senha" class="form-control" formControlName="senha">
+          <button type="button" class="icon-btn" (click)="hideSenha = !hideSenha">
+            <img src="assets/images/olho_senha.png" alt="Mostrar senha" style="width: 20px;">
           </button>
         </div>
-        <!-- Adicione este bloco no lugar do atual -->
-        <div class="password-hint-info">
-          <span class="info-icon" tabindex="0">ℹ
-            <span class="tooltip">
-              A senha deve ter no mínimo 8 caracteres e conter:
-              <ul>
-                <li>1 letra maiúscula (A–Z)</li>
-                <li>1 letra minúscula (a–z)</li>
-                <li>1 número (0–9)</li>
-                <li>1 caractere especial (ex.: !&#64;#$%^&amp;*)</li>
-              </ul>
-            </span>
-          </span>
-          <span class="info-text">Requisitos de senha</span>
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('senha')?.hasError('required') && formulario.get('senha')?.touched"
-          translate
-        >
-          A senha é obrigatória.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('senha')?.hasError('pattern') && formulario.get('senha')?.touched"
-          translate
-        >
-          Senha fraca: inclua maiúscula, minúscula, número e caractere especial.
+        <div class="error" *ngIf="formulario.get('senha')?.hasError('pattern')">
+          Senha fraca (precisa de maiúscula, minúscula, número e símbolo).
         </div>
       </div>
-
-      <!-- ******** CONFIRMAR SENHA ******** -->
       <div class="form-group">
-        <label for="confirmasenha" translate>Confirme sua senha</label>
-        <input
-          type="password"
-          id="confirmasenha"
-          class="form-input"
-          formControlName="confirmasenha"
-          placeholder="Digite novamente a senha"
-        />
-        <div
-          class="error"
-          *ngIf="formulario.get('confirmasenha')?.hasError('required') && formulario.get('confirmasenha')?.touched"
-          translate
-        >
-          Confirmação de senha é obrigatória.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('confirmasenha')?.hasError('mismatch') && formulario.get('confirmasenha')?.touched"
-          translate
-        >
+        <label for="confirmasenha">Confirmar Nova Senha</label>
+        <input type="password" id="confirmasenha" class="form-control" formControlName="confirmasenha">
+        <div class="error" *ngIf="formulario.get('confirmasenha')?.hasError('mismatch')">
           As senhas não coincidem.
         </div>
       </div>
+    </div>
 
-      <!-- ******** CIDADE ******** -->
-      <div class="form-group">
-        <label for="Cidade" translate>Cidade</label>
-        <input
-          type="text"
-          id="Cidade"
-          class="form-input"
-          formControlName="Cidade"
-          placeholder="Digite sua cidade"
-        />
-        <div
-          class="error"
-          *ngIf="formulario.get('Cidade')?.hasError('required') && formulario.get('Cidade')?.touched"
-          translate
-        >
-          A cidade é obrigatória.
-        </div>
-      </div>
-
-      <!-- ******** TELEFONE ******** -->
-      <div class="form-group">
-        <label for="telefone" translate>Telefone</label>
-        <input
-          type="text"
-          id="telefone"
-          class="form-input"
-          formControlName="telefone"
-          mask="(00) 0 0000-0000"
-          placeholder="(99) 9 9999-9999"
-        />
-        <div
-          class="error"
-          *ngIf="formulario.get('telefone')?.hasError('required') && formulario.get('telefone')?.touched"
-          translate
-        >
-          O telefone é obrigatório.
-        </div>
-        <div
-          class="error"
-          *ngIf="formulario.get('telefone')?.hasError('telefoneIncompleto') && formulario.get('telefone')?.touched"
-          translate
-        >
-          Telefone incompleto.
-        </div>
-      </div>
-
-      <!-- ******** AÇÕES: SALVAR / CANCELAR ******** -->
-      <div class="form-actions">
-        <button type="submit" [disabled]="!formulario.valid" class="btn-primary">
-          Salvar Alterações
-        </button>
-        <button
-          type="button"
-          class="btn-secondary"
-          routerLink="/menu"
-          translate
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
-  </div>
-</section>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/perfilCliente/{{cliente.ID}}">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="formulario.invalid">
+        Salvar Alterações
+      </button>
+    </div>
+  </form>
+</div>

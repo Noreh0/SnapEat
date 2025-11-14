@@ -1,0 +1,141 @@
+<div class="grafico-pratos-container">
+  <div class="card">
+    <!-- Header Sofisticado -->
+    <div class="card-header">
+      <h3>🍽️ Comparação de Pratos</h3>
+      <p class="subtitle">Análise sofisticada da evolução gastronômica</p>
+    </div>
+
+    <!-- Controles Refinados -->
+    <div class="controles" [formGroup]="filtroForm">
+      <!-- Período e Métrica -->
+      <div class="filtro-row">
+        <div class="filtro-grupo">
+          <label>Período de Análise</label>
+          <div class="date-range">
+            <input 
+              type="date" 
+              formControlName="dataInicio" 
+              class="form-control"
+              [max]="filtroForm.get('dataFim')?.value"
+            >
+            <span>até</span>
+            <input 
+              type="date" 
+              formControlName="dataFim" 
+              class="form-control"
+              [min]="filtroForm.get('dataInicio')?.value"
+            >
+          </div>
+        </div>
+
+        <div class="filtro-grupo">
+          <label>Métrica de Avaliação</label>
+          <select 
+            formControlName="metrica" 
+            class="form-control"
+          >
+            <option *ngFor="let metrica of metricas" [value]="metrica.value">
+              {{ metrica.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Seleção de Pratos -->
+      <div class="filtro-row">
+        <div class="filtro-grupo full-width">
+          <label>
+            Selecione os Pratos 
+            <span style="font-weight: 400; opacity: 0.7;">
+              ({{ pratosIds.length }}/5 selecionados)
+            </span>
+          </label>
+          
+          <div class="pratos-grid">
+            <div 
+              *ngFor="let prato of pratosDisponiveis; let i = index" 
+              class="prato-card"
+              [class.selected]="isPratoSelecionado(prato.ID)"
+              (click)="togglePrato(prato.ID)"
+              [attr.tabindex]="0"
+              (keydown.enter)="togglePrato(prato.ID)"
+              (keydown.space)="togglePrato(prato.ID); $event.preventDefault()"
+            >
+              <div class="prato-checkbox">
+                <input 
+                  type="checkbox" 
+                  [checked]="isPratoSelecionado(prato.ID)"
+                  [id]="'prato-' + prato.ID"
+                  (click)="$event.stopPropagation()"
+                  tabindex="-1"
+                >
+              </div>
+              <div class="prato-info">
+                <h4>{{ prato.Nome }}</h4>
+                <p>{{ prato.descricao || 'Delícia da casa' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensagem quando não há pratos -->
+          <div *ngIf="pratosDisponiveis.length === 0" class="empty-state">
+            <p>Nenhum prato disponível para comparação no momento.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="filtro-acoes">
+        <button 
+          (click)="limparSelecao()" 
+          class="btn btn-secondary"
+          [disabled]="pratosIds.length === 0"
+        >
+          Limpar Seleção
+        </button>
+        <button 
+          (click)="aplicarFiltros()" 
+          class="btn btn-primary"
+          [disabled]="pratosIds.length === 0"
+        >
+          Atualizar Comparação
+        </button>
+      </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="chart-wrapper" *ngIf="pratosIds.length > 0 && chartData.datasets && chartData.datasets.length > 0">
+      <canvas 
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="chartType"
+        aria-label="Gráfico de comparação de pratos"
+        role="img"
+      >
+      </canvas>
+    </div>
+
+    <!-- Estado Vazio Elegante -->
+    <div class="empty-state" *ngIf="pratosIds.length === 0">
+      <p>✨ Selecione pelo menos um prato para visualizar a análise comparativa</p>
+      <small>💡 Dica: Pratos com avaliações aparecem primeiro na lista</small>
+    </div>
+
+    <!-- Loading/No Data State -->
+    <div class="empty-state" *ngIf="pratosIds.length > 0 && (!chartData.datasets || chartData.datasets.length === 0)">
+      <p>📊 Carregando dados de comparação...</p>
+      <small>⚠️ Se não houver dados, verifique se existem avaliações de pratos no período selecionado</small>
+      <br><br>
+      <div style="padding: 10px; background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; margin-top: 10px;">
+        <strong>💡 Para visualizar o gráfico:</strong>
+        <ul style="margin-top: 5px; padding-left: 20px; font-size: 0.9em;">
+          <li>Certifique-se que os pratos selecionados possuem avaliações</li>
+          <li>Ajuste o período para incluir datas com avaliações</li>
+          <li>Adicione avaliações aos pratos se necessário</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

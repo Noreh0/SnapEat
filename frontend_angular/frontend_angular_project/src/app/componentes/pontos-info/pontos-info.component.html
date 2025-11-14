@@ -1,0 +1,29 @@
+<div class="pontos-info" *ngIf="!loading && !error">
+  <div class="pontos-card" [ngClass]="{ 'pode-ganhar': podeGanharPontos, 'ja-ganhou': !podeGanharPontos }">
+    <div class="pontos-icon">
+      <span *ngIf="podeGanharPontos">⭐</span>
+      <span *ngIf="!podeGanharPontos">✅</span>
+    </div>
+    <div class="pontos-content">
+      <h4 class="pontos-titulo">{{ podeGanharPontos ? 'Ganhe Pontos!' : 'Pontos do Dia' }}</h4>
+      <p class="pontos-mensagem">{{ mensagemPontos }}</p>
+      <div class="pontos-detalhes" *ngIf="podeGanharPontos && pontosInfo">
+        <small class="pontos-extra">
+          Total possível hoje: {{ pontosInfo.total_possivel_hoje }} pontos
+          <span *ngIf="pontosInfo.total_possivel_hoje > pontosDisponiveis">
+            ({{ pontosDisponiveis }} desta ação + {{ pontosInfo.total_possivel_hoje - pontosDisponiveis }} de outras avaliações)
+          </span>
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pontos-loading" *ngIf="loading">
+  <div class="loading-spinner"></div>
+  <p>Verificando pontos disponíveis...</p>
+</div>
+
+<div class="pontos-error" *ngIf="error">
+  <p>❌ {{ error }}</p>
+</div>

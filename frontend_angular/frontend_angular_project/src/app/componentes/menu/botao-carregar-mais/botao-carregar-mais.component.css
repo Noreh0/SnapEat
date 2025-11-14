@@ -7,7 +7,7 @@
   justify-content: center;
 }
 .mensagem-center {
-  color:white;
+  color: var(--text-inverse);
   text-align: center;
   padding-top: 10px;
   padding-bottom: 10px;

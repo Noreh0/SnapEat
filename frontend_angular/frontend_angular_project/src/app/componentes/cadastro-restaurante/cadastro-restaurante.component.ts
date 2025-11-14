@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { FormValidations } from '../../form-validation';
 import { RestauranteService } from '../../services/restaurante.service';
+import { TIPOS_RESTAURANTE } from '../../model/tipos-restaurante';
+import { GeolocalizacaoService } from '../../services/geolocalizacao.service';
 
 @Component({
   selector: 'app-cadastro-restaurante',
@@ -20,24 +22,33 @@ import { RestauranteService } from '../../services/restaurante.service';
 export class CadastroRestauranteComponent implements OnInit {
   formulario!: FormGroup;
   hideSenha = true;
-  tipos = [
-    'Arabe','Brasileira','Carnes','Chinesa','Francesa','Frango',
-    'Italiana','Japonesa','Lanches','Mexicana','Peixes',
-    'Pizzaria','Saudavel','Vegana','Vegetariana'
-  ];
+  mostrarPopup = false;
+  tipos: string[] = [];
+  salvandoRestaurante = false;  // ✅ Flag para evitar múltiplos envios 
   constructor(
-    private restaurante: RestauranteService,
-    private formbuild: FormBuilder,
     private router: Router,
     private translate: TranslateService,
     private fb: FormBuilder,
-    private svc: RestauranteService
+    private svc: RestauranteService,
+    private geoService: GeolocalizacaoService,
   ) {}
 
   ngOnInit(): void {
+    console.log('Tipos de restaurante:', this.tipos); // debug
+    this.svc.getTipos().subscribe(
+      tipos => {
+        this.tipos = tipos;
+        console.log('Tipos carregados:', this.tipos);
+      },
+      error => {
+        console.error('Erro ao carregar tipos:', error);
+        alert('Erro ao carregar tipos de restaurante!');
+      }
+    );
     this.formulario = this.fb.group(
       {
         Nome: ['', [Validators.required, Validators.minLength(3)]],
+        nome_fantasia: ['', [Validators.required, Validators.minLength(3)]],
         descricao: ['', [Validators.maxLength(200)]],
         CNPJ: ['', [Validators.required, this.cnpjValidator]],
         email: ['', [Validators.required, Validators.email]],
@@ -55,10 +66,40 @@ export class CadastroRestauranteComponent implements OnInit {
         telefone: ['', [Validators.required, this.telefoneValidator]],
         Cidade: ['', Validators.required],
         Endereco: ['', Validators.required],
+        bairro: ['', Validators.required],
+        latitude: [null],
+        longitude: [null],
       },
       { validators: [this.senhasIguaisValidator] }
     );
   }
+  async onSubmit() {
+    try {
+      const geoData = await this.geoService
+        .buscarCoordenadas(this.formulario.value.Endereco, this.formulario.value.Cidade)
+        .toPromise();
+
+      if (geoData && geoData[0]) {
+        this.formulario.patchValue({
+          latitude: parseFloat(geoData[0].lat),
+          longitude: parseFloat(geoData[0].lon),
+          bairro: geoData[0].address?.suburb || this.formulario.value.bairro
+        });
+      } else {
+        console.error('Erro: Coordenadas não encontradas.');
+        return; // Não envia o formulário
+      }
+
+      // Debug: Verifique os valores do formulário antes de salvar
+      console.log('Dados do formulário antes de salvar:', this.formulario.value);
+
+      setTimeout(() => this.salvarRestaurante(), 0);
+    } catch (error) {
+      console.error('Erro ao obter coordenadas:', error);
+      return; // Não envia o formulário
+    }
+  }
+
   get f(): { [key: string]: AbstractControl } {
     return this.formulario.controls;
   }
@@ -131,29 +172,102 @@ export class CadastroRestauranteComponent implements OnInit {
 
 
 
+// Método salvarRestaurante():
   salvarRestaurante(): void {
-  if (this.formulario.invalid) {
-    this.formulario.markAllAsTouched();
-    return;
-  }
-  const dados = this.formulario.value;
-  this.svc.cadastrar(dados).subscribe(
-    (restaurante) => {
-      if (this.selectedFile) {
-        this.svc.uploadImagem(restaurante.ID, this.selectedFile).subscribe(() => {
-          this.router.navigate(['/login']);
-        });
-      } else {
-        this.router.navigate(['/login']);
-      }
-    },
-    (err: any) => {
-      alert(err.error?.message || 'Erro no cadastro.');
+    if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
+      return;
     }
-  );
-}
+
+    // ✅ Evitar múltiplos envios
+    if (this.salvandoRestaurante) {
+      console.log('Cadastro já está sendo processado...');
+      return;
+    }
+
+    this.salvandoRestaurante = true;  // ✅ Bloquear múltiplos envios
+
+    // ✅ NOVA ABORDAGEM: Enviar imagem junto com o cadastro usando FormData
+    if (this.selectedFile) {
+      console.log('Cadastrando restaurante com imagem...');
+      this.cadastrarComImagem();
+    } else {
+      console.log('Cadastrando restaurante sem imagem...');
+      this.cadastrarSemImagem();
+    }
+  }
+
+  // ✅ Método para cadastrar SEM imagem (método original)
+  private cadastrarSemImagem(): void {
+    const dados = {
+      ...this.formulario.value,
+      Nome: this.formulario.value.Nome,
+      CNPJ: this.formulario.value.CNPJ,
+      Endereco: this.formulario.value.Endereco,
+      Cidade: this.formulario.value.Cidade
+    };
+
+    console.log('Dados enviados ao backend (sem imagem):', dados);
+    
+    this.svc.cadastrar(dados).subscribe(
+      (restaurante) => {
+        console.log('Restaurante cadastrado com sucesso (sem imagem):', restaurante);
+        this.salvandoRestaurante = false;
+        this.router.navigate(['/login']);
+      },
+      (err: any) => {
+        console.error('Erro no cadastro:', err);
+        this.salvandoRestaurante = false;
+        alert(err.error?.message || 'Erro no cadastro.');
+      }
+    );
+  }
+
+  // ✅ Método para cadastrar COM imagem usando FormData
+  private cadastrarComImagem(): void {
+    const formData = new FormData();
+    
+    // Adicionar todos os campos do formulário
+    Object.keys(this.formulario.value).forEach(key => {
+      const value = this.formulario.value[key];
+      if (value !== null && value !== undefined) {
+        formData.append(key, value.toString());
+      }
+    });
+    
+    // Adicionar a imagem
+    formData.append('imagem', this.selectedFile!, this.selectedFile!.name);
+    
+    console.log('Enviando cadastro com imagem...');
+    console.log('Arquivo selecionado:', this.selectedFile);
+    
+    // Usar método específico para cadastro com imagem
+    this.svc.cadastrarComImagem(formData).subscribe(
+      (restaurante) => {
+        console.log('Restaurante cadastrado com sucesso (com imagem):', restaurante);
+        this.salvandoRestaurante = false;
+        this.router.navigate(['/login']);
+      },
+      (err: any) => {
+        console.error('Erro no cadastro com imagem:', err);
+        this.salvandoRestaurante = false;
+        
+        // Se falhar o cadastro com imagem, tentar sem imagem como fallback
+        if (err.status === 500 || err.status === 422) {
+          console.log('Tentando cadastro sem imagem como fallback...');
+          this.cadastrarSemImagem();
+        } else {
+          alert(err.error?.message || 'Erro no cadastro.');
+        }
+      }
+    );
+  }
   cancelar(): void {
     this.router.navigate(['/']);
+  }
+  verificarTipos() {
+    console.log('Tipos disponíveis:', this.tipos);
+    console.log('Valor atual do select:', this.formulario.get('tipo_restaurante')?.value);
   }
 
 
@@ -163,79 +277,6 @@ export class CadastroRestauranteComponent implements OnInit {
       return 'botao';
     } else {
       return 'botao_desabilitado';
-    }
-  }
-  getLingua() {
-    return this.translate.currentLang;
-  }
-  ValidaPlaceholderNome() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Name';
-    } else {
-      return 'Digite seu Nome';
-    }
-  }
-  ValidaPlaceholderDescricao() {
-    if (this.getLingua() == 'en') {
-      return 'Type the Description of the Restaurante';
-    } else {
-      return 'Digite a Descrição do restaurante';
-    }
-  }
-  ValidaPlaceholderCNPJ() {
-    if (this.getLingua() == 'en') {
-      return 'Type your CNPJ';
-    } else {
-      return 'Digite seu CNPJ';
-    }
-  }
-  ValidaPlaceholderEmail() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Email (Ex: Email@gmail.com)';
-    } else {
-      return 'Digite seu Email (Ex: Email@gmail.com)';
-    }
-  }
-  ValidaPlaceholderTipo() {
-    if (this.getLingua() == 'en') {
-      return 'Select the Type of the Restaurant';
-    } else {
-      return 'Selecione o Tipo do Restaurante';
-    }
-  }
-  ValidaPlaceholderSenha() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Password';
-    } else {
-      return 'Digite sua Senha';
-    }
-  }
-  ValidaPlaceholderConfirma() {
-    if (this.getLingua() == 'en') {
-      return 'Confirm your Password';
-    } else {
-      return 'Confirme sua Senha';
-    }
-  }
-  ValidaPlaceholderCidade() {
-    if (this.getLingua() == 'en') {
-      return 'Type your City';
-    } else {
-      return 'Digite sua Cidade';
-    }
-  }
-  ValidaPlaceholderTelefone() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Phone';
-    } else {
-      return 'Digite seu Telefone';
-    }
-  }
-  ValidaPlaceholderEndereco() {
-    if (this.getLingua() == 'en') {
-      return 'Type the Address';
-    } else {
-      return 'Digite o Endereço';
     }
   }
 }

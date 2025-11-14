@@ -1,0 +1,123 @@
+<div class="cliente-cupons-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Cupons Disponíveis</h1>
+      <p class="subtitle">Resgate cupons usando seus pontos de fidelidade</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="voltar()">
+        ← Voltar ao Restaurante
+      </button>
+    </div>
+  </header>
+
+  <!-- Informações de Pontos -->
+  <div class="pontos-card" *ngIf="pontos">
+    <div class="pontos-info">
+      <div class="pontos-item">
+        <span class="pontos-icon">★</span>
+        <div class="pontos-detalhes">
+          <span class="pontos-valor">{{ pontos.pontos_disponiveis }}</span>
+          <span class="pontos-label">Pontos Disponíveis</span>
+        </div>
+      </div>
+      <div class="pontos-historico">
+        <small>Total ganho: {{ pontos.pontos_totais }} pontos</small>
+        <small>Total usado: {{ pontos.pontos_utilizados }} pontos</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Carregando cupons disponíveis...</p>
+  </div>
+
+  <!-- Erro -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <h3>Erro</h3>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="carregarDados()" *ngIf="clienteId">
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Cupons -->
+  <div *ngIf="!loading && !error" class="cupons-grid">
+    <!-- Estado vazio -->
+    <div *ngIf="cuponsDisponiveis.length === 0" class="empty-state">
+      <div class="empty-icon">🎫</div>
+      <h3>Nenhum cupom disponível</h3>
+      <p>
+        Este restaurante ainda não criou cupons de desconto ou todos os cupons estão inativos/expirados.
+      </p>
+      <p *ngIf="pontos && pontos.pontos_disponiveis === 0">
+        💡 Dica: Continue avaliando o restaurante para ganhar pontos!
+      </p>
+    </div>
+
+    <!-- Cards dos cupons -->
+    <div *ngFor="let cupom of cuponsDisponiveis" class="cupom-card" [ngClass]="{ 'pode-resgatar': podeResgatar(cupom), 'nao-pode-resgatar': !podeResgatar(cupom) }">
+      <div class="cupom-header">
+        <div class="cupom-info">
+          <h3 class="cupom-titulo">{{ cupom.titulo }}</h3>
+          <div class="cupom-tipo">
+            <span class="desconto-valor">{{ formatarDesconto(cupom) }}</span>
+          </div>
+        </div>
+        <div class="cupom-status">
+          <span class="status-badge disponivel">Disponível</span>
+        </div>
+      </div>
+
+      <div class="cupom-body">
+        <div class="cupom-detalhes">
+          <div class="detalhe pontos-necessarios">
+            <span class="pontos-icon">★</span>
+            <span class="pontos-texto">{{ cupom.pontos_necessarios }} pontos</span>
+          </div>
+          
+          <div class="detalhe" *ngIf="cupom.valor_minimo && cupom.valor_minimo > 0">
+            <span class="label">Valor mínimo:</span>
+            <span class="valor">R$ {{ cupom.valor_minimo | number:'1.2-2' }}</span>
+          </div>
+          
+          <div class="detalhe">
+            <span class="label">Válido até:</span>
+            <span class="valor">{{ formatarData(cupom.data_validade) }}</span>
+          </div>
+          
+          <div class="detalhe">
+            <span class="label">Usos restantes:</span>
+            <span class="valor">{{ cupom.usos_restantes }}</span>
+          </div>
+        </div>
+
+        <p class="cupom-descricao" *ngIf="cupom.descricao">
+          {{ cupom.descricao }}
+        </p>
+
+        <div class="cupom-footer">
+          <div class="disponibilidade-info" *ngIf="!podeResgatar(cupom)">
+            <small class="texto-insuficiente">
+              Você precisa de mais {{ cupom.pontos_necessarios - (pontos?.pontos_disponiveis || 0) }} pontos
+            </small>
+          </div>
+          
+          <button 
+            class="btn-resgatar" 
+            [class.disabled]="!podeResgatar(cupom)"
+            [disabled]="!podeResgatar(cupom)"
+            (click)="resgatarCupom(cupom)"
+          >
+            <span *ngIf="podeResgatar(cupom)">🎁 Resgatar Cupom</span>
+            <span *ngIf="!podeResgatar(cupom)">❌ Pontos Insuficientes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

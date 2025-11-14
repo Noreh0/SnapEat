@@ -1,12 +1,63 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  title: SnapEats API
-  description: API para gerenciamento de usuários, restaurantes e avaliações
-  version: "1.0"
+  title: SnapEats API - Sistema Completo de Avaliação de Restaurantes
+  description: |
+    # 🍽️ SnapEats API v2.0.1
+    
+    ## Visão Geral
+    API RESTful completa e robusta para plataforma de avaliação de restaurantes, oferecendo funcionalidades abrangentes para clientes, restaurantes e administradores.
+    
+    ## 🚀 Principais Funcionalidades
+    - **Autenticação JWT** segura com múltiplos tipos de usuário
+    - **Sistema de Avaliações** com análise de sentimentos via IA
+    - **Geolocalização** e busca por proximidade
+    - **Dashboard Analytics** em tempo real
+    - **Sistema de Cupons** promocionais
+    - **Upload de Imagens** para pratos e restaurantes
+    - **Notificações** push e email automáticas
+    - **Sistema de Tags** e conquistas gamificadas
+    
+    ## 🔐 Autenticação
+    Esta API utiliza **JWT (JSON Web Tokens)** para autenticação. Após login bem-sucedido:
+    1. Inclua o token no header: `Authorization: Bearer <seu_token>`
+    2. O token expira em 24 horas
+    3. Renove via refresh token ou novo login
+    
+    ## 📊 Rate Limits
+    - **Não autenticado**: 100 req/min
+    - **Cliente autenticado**: 1000 req/min  
+    - **Restaurante autenticado**: 2000 req/min
+    
+    ## 🌐 Ambientes
+    - **Desenvolvimento**: http://localhost:5000
+    - **Homologação**: https://api-stage.snapeats.com
+    - **Produção**: https://api.snapeats.com
+    
+    ## 📧 Suporte
+    - Email: suporte@snapeats.com
+    - Documentação: https://docs.snapeats.com
+    - Status: https://status.snapeats.com
+  version: "2.0.1"
+  termsOfService: https://snapeats.com/termos
+  contact:
+    name: Equipe SnapEats
+    email: suporte@snapeats.com
+    url: https://snapeats.com/contato
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: http://localhost:5000/
-    description: Servidor de desenvolvimento
+  - url: http://localhost:5000
+    description: 🛠️ Servidor de Desenvolvimento
+  - url: https://api-stage.snapeats.com
+    description: 🧪 Ambiente de Homologação
+  - url: https://api.snapeats.com
+    description: 🚀 Ambiente de Produção
+
+externalDocs:
+  description: 📚 Documentação Completa e Guias
+  url: https://docs.snapeats.com
 
 # Aplica o esquema BearerAuth por padrão a todas as operações.
 security:
@@ -18,8 +69,23 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: |
+        Autenticação via JWT (JSON Web Token).
+        
+        **Como usar:**
+        1. Faça login via `/auth/login`
+        2. Copie o `access_token` da resposta
+        3. Adicione no header: `Authorization: Bearer <token>`
+        
+        **Exemplo:**
+        ```
+        Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+        ```
 
   schemas:
+    # =============================================================================
+    # 👥 ESQUEMAS DE USUÁRIO/CLIENTE
+    # =============================================================================
     Usuario:
       type: object
       required:
@@ -30,19 +96,62 @@ components:
         - telefone
         - Cidade
       properties:
+        ID:
+          type: integer
+          readOnly: true
+          description: "ID único do cliente (gerado automaticamente)"
+          example: 123
         Nome:
           type: string
+          minLength: 2
+          maxLength: 100
+          description: "Nome completo do cliente"
+          example: "João Silva Santos"
         CPF:
           type: string
+          pattern: '^\d{11}$'
+          description: "CPF do cliente (somente números, 11 dígitos)"
+          example: "12345678901"
         email:
           type: string
+          format: email
+          maxLength: 100
+          description: "Email único do cliente"
+          example: "joao.silva@exemplo.com"
         senha:
           type: string
+          writeOnly: true
+          minLength: 6
+          maxLength: 100
+          description: "Senha do cliente (mínimo 6 caracteres)"
+          example: "MinhaSenh@123"
         telefone:
           type: string
+          pattern: '^\(\d{2}\)\d{4,5}-\d{4}$'
+          description: "Telefone com DDD no formato (XX)XXXXX-XXXX"
+          example: "(11)99999-9999"
         Cidade:
           type: string
+          minLength: 2
+          maxLength: 50
+          description: "Cidade de residência do cliente"
+          example: "São Paulo"
+        pontos_acumulados:
+          type: integer
+          readOnly: true
+          minimum: 0
+          description: "Pontos de fidelidade acumulados pelo cliente"
+          example: 250
+        data_cadastro:
+          type: string
+          format: date-time
+          readOnly: true
+          description: "Data e hora do cadastro (ISO 8601)"
+          example: "2024-01-15T10:30:00Z"
 
+    # =============================================================================
+    # 🔐 ESQUEMAS DE AUTENTICAÇÃO
+    # =============================================================================
     Login:
       type: object
       required:
@@ -51,9 +160,46 @@ components:
       properties:
         email:
           type: string
+          format: email
+          description: "Email do usuário (cliente ou restaurante)"
+          example: "usuario@exemplo.com"
         senha:
           type: string
+          minLength: 6
+          description: "Senha do usuário"
+          example: "MinhaSenh@123"
+      example:
+        email: "joao@exemplo.com"
+        senha: "MinhaSenh@123"
 
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: "Token JWT para autenticação nas próximas requisições"
+          example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMiLCJ0aXBvIjoiY2xpZW50ZSIsImV4cCI6MTYzOTU5MTIwMH0.example"
+        tipo:
+          type: string
+          enum: ["cliente", "restaurante"]
+          description: "Tipo do usuário logado"
+          example: "cliente"
+        id:
+          type: integer
+          description: "ID do usuário no sistema"
+          example: 123
+        nome:
+          type: string
+          description: "Nome completo do usuário"
+          example: "João Silva"
+        expires_in:
+          type: integer
+          description: "Tempo de expiração do token em segundos"
+          example: 86400
+
+    # =============================================================================
+    # 🏪 ESQUEMAS DE RESTAURANTE
+    # =============================================================================
     Restaurante:
       type: object
       required:
@@ -157,61 +303,195 @@ paths:
 
   /cliente/{ID}:
     get:
-      summary: Busca usuário por ID
+      tags:
+        - 👥 Clientes
+      summary: Busca cliente por ID
+      description: |
+        Retorna informações detalhadas de um cliente específico.
+        
+        **Requisitos:**
+        - ID válido do cliente
+        - Token JWT válido (apenas o próprio cliente pode ver seus dados)
+        
+        **Exemplo de Resposta:**
+        ```json
+        {
+          "ID": 1,
+          "Nome": "João Silva",
+          "email": "joao@exemplo.com",
+          "telefone": "(11)99999-9999",
+          "Cidade": "São Paulo",
+          "pontos_acumulados": 250,
+          "data_cadastro": "2024-01-15T10:30:00Z"
+        }
+        ```
       parameters:
         - in: path
           name: ID
           required: true
+          description: ID único do cliente
           schema:
             type: integer
+            minimum: 1
+          example: 123
       responses:
         '200':
-          description: Usuário encontrado
+          description: ✅ Cliente encontrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          description: 🔒 Token JWT ausente ou inválido
+        '403':
+          description: 🚫 Acesso negado - apenas o próprio cliente pode ver seus dados
         '404':
-          description: Usuário não encontrado
+          description: ❌ Cliente não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cliente não encontrado"
 
-  /cliente/{ID}:
     put:
-      summary: Edita usuário (somente dono)
+      tags:
+        - 👥 Clientes
+      summary: Atualiza dados do cliente
+      description: |
+        Permite ao cliente atualizar suas próprias informações.
+        
+        **Restrições:**
+        - Apenas o próprio cliente pode editar seus dados
+        - Email deve ser único no sistema
+        - CPF não pode ser alterado após cadastro
+        
+        **Campos Editáveis:**
+        - Nome, email, telefone, cidade, senha
+        
+        **Exemplo de Requisição:**
+        ```json
+        {
+          "Nome": "João Silva Santos",
+          "email": "joao.novo@exemplo.com",
+          "telefone": "(11)98888-8888",
+          "Cidade": "Rio de Janeiro"
+        }
+        ```
       security:
         - BearerAuth: []
       parameters:
         - in: path
           name: ID
           required: true
+          description: ID do cliente a ser atualizado
           schema:
             type: integer
+            minimum: 1
+          example: 123
       requestBody:
         required: true
+        description: Dados do cliente para atualização
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Usuario'
+              type: object
+              properties:
+                Nome:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  example: "João Silva Santos"
+                email:
+                  type: string
+                  format: email
+                  example: "joao.novo@exemplo.com"
+                telefone:
+                  type: string
+                  pattern: '^\(\d{2}\)\d{4,5}-\d{4}$'
+                  example: "(11)98888-8888"
+                Cidade:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: "Rio de Janeiro"
+                senha:
+                  type: string
+                  minLength: 6
+                  description: "Nova senha (opcional)"
+                  example: "NovaSenha@123"
       responses:
         '200':
-          description: Usuário atualizado
+          description: ✅ Cliente atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cliente atualizado com sucesso"
+                  data:
+                    $ref: '#/components/schemas/Usuario'
+        '400':
+          description: 📝 Dados inválidos na requisição
+        '401':
+          description: 🔒 Token JWT ausente ou inválido
         '403':
-          description: Ação não autorizada
+          description: 🚫 Acesso negado - apenas o próprio cliente pode editar
         '404':
-          description: Usuário não encontrado
+          description: ❌ Cliente não encontrado
+        '409':
+          description: ⚠️ Email já está em uso por outro usuário
 
     delete:
-      summary: Exclui usuário (somente dono)
+      tags:
+        - 👥 Clientes
+      summary: Exclui conta do cliente
+      description: |
+        Remove permanentemente a conta do cliente do sistema.
+        
+        **⚠️ ATENÇÃO: Esta ação é irreversível!**
+        
+        **Consequências da exclusão:**
+        - Todas as avaliações do cliente serão removidas
+        - Histórico de pontos será perdido
+        - Cupons não utilizados serão invalidados
+        - Dados pessoais serão anonizados conforme LGPD
+        
+        **Requisitos:**
+        - Apenas o próprio cliente pode excluir sua conta
+        - Token JWT válido obrigatório
       security:
         - BearerAuth: []
       parameters:
         - in: path
           name: ID
           required: true
+          description: ID do cliente a ser excluído
           schema:
             type: integer
+            minimum: 1
+          example: 123
       responses:
         '200':
-          description: Usuário removido
+          description: ✅ Cliente excluído com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Conta excluída com sucesso"
+        '401':
+          description: 🔒 Token JWT ausente ou inválido
         '403':
-          description: Ação não autorizada
+          description: 🚫 Acesso negado - apenas o próprio cliente pode excluir
         '404':
-          description: Usuário não encontrado
+          description: ❌ Cliente não encontrado
 
   /restaurante:
     post:

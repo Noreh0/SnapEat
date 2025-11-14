@@ -1,81 +1,176 @@
-<!-- cabecalho.component.html -->
-<header class="cabecalho">
-  <!-- lado esquerdo: ícone do usuário (ou logo) -->
+<header class="cabecalho" [@headerAnimation]="headerState">
+  <!-- Sistema de Mensagens de Feedback -->
+  <div class="feedback-system" *ngIf="showMessage" [@messageSlide]>
+    <div class="feedback-message" [ngClass]="'feedback-message--' + messageType">
+      <div class="feedback-content">
+        <span class="feedback-icon">
+          <ng-container [ngSwitch]="messageType">
+            <span *ngSwitchCase="'success'">✅</span>
+            <span *ngSwitchCase="'error'">❌</span>
+            <span *ngSwitchCase="'warning'">⚠️</span>
+            <span *ngSwitchDefault>ℹ️</span>
+          </ng-container>
+        </span>
+        <span class="feedback-text">{{ messageText }}</span>
+      </div>
+      <button class="feedback-close" (click)="closeFeedbackMessage()" aria-label="Fechar mensagem">×</button>
+    </div>
+  </div>
+
+  <!-- Indicador de Conectividade -->
+  <div class="connectivity-indicator" *ngIf="!isConnected" [@messageSlide]>
+    <span class="connectivity-icon">📡</span>
+    <span>Sem conexão com a internet</span>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading" [@messageSlide]>
+    <div class="loading-spinner"></div>
+    <span class="loading-text">{{ loadingMessage }}</span>
+  </div>
+
+  <!-- Logo lateral -->
   <div class="cabecalho__logo">
-    <button class="cabecalho__btn-logo" (click)="goHome()">
+    <button class="cabecalho__btn-logo" (click)="goHome()" 
+            [disabled]="isLoading"
+            [@navItemAnimation]="'idle'">
       <img
         class="cabecalho__avatar"
         src="../../../assets/images/logo_snapEats.png"
-        alt="Avatar do usuário"
+        alt="Logo SnapEats"
       />
     </button>
   </div>
 
-  <!-- parte central: título ou slogan (opcional) -->
-  <div class="cabecalho__titulo" routerLink="/">
-    <h1>SnapEats</h1>
+  <!-- Logo central -->
+  <div class="cabecalho__titulo" 
+       (click)="safeNavigate(['/'])"
+       [@navItemAnimation]="'idle'">
+    <img
+      src="../../../assets/images/Snap_eats_corrido.png"
+      alt="SnapEats Logo"
+      class="cabecalho__logo-central"
+    />
   </div>
 
-  <!-- navegação / botões principais -->
+  <!-- Navegação -->
   <nav class="cabecalho__nav">
-    <!-- se estiver logado -->
     <ng-container *ngIf="logado; else blocoNaoLogado">
-      <span class="cabecalho__saudacao">
-        Olá,
-        <strong *ngIf="nomeUsuario">{{ nomeUsuario }}</strong>!
-      </span>
-
       <ul class="cabecalho__lista-links">
-        <!-- links comuns a todos -->
-        <li><a routerLink="/menu" class="cabecalho__link">Menu</a></li>
+        <span class="cabecalho__saudacao">
+          {{ 'HEADER.GREETING' | translate }}, <strong *ngIf="nomeUsuario">{{ nomeUsuario }}</strong>!
+        </span>
 
-        <!-- botão “Perfil Cliente” ou “Perfil Restaurante” -->
+        <li><a routerLink="/menu" class="cabecalho__link">{{ 'HEADER.MENU' | translate }}</a></li>
+
+        <!-- Perfil -->
         <li *ngIf="tipo === 'cliente'; else perfilRestaurante">
           <a [routerLink]="['/perfilCliente', id]" class="cabecalho__link">
-            Perfil
+            {{ 'HEADER.PROFILE' | translate }}
           </a>
         </li>
         <ng-template #perfilRestaurante>
           <li>
-            <a
-              [routerLink]="['/perfilRestaurante', id]"
-              class="cabecalho__link"
-            >
-              Perfil
+            <a [routerLink]="['/perfil-restaurante', id]" class="cabecalho__link">
+              {{ 'HEADER.PROFILE' | translate }}
             </a>
           </li>
           <li *ngIf="tipo==='restaurante'">
             <a [routerLink]="['/restaurante', id, 'pratos']" class="cabecalho__link">
-              Pratos
+              {{ 'HEADER.DISHES' | translate }}
             </a>
           </li>
         </ng-template>
 
-        <!-- botão trocar idioma -->
+        <!-- Idioma -->
         <li>
-          <button class="cabecalho__link cabecalho__link--button" (click)="changeLanguage()">
+          <button class="cabecalho__link cabecalho__link--button language-btn" 
+                  (click)="changeLanguage()" 
+                  [disabled]="isLoading"
+                  [@navItemAnimation]="'idle'"
+                  [title]="'Alterar idioma'">
+            <span class="language-icon">🌐</span>
             {{ currentLanguage === 'pt' ? 'EN' : 'PT' }}
           </button>
         </li>
 
-        <!-- logout -->
+        <!-- Tema -->
         <li>
-          <button class="cabecalho__link cabecalho__link--button" (click)="logout()">
-            Logout
+          <button 
+            class="cabecalho__link cabecalho__link--button theme-toggle-btn" 
+            (click)="toggleTheme()"
+            [disabled]="isLoading"
+            [@themeToggle]="currentTheme"
+            [@navItemAnimation]="'idle'"
+            [title]="(currentTheme === 'dark' ? 'HEADER.LIGHT_MODE' : 'HEADER.DARK_MODE') | translate"
+          >
+            <span class="theme-icon">
+              <!-- Ícone do sol para modo claro -->
+              <svg *ngIf="currentTheme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+              </svg>
+              <!-- Ícone da lua para modo escuro -->
+              <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </span>
+          </button>
+        </li>
+
+        <!-- Logout -->
+        <li>
+          <button class="cabecalho__link cabecalho__link--button logout-btn" 
+                  (click)="logout()" 
+                  [disabled]="isLoading"
+                  [@navItemAnimation]="'idle'">
+            <span class="logout-icon" *ngIf="!isLoading">🚪</span>
+            <span class="logout-spinner" *ngIf="isLoading">⏳</span>
+            {{ 'HEADER.LOGOUT' | translate }}
           </button>
         </li>
       </ul>
     </ng-container>
 
-    <!-- se NÃO estiver logado -->
+    <!-- Não logado -->
     <ng-template #blocoNaoLogado>
       <ul class="cabecalho__lista-links">
-        <li><a routerLink="/cadastroCliente" class="cabecalho__link">Cadastro Cliente</a></li>
-        <li><a routerLink="/cadastroRestaurante" class="cabecalho__link">Cadastro Restaurante</a></li>
-        <li><a routerLink="/login" class="cabecalho__link">Login</a></li>
+        <li><a routerLink="/cadastroCliente" class="cabecalho__link">{{ 'HEADER.CLIENT_REGISTER' | translate }}</a></li>
+        <li><a routerLink="/cadastroRestaurante" class="cabecalho__link">{{ 'HEADER.RESTAURANT_REGISTER' | translate }}</a></li>
+        <li><a routerLink="/login" class="cabecalho__link">{{ 'HEADER.LOGIN' | translate }}</a></li>
+        <!-- Idioma (não logado) -->
         <li>
-          <button class="cabecalho__link cabecalho__link--button" (click)="changeLanguage()">
+          <button class="cabecalho__link cabecalho__link--button language-btn" 
+                  (click)="changeLanguage()" 
+                  [disabled]="isLoading"
+                  [@navItemAnimation]="'idle'"
+                  [title]="'Alterar idioma'">
+            <span class="language-icon">🌐</span>
             {{ currentLanguage === 'pt' ? 'EN' : 'PT' }}
+          </button>
+        </li>
+        
+        <!-- Tema (também para usuário não logado) -->
+        <li>
+          <button 
+            class="cabecalho__link cabecalho__link--button theme-toggle-btn" 
+            (click)="toggleTheme()"
+            [disabled]="isLoading"
+            [@themeToggle]="currentTheme"
+            [@navItemAnimation]="'idle'"
+            [title]="(currentTheme === 'dark' ? 'HEADER.LIGHT_MODE' : 'HEADER.DARK_MODE') | translate"
+          >
+            <span class="theme-icon">
+              <!-- Ícone do sol para modo claro -->
+              <svg *ngIf="currentTheme === 'light'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+              </svg>
+              <!-- Ícone da lua para modo escuro -->
+              <svg *ngIf="currentTheme === 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </span>
           </button>
         </li>
       </ul>

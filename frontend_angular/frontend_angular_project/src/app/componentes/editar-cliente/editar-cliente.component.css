@@ -1,262 +1,213 @@
-/* ========== FUNDO GERAL DA PÁGINA ========== */
-.editar-cliente-page {
-  min-height: 100vh;
-  padding: 2rem;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Variáveis de fonte - Sistema Deezer */
+:host {
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(to right, #1c1c1f, #111113);
-}
-
-/* ========== CARD (FORMULÁRIO) ========== */
-.form-card {
-  background-color: #202024;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  padding: 2rem;
+  min-height: 100vh;
   width: 100%;
-  max-width: 600px;
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: var(--fonte-primaria);
 }
 
-/* ========== CABEÇALHO DO FORMULÁRIO ========== */
+.form-card {
+  width: 100%;
+  max-width: 700px;
+  background-color: var(--bg-secondary);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-heavy);
+}
+
+/* --- Cabeçalho --- */
 .form-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1.5rem;
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.form-header h1 {
-  font-size: 2.5rem;
-  margin: 1rem 0 0;
-}
-
-/* ===== FOTO DE PERFIL ===== */
 .profile-pic-container {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid #3b82f6;
+  margin: 0 auto 20px;
+  border: 3px solid #fff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.profile-pic-container .avatar {
+.avatar {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
-  background-color: #444;
+  background-color: var(--border-color);
 }
 
-.profile-pic-container .edit-avatar-btn {
+.edit-avatar-btn {
   position: absolute;
   bottom: 0;
   right: 0;
-  background: rgba(59, 130, 246, 0.8);
-  border: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-secondary); /* Verde Oliva */
+  border: 2px solid #fff;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-.profile-pic-container .edit-avatar-btn:hover {
-  background: rgba(59, 130, 246, 1);
+.edit-avatar-btn:hover {
+  transform: scale(1.1);
 }
 
-.profile-pic-container .camera-icon {
-  width: 16px;
-  height: 16px;
+.camera-icon {
+  width: 18px;
+  height: 18px;
+  filter: invert(1);
 }
 
-/* ========== GRUPOS DE INPUTS ========== */
+.form-header h1 {
+  font-family: var(--fonte-primaria);
+  font-size: 2.2rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* --- Formulário --- */
+form {
+  text-align: left;
+}
+
 .form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1.5rem;
+  margin-bottom: 25px;
 }
 
 .form-group label {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #e5e5e5;
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
 }
 
-/* ===== ESTILIZAÇÃO PADRÃO DOS INPUTS ===== */
-.form-input {
-  padding: 0.75rem 1rem;
-  background-color: #2c2c2f;
-  border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 1rem;
+.form-control {
   width: 100%;
-  box-sizing: border-box;
-  transition: outline 0.2s ease;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background-color: transparent;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+  border-radius: 0;
 }
 
-.form-input:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary); /* Terracota */
 }
 
-/* ===== INPUT DE SENHA COM ÍCONE ===== */
+.form-control[readonly] {
+  color: #9a928b;
+  cursor: not-allowed;
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  padding-right: 2.5rem;
+}
+
+select.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary); /* Terracota */
+}
+.form-row {
+  display: flex;
+  gap: 30px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
 .senha-wrapper {
   position: relative;
-  width: 100%;
-}
-
-.input-com-icon {
-  padding-right: 3rem; /* espaço para o ícone do olho */
 }
 
 .icon-btn {
   position: absolute;
+  right: 0;
   top: 50%;
-  right: 0.75rem;
   transform: translateY(-50%);
-  background: transparent;
+  background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  opacity: 0.6;
 }
 
-.password-icon {
-  width: 24px;
-  height: 24px;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.icon-btn:hover .password-icon {
-  opacity: 1;
-}
-
-/* ===== DICA DE SENHA ===== */
-.password-hint {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.password-hint ul {
-  margin: 0.25rem 0 0.5rem 1.25rem;
-  list-style-type: disc;
-  color: #9ca3af;
-}
-
-/* ========== MENSAGENS DE ERRO ========= */
 .error {
-  color: #f87171;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+  color: #c0392b;
+  font-size: 0.8rem;
+  padding-top: 5px;
 }
 
-/* ========== BOTÕES ========== */
+/* --- Ações --- */
 .form-actions {
+  margin-top: 40px;
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 15px;
 }
 
-/* Botão “Salvar Alterações” */
-.btn-primary {
-  background-color: #3b82f6;
-  color: #ffffff;
+.btn {
+  padding: 12px 25px;
   border: none;
-  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-secondary);
+  color: var(--bg-secondary);
+  box-shadow: 0 4px 15px rgba(106, 123, 83, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #586744;
+  transform: translateY(-2px);
 }
 
 .btn-primary:disabled {
-  background-color: #575757;
+  background-color: #B0B8A4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.btn-primary:not(:disabled):hover {
-  background-color: #2563eb;
-}
-
-/* Botão “Cancelar” */
 .btn-secondary {
   background-color: transparent;
-  border: 2px solid #ffffff;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  color: var(--text-secondary);
 }
 
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-/* Exemplo de tooltip para o informativo de senha */
-.password-hint-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  font-size: 0.95em;
-  color: #555;
-}
-
-.info-icon {
-  position: relative;
-  cursor: pointer;
-  font-size: 1.2em;
-}
-
-.info-icon .tooltip {
-  visibility: hidden;
-  opacity: 0;
-  width: 260px;
-  background: #222;
-  color: #fff;
-  text-align: left;
-  border-radius: 6px;
-  padding: 12px;
-  position: absolute;
-  z-index: 1;
-  left: 120%;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: opacity 0.2s;
-  font-size: 0.95em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.info-icon:hover .tooltip,
-.info-icon:focus .tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* ========== RESPONSIVIDADE ========== */
-@media (max-width: 640px) {
-  .form-card {
-    padding: 1.5rem;
-    max-width: 90%;
-  }
-  .form-header h1 {
-    font-size: 2rem;
-  }
-  .profile-pic-container {
-    width: 80px;
-    height: 80px;
-  }
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+  :host { padding: 20px 10px; }
+  .form-card { padding: 30px 25px; }
+  .form-row { flex-direction: column; gap: 0; }
+  .form-actions { flex-direction: column-reverse; }
+  .btn { width: 100%; }
 }

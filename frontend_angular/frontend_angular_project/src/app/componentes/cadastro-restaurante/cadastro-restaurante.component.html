@@ -2,212 +2,146 @@
   <div class="form-card">
     <!-- HEADER -->
     <header class="form-header">
-      <h1 translate>Cadastro de Restaurante</h1>
+      <h1>{{ 'RESTAURANT_REGISTER.TITLE' | translate }}</h1>
     </header>
 
-    <!-- FORMULÁRIO REATIVO -->
-    <form [formGroup]="formulario" (ngSubmit)="salvarRestaurante()" novalidate>
+    <form [formGroup]="formulario" (ngSubmit)="onSubmit()" novalidate>
       
-      <!-- NOME -->
+      <!-- Nome -->
       <div class="form-group">
-        <label for="Nome" translate>Nome<b>*</b></label>
-        <input
-          id="Nome"
-          type="text"
-          class="form-input"
-          formControlName="Nome"
-          placeholder="Digite o nome do restaurante"
-        />
-        <div class="error" *ngIf="f['Nome'].hasError('required') && f['Nome'].touched" translate>
-          O nome é obrigatório.
-        </div>
-        <div class="error" *ngIf="f['Nome'].hasError('minlength') && f['Nome'].touched" translate>
-          Deve ter ao menos 3 caracteres.
-        </div>
+        <label for="Nome">{{ 'RESTAURANT_REGISTER.NAME' | translate }}<b>*</b></label>
+        <input id="Nome" type="text" class="form-input" formControlName="Nome" [placeholder]="'RESTAURANT_REGISTER.NAME_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['Nome'].hasError('required') && f['Nome'].touched">{{ 'RESTAURANT_REGISTER.ERROR_NAME_REQUIRED' | translate }}</div>
+        <div class="error" *ngIf="f['Nome'].hasError('minlength') && f['Nome'].touched">{{ 'RESTAURANT_REGISTER.ERROR_NAME_MINLENGTH' | translate }}</div>
       </div>
 
-      <!-- DESCRIÇÃO -->
+      <!-- Nome Fantasia -->
       <div class="form-group">
-        <label for="descricao" translate>Descrição</label>
-        <textarea
-          id="descricao"
-          class="form-textarea"
-          formControlName="descricao"
-          rows="3"
-          placeholder="Descreva o restaurante (opcional)"
-        ></textarea>
-        <div class="error" *ngIf="f['descricao'].hasError('maxlength') && f['descricao'].touched" translate>
-          Máximo de 200 caracteres.
-        </div>
+        <label for="nome_fantasia">{{ 'RESTAURANT_REGISTER.FANTASY_NAME' | translate }}</label>
+        <input id="nome_fantasia" type="text" class="form-input" formControlName="nome_fantasia" [placeholder]="'RESTAURANT_REGISTER.FANTASY_NAME_PLACEHOLDER' | translate" required />
+        <div class="error" *ngIf="f['nome_fantasia'].hasError('required') && f['nome_fantasia'].touched">{{ 'RESTAURANT_REGISTER.ERROR_FANTASY_NAME_REQUIRED' | translate }}</div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="form-group">
+        <label for="descricao">{{ 'RESTAURANT_REGISTER.DESCRIPTION' | translate }}</label>
+        <textarea id="descricao" class="form-textarea" formControlName="descricao" rows="3" [placeholder]="'RESTAURANT_REGISTER.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
+        <div class="error" *ngIf="f['descricao'].hasError('maxlength') && f['descricao'].touched">{{ 'RESTAURANT_REGISTER.ERROR_DESCRIPTION_MAXLENGTH' | translate }}</div>
       </div>
 
       <!-- CNPJ -->
       <div class="form-group">
-        <label for="CNPJ" translate>CNPJ<b>*</b></label>
-        <input
-          id="CNPJ"
-          type="text"
-          mask="00.000.000/0000-00"
-          class="form-input"
-          formControlName="CNPJ"
-          placeholder="00.000.000/0000-00"
-          autocomplete="off"
-        />
-        <div class="error" *ngIf="f['CNPJ'].hasError('required') && f['CNPJ'].touched" translate>
-          O CNPJ é obrigatório.
-        </div>
-        <div class="error" *ngIf="f['CNPJ'].hasError('minlength') && f['CNPJ'].touched" translate>
-          CNPJ incompleto.
-        </div>
-        <div class="error" *ngIf="f['CNPJ'].hasError('cnpjInvalido') && f['CNPJ'].touched" translate>
-          CNPJ inválido.
-        </div>
+        <label for="CNPJ">{{ 'RESTAURANT_REGISTER.CNPJ' | translate }}<b>*</b></label>
+        <input id="CNPJ" type="text" mask="00.000.000/0000-00" class="form-input" formControlName="CNPJ" [placeholder]="'RESTAURANT_REGISTER.CNPJ_PLACEHOLDER' | translate" autocomplete="off" />
+        <div class="error" *ngIf="f['CNPJ'].hasError('required') && f['CNPJ'].touched">{{ 'RESTAURANT_REGISTER.ERROR_CNPJ_REQUIRED' | translate }}</div>
+        <div class="error" *ngIf="f['CNPJ'].hasError('minlength') && f['CNPJ'].touched">{{ 'RESTAURANT_REGISTER.ERROR_CNPJ_INCOMPLETE' | translate }}</div>
+        <div class="error" *ngIf="f['CNPJ'].hasError('cnpjInvalido') && f['CNPJ'].touched">{{ 'RESTAURANT_REGISTER.ERROR_CNPJ_INVALID' | translate }}</div>
       </div>
 
-      <!-- E-MAIL -->
+      <!-- Email -->
       <div class="form-group">
-        <label for="email" translate>Email<b>*</b></label>
-        <input
-          id="email"
-          type="email"
-          class="form-input"
-          formControlName="email"
-          placeholder="email@exemplo.com"
-        />
-        <div class="error" *ngIf="f['email'].hasError('required') && f['email'].touched" translate>
-          O email é obrigatório.
-        </div>
-        <div class="error" *ngIf="f['email'].hasError('email') && f['email'].touched" translate>
-          Email inválido.
-        </div>
+        <label for="email">{{ 'RESTAURANT_REGISTER.EMAIL' | translate }}<b>*</b></label>
+        <input id="email" type="email" class="form-input" formControlName="email" [placeholder]="'RESTAURANT_REGISTER.EMAIL_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['email'].hasError('required') && f['email'].touched">{{ 'RESTAURANT_REGISTER.ERROR_EMAIL_REQUIRED' | translate }}</div>
+        <div class="error" *ngIf="f['email'].hasError('email') && f['email'].touched">{{ 'RESTAURANT_REGISTER.ERROR_EMAIL_INVALID' | translate }}</div>
       </div>
 
-      <!-- TIPO DE COZINHA -->
+      <!-- Tipo de Cozinha -->
       <div class="form-group">
-        <label for="tipo_restaurante" translate>Tipo de Cozinha<b>*</b></label>
-        <select
-          id="tipo_restaurante"
-          class="form-select"
-          formControlName="tipo_restaurante"
-        >
-          <option value="" disabled translate>Selecione</option>
-          <option *ngFor="let t of tipos" [value]="t">{{ t | titlecase }}</option>
+        <label for="tipo_restaurante">{{ 'RESTAURANT_REGISTER.CUISINE_TYPE' | translate }}<b>*</b></label>
+        <select id="tipo_restaurante" class="form-select" formControlName="tipo_restaurante">
+          <option value="" disabled selected>{{ 'RESTAURANT_REGISTER.CUISINE_TYPE_PLACEHOLDER' | translate }}</option>
+          <option *ngFor="let tipo of tipos" [value]="tipo">{{ tipo }}</option>
         </select>
-        <div class="error" *ngIf="f['tipo_restaurante'].hasError('required') && f['tipo_restaurante'].touched" translate>
-          Selecione um tipo.
-        </div>
+        <div class="error" *ngIf="f['tipo_restaurante'].hasError('required') && f['tipo_restaurante'].touched">{{ 'RESTAURANT_REGISTER.ERROR_CUISINE_TYPE_REQUIRED' | translate }}</div>
       </div>
 
-      <!-- SENHA -->
+      <!-- Senha -->
       <div class="form-group">
-        <label for="senha" translate>Senha<b>*</b></label>
+        <label for="senha">{{ 'RESTAURANT_REGISTER.PASSWORD' | translate }}<b>*</b></label>
         <div class="senha-wrapper">
-          <input
-            [type]="hideSenha ? 'password' : 'text'"
-            id="senha"
-            class="form-input input-with-icon"
-            formControlName="senha"
-            placeholder="Crie uma senha forte"
-          />
-          <button type="button" class="icon-btn" (click)="hideSenha = !hideSenha" aria-label="Mostrar/ocultar senha">
-            <img src="../../../assets/images/olho_senha.png" alt="Toggle" class="password-icon" />
-          </button>
+          <div class="input-with-icon">
+            <input id="senha" [type]="hideSenha ? 'password' : 'text'" class="form-input" formControlName="senha" [placeholder]="'RESTAURANT_REGISTER.PASSWORD_PLACEHOLDER' | translate" />
+            <button type="button" class="icon-btn" (click)="hideSenha = !hideSenha" [attr.aria-label]="'Toggle password visibility'">
+              <svg *ngIf="!hideSenha" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="password-icon">
+                <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+                <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+              </svg>
+              <svg *ngIf="hideSenha" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="password-icon">
+                <path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 101.06-1.06l-1.745-1.745a10.029 10.029 0 003.3-4.38 1.651 1.651 0 000-1.185A10.004 10.004 0 009.999 3a9.956 9.956 0 00-4.744 1.194L3.28 2.22zM7.752 6.69l1.092 1.092a2.5 2.5 0 013.374 3.373l1.091 1.092a4 4 0 00-5.557-5.557z" clip-rule="evenodd" />
+                <path d="M10.748 13.93l2.523 2.523a9.987 9.987 0 01-3.27.547c-4.257 0-7.893-2.66-9.336-6.41a1.651 1.651 0 010-1.186A10.007 10.007 0 012.839 6.02L1.723 4.904a.75.75 0 00-1.061 1.06l1.061 1.061A11.516 11.516 0 00.664 10.59 1.651 1.651 0 00.664 10.59z" />
+              </svg>
+            </button>
+          </div>
+          <div class="password-hint-info">
+            <div class="info-icon" tabindex="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="info-svg">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              <div class="tooltip">
+                <span class="info-text">{{ 'RESTAURANT_REGISTER.PASSWORD_HINT' | translate }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="password-hint" translate>
-          Mín. 8 caracteres, incluindo:<br/>
-          • 1 letra maiúscula<br/>
-          • 1 letra minúscula<br/>
-          • 1 número<br/>
-          • 1 caractere especial
-        </div>
-        <div class="error" *ngIf="f['senha'].hasError('required') && f['senha'].touched" translate>
-          A senha é obrigatória.
-        </div>
-        <div class="error" *ngIf="f['senha'].hasError('pattern') && f['senha'].touched" translate>
-          Senha fraca.
-        </div>
+        <div class="error" *ngIf="f['senha'].hasError('required') && f['senha'].touched">{{ 'RESTAURANT_REGISTER.ERROR_PASSWORD_REQUIRED' | translate }}</div>
+        <div class="error" *ngIf="f['senha'].hasError('pattern') && f['senha'].touched">{{ 'RESTAURANT_REGISTER.ERROR_PASSWORD_PATTERN' | translate }}</div>
       </div>
 
-      <!-- CONFIRMAR SENHA -->
+      <!-- Confirmar Senha -->
       <div class="form-group">
-        <label for="confirmasenha" translate>Confirme a Senha<b>*</b></label>
-        <input
-          id="confirmasenha"
-          type="password"
-          class="form-input"
-          formControlName="confirmasenha"
-          placeholder="Repita a senha"
-        />
-        <div class="error" *ngIf="f['confirmasenha'].hasError('required') && f['confirmasenha'].touched" translate>
-          Obrigatório confirmar.
-        </div>
-        <div class="error" *ngIf="f['confirmasenha'].hasError('mismatch') && f['confirmasenha'].touched" translate>
-          Senhas não coincidem.
-        </div>
+        <label for="confirmasenha">{{ 'RESTAURANT_REGISTER.CONFIRM_PASSWORD' | translate }}<b>*</b></label>
+        <input id="confirmasenha" type="password" class="form-input" formControlName="confirmasenha" [placeholder]="'RESTAURANT_REGISTER.CONFIRM_PASSWORD_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['confirmasenha'].hasError('required') && f['confirmasenha'].touched">{{ 'RESTAURANT_REGISTER.ERROR_CONFIRM_PASSWORD_REQUIRED' | translate }}</div>
+        <div class="error" *ngIf="f['confirmasenha'].hasError('senhasNaoCoincidem') && f['confirmasenha'].touched">{{ 'RESTAURANT_REGISTER.ERROR_PASSWORD_MISMATCH' | translate }}</div>
       </div>
 
-      <!-- TELEFONE -->
+      <!-- Telefone -->
       <div class="form-group">
-        <label for="telefone" translate>Telefone<b>*</b></label>
-        <input
-          id="telefone"
-          type="text"
-          mask="(00) 0 0000-0000"
-          class="form-input"
-          formControlName="telefone"
-          placeholder="(99) 9 9999-9999"
-        />
-        <div class="error" *ngIf="f['telefone'].hasError('required') && f['telefone'].touched" translate>
-          Telefone obrigatório.
-        </div>
-        <div class="error" *ngIf="f['telefone'].hasError('minlength') && f['telefone'].touched" translate>
-          Telefone incompleto.
-        </div>
+        <label for="telefone">{{ 'RESTAURANT_REGISTER.PHONE' | translate }}<b>*</b></label>
+        <input id="telefone" type="text" mask="(00) 00000-0000" class="form-input" formControlName="telefone" [placeholder]="'RESTAURANT_REGISTER.PHONE_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['telefone'].hasError('required') && f['telefone'].touched">{{ 'RESTAURANT_REGISTER.ERROR_PHONE_REQUIRED' | translate }}</div>
+        <div class="error" *ngIf="f['telefone'].hasError('telefoneInvalido') && f['telefone'].touched">{{ 'RESTAURANT_REGISTER.ERROR_PHONE_INVALID' | translate }}</div>
       </div>
 
-      <!-- CIDADE -->
+      <!-- Cidade -->
       <div class="form-group">
-        <label for="Cidade" translate>Cidade<b>*</b></label>
-        <input
-          id="Cidade"
-          type="text"
-          class="form-input"
-          formControlName="Cidade"
-          placeholder="Digite seu município"
-        />
-        <div class="error" *ngIf="f['Cidade'].hasError('required') && f['Cidade'].touched" translate>
-          Cidade obrigatória.
-        </div>
+        <label for="Cidade">{{ 'RESTAURANT_REGISTER.CITY' | translate }}<b>*</b></label>
+        <input id="Cidade" type="text" class="form-input" formControlName="Cidade" [placeholder]="'RESTAURANT_REGISTER.CITY_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['Cidade'].hasError('required') && f['Cidade'].touched">{{ 'RESTAURANT_REGISTER.ERROR_CITY_REQUIRED' | translate }}</div>
       </div>
 
-      <!-- ENDEREÇO -->
+      <!-- Endereço -->
       <div class="form-group">
-        <label for="Endereco" translate>Endereço<b>*</b></label>
-        <input
-          id="Endereco"
-          type="text"
-          class="form-input"
-          formControlName="Endereco"
-          placeholder="Rua, número, complemento"
-        />
-        <div class="error" *ngIf="f['Endereco'].hasError('required') && f['Endereco'].touched" translate>
-          Endereço obrigatório.
-        </div>
-      </div>
-      <!-- Adicione no form de cadastro/edição -->
-      <div class="form-group">
-        <label for="imagem">Foto do Restaurante</label>
-        <input type="file" id="imagem" (change)="onFileSelected($event)" />
-        <img *ngIf="previewImg" [src]="previewImg" class="preview-img" />
+        <label for="Endereco">{{ 'RESTAURANT_REGISTER.ADDRESS' | translate }}<b>*</b></label>
+        <input id="Endereco" type="text" class="form-input" formControlName="Endereco" [placeholder]="'RESTAURANT_REGISTER.ADDRESS_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['Endereco'].hasError('required') && f['Endereco'].touched">{{ 'RESTAURANT_REGISTER.ERROR_ADDRESS_REQUIRED' | translate }}</div>
       </div>
 
-      <!-- AÇÕES -->
+      <!-- Bairro -->
+      <div class="form-group">
+        <label for="bairro">{{ 'RESTAURANT_REGISTER.NEIGHBORHOOD' | translate }}<b>*</b></label>
+        <input id="bairro" type="text" class="form-input" formControlName="bairro" [placeholder]="'RESTAURANT_REGISTER.NEIGHBORHOOD_PLACEHOLDER' | translate" />
+        <div class="error" *ngIf="f['bairro'].hasError('required') && f['bairro'].touched">{{ 'RESTAURANT_REGISTER.ERROR_NEIGHBORHOOD_REQUIRED' | translate }}</div>
+      </div>
+
+      <!-- Foto do Restaurante -->
+      <div class="form-group">
+        <label for="foto">{{ 'RESTAURANT_REGISTER.PHOTO' | translate }}</label>
+        <input id="foto" type="file" class="form-input" (change)="onFileSelected($event)" accept="image/*" />
+        <img [src]="previewImg" *ngIf="previewImg" class="preview-img" alt="Preview da imagem do restaurante">
+      </div>
+
+      <!-- Coordenadas -->
+      <input type="hidden" formControlName="latitude">
+      <input type="hidden" formControlName="longitude">
+
+      <!-- Ações -->
       <div class="form-actions">
-        <button type="submit" class="btn-primary" [disabled]="!formulario.valid" translate>
-          Salvar
-        </button>
-        <button type="button" class="btn-secondary" (click)="cancelar()" translate>
-          Cancelar
+        <button type="button" class="btn-secondary" (click)="cancelar()">{{ 'RESTAURANT_REGISTER.CANCEL_BUTTON' | translate }}</button>
+        <button type="submit" class="btn-primary" [disabled]="!formulario.valid || salvandoRestaurante">
+          <span *ngIf="!salvandoRestaurante">{{ 'RESTAURANT_REGISTER.REGISTER_BUTTON' | translate }}</span>
+          <span *ngIf="salvandoRestaurante">Cadastrando...</span>
         </button>
       </div>
     </form>

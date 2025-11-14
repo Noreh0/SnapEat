@@ -24,6 +24,12 @@ import { AvaliacaoPratoListComponent } from './componentes/avaliacao-prato-list/
 import { AvaliacaoPratoFormComponent } from './componentes/avaliacao-prato-form/avaliacao-prato-form.component';
 import { RecuperarSenhaComponent } from './componentes/recuperar-senha/recuperar-senha.component';
 import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir-senha.component';
+import { DenunciasRestauranteComponent } from './componentes/denuncias-restaurante/denuncias-restaurante.component';
+import { ComplementarCadastroComponent } from './componentes/complementar-cadastro/complementar-cadastro.component';
+import { CupomFormComponent } from './componentes/cupom-form/cupom-form.component';
+import { CupomListComponent } from './componentes/cupom-list/cupom-list.component';
+import { ClienteCuponsComponent } from './componentes/cliente-cupons/cliente-cupons.component';
+import { MeusCuponsComponent } from './componentes/meus-cupons/meus-cupons.component';
 
 const routes: Routes = [
   {
@@ -39,16 +45,28 @@ const routes: Routes = [
     path: 'menu',
     component: MenuComponent,
   },
+  // Rota simplificada para avaliar restaurante
+  {
+    path: 'avaliar/:id',
+    redirectTo: 'perfilRestaurante/:id/criaAvaliacao',
+    pathMatch: 'full'
+  },
   { path: 'restaurante/:id',
     component: RestauranteComponent 
   },
   { path: 'dashboard-restaurante/:id', component: DashboardRestauranteComponent },
+    {
+    path: 'perfil-restaurante/:id',
+    component: PerfilRestauranteComponent,
+    canActivate: [AuthGuard]
+  },
+  
+  // Rota alternativa para compatibilidade com links antigos
   {
-  path: 'perfilRestaurante/:id_restaurante',
-  component: PerfilRestauranteComponent,
-  canActivate: [AuthGuard]
-  // removi data.tipo aqui: qualquer usuário logado pode ver o perfil
-},
+    path: 'perfilRestaurante/:id',
+    redirectTo: 'perfil-restaurante/:id',
+    pathMatch: 'full'
+  },
 {
     path: 'restaurante/:id/pratos',
     component: PratosListComponent
@@ -65,8 +83,43 @@ const routes: Routes = [
     path: 'restaurante/:restauranteId/pratos/:pratoId/editar',
     component: PratoEditComponent
   },
+  // Rotas de cupons - Restaurante (gerenciar)
+  {
+    path: 'restaurante/:id/cupons',
+    component: CupomListComponent,
+    canActivate: [AuthGuard],
+    data: { tipo: 'restaurante' }
+  },
+  {
+    path: 'restaurante/:id/cupons/novo',
+    component: CupomFormComponent,
+    canActivate: [AuthGuard],
+    data: { tipo: 'restaurante' }
+  },
+  {
+    path: 'restaurante/:id/cupons/editar/:cupomId',
+    component: CupomFormComponent,
+    canActivate: [AuthGuard],
+    data: { tipo: 'restaurante' }
+  },
+  // Rotas de cupons - Cliente (resgatar)
+  {
+    path: 'cliente/cupons/:restauranteId',
+    component: ClienteCuponsComponent,
+    canActivate: [AuthGuard],
+    data: { tipo: 'cliente' }
+  },
   { path: 'recuperar-senha', component: RecuperarSenhaComponent },
-  { path: 'redefinir-senha/:token', component: RedefinirSenhaComponent },
+  {
+    path: 'redefinir-senha/:token',
+    component: RedefinirSenhaComponent,
+    // Importante: preserve o token completo sem parsing
+    pathMatch: 'full'
+  },
+  {
+    path: 'complementar-cadastro',
+    component: ComplementarCadastroComponent,
+  },
 
 {
   path: 'perfilRestaurante/:id_restaurante/criaAvaliacao',
@@ -78,7 +131,7 @@ const routes: Routes = [
 
 // app-routing.module.ts
 {
-  path: 'perfilRestaurante/:id_restaurante/editarRestaurante',
+  path: 'editar-restaurante/:id',
   component: EditarRestauranteComponent,
   canActivate: [AuthGuard],
   data: { tipo: 'restaurante' }
@@ -89,6 +142,7 @@ const routes: Routes = [
     path: 'prato/:pratoId/avaliacoes',
     component: AvaliacaoPratoListComponent
   },
+  { path: 'restaurante/:id/denuncias', component: DenunciasRestauranteComponent },
   {
     path: 'prato/:pratoId/avaliacoes/criar',
     component: AvaliacaoPratoFormComponent
@@ -111,6 +165,12 @@ const routes: Routes = [
     {
       path: ':id_cliente/editarCliente',
       component: EditarClienteComponent,
+      canActivate: [AuthGuard],
+      data: { tipo: 'cliente' }
+    },
+    {
+      path: ':id_cliente/meus-cupons',
+      component: MeusCuponsComponent,
       canActivate: [AuthGuard],
       data: { tipo: 'cliente' }
     },

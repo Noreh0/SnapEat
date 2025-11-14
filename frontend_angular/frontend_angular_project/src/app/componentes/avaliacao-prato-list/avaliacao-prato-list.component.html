@@ -1,60 +1,337 @@
-<section class="eval-prato-list-page">
-
-  <!-- HEADER -->
-  <div class="page-header">
-    <h1>Avaliações do Prato</h1>
-    <button
-      *ngIf="isCliente"
-      class="btn-primary"
-      [routerLink]="['/prato', pratoId, 'avaliacoes', 'criar']"
-    >
-      + Nova Avaliação
-    </button>
-  </div>
-
-  <!-- SEM AVALIAÇÕES -->
-  <ng-container *ngIf="avaliacoes.length; else noEvals">
-    <!-- LISTA DE CARDS -->
-    <div class="eval-list">
-      <div *ngFor="let a of avaliacoes" class="review-card">
-        
-        <!-- CABEÇALHO DO CARD -->
-        <div class="review-header">
-          <div class="reviewer">
-            <img src="assets/icons/user-avatar.svg" alt="avatar" class="avatar"/>
-            <span>{{ a.ID_Cliente }}</span>
-          </div>
-          <div class="meta">
-            <span class="stars">{{ renderStars(a.Nota) }}</span>
-          </div>
+<div class="page-wrapper" [@pageAnimation] (click)="fecharMenuAcoes()">
+  
+  <!-- Sistema de Feedback -->
+  <div class="feedback-system">
+    <div 
+      *ngFor="let message of feedbackMessages" 
+      class="feedback-message feedback-message--{{message.type}}"
+      [@feedbackSlideAnimation]>
+      <div class="feedback-content">
+        <div class="feedback-header">
+          <i class="feedback-icon" [ngClass]="{
+            'fas fa-check-circle': message.type === 'success',
+            'fas fa-exclamation-triangle': message.type === 'warning',
+            'fas fa-times-circle': message.type === 'error',
+            'fas fa-info-circle': message.type === 'info'
+          }"></i>
+          <h4 class="feedback-title">{{ message.title }}</h4>
+          <button 
+            class="feedback-close" 
+            (click)="closeFeedbackMessage(message.id)"
+            aria-label="Fechar mensagem">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-
-        <!-- CORPO DO COMENTÁRIO -->
-        <p class="review-body">{{ a.Comentario }}</p>
-
-        <!-- AÇÕES -->
-        <div class="review-actions">
-          <button
-            *ngIf="isCliente && a.ID_Cliente === auth.usuarioAtual?.ID"
-            class="btn-secondary"
-            (click)="edit(a)"
-          >Editar</button>
-          <button
-            *ngIf="isCliente && a.ID_Cliente === auth.usuarioAtual?.ID"
-            class="btn-secondary"
-            (click)="delete(a.ID)"
-          >Excluir</button>
-        </div>
-
+        <p class="feedback-text">{{ message.message }}</p>
       </div>
     </div>
-  </ng-container>
+  </div>
 
-  <!-- TEMPLATE “SEM AVALIAÇÕES” -->
-  <ng-template #noEvals>
-    <div class="no-evals">
-      Ainda não há avaliações para este prato.
+  <!-- Indicador de Conectividade -->
+  <div class="connectivity-indicator" [class]="getConnectivityClass()">
+    <i class="fas" [ngClass]="{
+      'fa-wifi': isOnline,
+      'fa-wifi-slash': !isOnline
+    }"></i>
+    <span>{{ getConnectivityText() }}</span>
+  </div>
+
+  <!-- Hero Section com info do prato -->
+  <section class="hero-section" *ngIf="prato; else heroLoading">
+    <div class="hero-content">
+      <button class="btn-voltar-hero" (click)="voltarAoCardapio()" *ngIf="restaurante">
+        <i class="fas fa-arrow-left"></i>
+        <span>Voltar ao Cardápio</span>
+      </button>
+      
+      <div class="hero-prato-info">
+        <div class="hero-prato-imagem" [style.background-image]="'url(' + prato.imagem_url + ')'">
+          <div class="loading-overlay" *ngIf="loadingState.prato">
+            <div class="spinner"></div>
+          </div>
+        </div>
+        <div class="hero-prato-detalhes">
+          <h1 class="hero-prato-nome">{{ prato.Nome }}</h1>
+          <p class="hero-prato-descricao">{{ prato.descricao }}</p>
+          <div class="hero-stats">
+            <span class="stat-item">
+              <i class="fas fa-star"></i>
+              <strong>{{ avaliacoes.length }}</strong> 
+              {{ avaliacoes.length === 1 ? 'avaliação' : 'avaliações' }}
+            </span>
+            <span class="stat-item" *ngIf="restaurante; else restauranteLoading">
+              <i class="fas fa-utensils"></i>
+              {{ restaurante.Nome }}
+            </span>
+            <ng-template #restauranteLoading>
+              <span class="stat-item loading-text">
+                <i class="fas fa-spinner fa-spin"></i>
+                Carregando restaurante...
+              </span>
+            </ng-template>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- Hero Loading State -->
+  <ng-template #heroLoading>
+    <section class="hero-section hero-loading">
+      <div class="hero-content">
+        <div class="hero-prato-info">
+          <div class="hero-prato-imagem shimmer-placeholder"></div>
+          <div class="hero-prato-detalhes">
+            <div class="shimmer-title shimmer-placeholder"></div>
+            <div class="shimmer-text shimmer-placeholder"></div>
+            <div class="shimmer-text shimmer-placeholder" style="width: 80%;"></div>
+            <div class="hero-stats">
+              <div class="shimmer-text shimmer-placeholder" style="width: 120px;"></div>
+              <div class="shimmer-text shimmer-placeholder" style="width: 150px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </ng-template>
 
-</section>
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-container">
+      <!-- Header de Avaliações -->
+      <header class="avaliacoes-header">
+        <div class="header-info">
+          <h2 class="avaliacoes-title">Avaliações dos Clientes</h2>
+          <p class="avaliacoes-subtitle" *ngIf="!loadingState.avaliacoes">
+            {{ avaliacoes.length }} 
+            {{ avaliacoes.length === 1 ? 'avaliação' : 'avaliações' }}
+          </p>
+          <p class="avaliacoes-subtitle loading-text" *ngIf="loadingState.avaliacoes">
+            <i class="fas fa-spinner fa-spin"></i>
+            Carregando avaliações...
+          </p>
+        </div>
+        
+        <div class="header-actions">
+          <button 
+            class="btn-refresh"
+            (click)="forceRefresh()"
+            [disabled]="isLoading()"
+            title="Atualizar dados">
+            <i class="fas" [ngClass]="{
+              'fa-sync-alt': !isLoading(),
+              'fa-spinner fa-spin': isLoading()
+            }"></i>
+          </button>
+          
+          <button 
+            *ngIf="isCliente" 
+            class="btn-adicionar-avaliacao"
+            [class.loading]="loadingState.geral"
+            [@buttonAnimation]
+            (click)="adicionarAvaliacao()"
+            [disabled]="!isOnline">
+            <div class="btn-content">
+              <i class="fas fa-plus"></i>
+              <span>Avaliar Prato</span>
+            </div>
+            <div class="btn-progress" *ngIf="loadingState.geral"></div>
+          </button>
+        </div>
+      </header>
+
+      <!-- Loading State para Avaliações -->
+      <div class="avaliacoes-loading" *ngIf="loadingState.avaliacoes && avaliacoes.length === 0">
+        <div class="loading-grid">
+          <div class="loading-card" *ngFor="let item of [1,2,3]">
+            <div class="loading-header">
+              <div class="loading-avatar shimmer-placeholder"></div>
+              <div class="loading-info">
+                <div class="shimmer-text shimmer-placeholder" style="width: 40%;"></div>
+                <div class="shimmer-text shimmer-placeholder" style="width: 60%;"></div>
+              </div>
+              <div class="loading-rating shimmer-placeholder"></div>
+            </div>
+            <div class="loading-body">
+              <div class="shimmer-text shimmer-placeholder"></div>
+              <div class="shimmer-text shimmer-placeholder" style="width: 80%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Avaliações em Cards -->
+      <div class="avaliacoes-grid" [@listAnimation]="avaliacoes.length" *ngIf="avaliacoes.length > 0; else semAvaliacoes">
+        <article 
+          *ngFor="let avaliacao of avaliacoes; let i = index" 
+          class="avaliacao-card"
+          [@cardAnimation]
+          [class.excluindo]="isExcluindo(avaliacao.ID)">
+          
+          <!-- Header do Card -->
+          <div class="card-header">
+            <div class="user-info">
+              <div class="user-avatar">
+                <img src="assets/images/perfil-usuário.png" alt="Avatar">
+              </div>
+              <div class="user-details">
+                <h3 class="user-name">{{ avaliacao.Nome_Cliente || 'Anônimo' }}</h3>
+                <div class="meta-info">
+                  <span class="data-relativa">{{ getDataRelativa(avaliacao.created_at) }}</span>
+                  <span class="separador">•</span>
+                  <span class="data-completa">{{ avaliacao.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nota com estrelas -->
+            <div class="rating-badge">
+              <span class="rating-number">{{ avaliacao.Nota }}</span>
+              <div class="rating-stars" [innerHTML]="renderStars(avaliacao.Nota)"></div>
+            </div>
+          </div>
+
+          <!-- Comentário -->
+          <div class="card-body">
+            <p class="comentario-texto">{{ avaliacao.Comentario }}</p>
+          </div>
+
+          <!-- Loading Overlay para exclusão -->
+          <div class="exclusao-overlay" *ngIf="isExcluindo(avaliacao.ID)">
+            <div class="exclusao-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Excluindo...</span>
+            </div>
+          </div>
+
+          <!-- Seção de Imagens -->
+          <div class="review-images-section" *ngIf="temImagens(avaliacao)">
+            <!-- Grid de Imagens (visível apenas quando expandido) -->
+            <div class="imagens-grid" *ngIf="imagensEstaoExpandidas(avaliacao.ID)" [@imageExpandAnimation]>
+              <div class="imagem-item" *ngFor="let imagem of avaliacao.imagens_urls" (click)="abrirImagemModal(imagem)">
+                <img [src]="imagem" [alt]="'Foto da avaliação de ' + avaliacao.Nome_Cliente" loading="lazy">
+                <div class="imagem-overlay">
+                  <i class="fas fa-search-plus"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer com ações (igual ao restaurante.component.html) -->
+          <div class="review-footer">
+            <!-- Data da avaliação -->
+            <div class="review-date" *ngIf="avaliacao.created_at">
+              {{ avaliacao.created_at | date:'dd/MM/yyyy' }}
+            </div>
+            
+            <!-- Ações -->
+            <div class="review-actions">
+              <!-- Botão para ver imagens -->
+              <button 
+                class="btn-view-images" 
+                *ngIf="temImagens(avaliacao)"
+                (click)="toggleImagens(avaliacao.ID)">
+                <i class="fas" [ngClass]="imagensEstaoExpandidas(avaliacao.ID) ? 'fa-eye-slash' : 'fa-images'"></i>
+                {{ getTextoToggleImagens(avaliacao.ID, avaliacao.imagens_urls!.length) }}
+              </button>
+              
+              <!-- Botões de editar/excluir para o autor -->
+              <ng-container *ngIf="isAutor(avaliacao)">
+                <button 
+                  class="btn-action editar" 
+                  (click)="editarAvaliacao(avaliacao)"
+                  [disabled]="isExcluindo(avaliacao.ID) || !isOnline"
+                  title="Editar avaliação">
+                  <i class="fas fa-edit"></i>
+                  <span>Editar</span>
+                </button>
+                <button 
+                  class="btn-action excluir" 
+                  (click)="excluirAvaliacao(avaliacao)"
+                  [disabled]="isExcluindo(avaliacao.ID) || !isOnline"
+                  [class.loading]="isExcluindo(avaliacao.ID)"
+                  title="Excluir avaliação">
+                  <i class="fas" [ngClass]="{
+                    'fa-trash-alt': !isExcluindo(avaliacao.ID),
+                    'fa-spinner fa-spin': isExcluindo(avaliacao.ID)
+                  }"></i>
+                  <span>{{ isExcluindo(avaliacao.ID) ? 'Excluindo...' : 'Excluir' }}</span>
+                </button>
+              </ng-container>
+              
+              <!-- Botão de denunciar para outros usuários -->
+              <button 
+                class="btn-report" 
+                *ngIf="!isAutor(avaliacao) && isCliente"
+                (click)="denunciarAvaliacao(avaliacao)"
+                [disabled]="!isOnline"
+                title="Denunciar avaliação inadequada">
+                <i class="fas fa-flag"></i>
+                <span>Denunciar</span>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Estado Vazio -->
+      <ng-template #semAvaliacoes>
+        <div class="empty-state" *ngIf="!loadingState.avaliacoes">
+          <div class="empty-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <h3>Nenhuma avaliação ainda</h3>
+          <p *ngIf="isOnline">Seja o primeiro a compartilhar sua opinião sobre este prato!</p>
+          <p *ngIf="!isOnline" class="offline-message">
+            <i class="fas fa-wifi-slash"></i>
+            Conecte-se à internet para ver as avaliações
+          </p>
+          <button 
+            *ngIf="isCliente && isOnline" 
+            class="btn-primeira-avaliacao"
+            [@buttonAnimation]
+            (click)="adicionarAvaliacao()">
+            <i class="fas fa-star"></i>
+            Fazer Primeira Avaliação
+          </button>
+          <button 
+            *ngIf="!isOnline" 
+            class="btn-retry"
+            (click)="forceRefresh()">
+            <i class="fas fa-sync-alt"></i>
+            Tentar Conectar
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </main>
+</div>
+
+<!-- Modal de Imagem Aprimorado -->
+<div class="modal-imagem" *ngIf="imagemModalAberto" (click)="fecharImagemModal()" [@modalBackdropAnimation]>
+  <div class="modal-imagem__conteudo" (click)="$event.stopPropagation()" [@modalContentAnimation]>
+    <button class="modal-imagem__fechar" (click)="fecharImagemModal()" aria-label="Fechar modal">
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="imagemSelecionada" alt="Imagem ampliada da avaliação" loading="eager">
+    
+    <!-- Loading para imagem do modal -->
+    <div class="modal-loading" *ngIf="imagemSelecionada">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay Global de Loading -->
+<div class="global-loading-overlay" *ngIf="loadingState.geral">
+  <div class="loading-content">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+    <h3>Carregando...</h3>
+    <p>Buscando informações do prato</p>
+    <div class="loading-progress">
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+</div>

@@ -1,18 +1,22 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgChartsModule } from 'ng2-charts';
+import { Chart, registerables } from 'chart.js';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatOption } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { environment } from '../environments/environment';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { JwtModule } from '@auth0/angular-jwt';
-export function tokenGetter() {
-  return localStorage.getItem('token');
-}
+import { ToastrModule } from 'ngx-toastr';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -62,6 +66,37 @@ import { AvaliacaoPratoListComponent } from './componentes/avaliacao-prato-list/
 import { AvaliacaoPratoFormComponent } from './componentes/avaliacao-prato-form/avaliacao-prato-form.component';
 import { RecuperarSenhaComponent } from './componentes/recuperar-senha/recuperar-senha.component';
 import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir-senha.component';
+import { RestaurantesProximosComponent } from './componentes/restaurantes-proximos/restaurantes-proximos.component';
+import { DenunciasRestauranteComponent } from './componentes/denuncias-restaurante/denuncias-restaurante.component';
+import { NotificacoesComponent } from './componentes/notificacoes/notificacoes.component';
+import { FiltroAvancadoComponent } from './componentes/filtro-avancado/filtro-avancado.component';
+import { ComplementarCadastroComponent } from './componentes/complementar-cadastro/complementar-cadastro.component';
+import { CacheService } from './services/cache.service';
+import { GraficoEvolucaoComponent } from './componentes/grafico-evolucao/grafico-evolucao.component';
+import { GraficoMensalComparativoComponent } from './componentes/grafico-mensal-comparativo/grafico-mensal-comparativo.component';
+import { GraficoComparacaoPratosComponent } from './componentes/grafico-comparacao-pratos/grafico-comparacao-pratos.component';
+import { TagsSelectorComponent } from './componentes/tags-selector/tags-selector.component';
+import { TagService } from './services/tag.service';
+import { RestaurantTagsBadgesComponent } from './componentes/restaurant-tags-badges/restaurant-tags-badges.component';
+import { CupomFormComponent } from './componentes/cupom-form/cupom-form.component';
+import { CupomListComponent } from './componentes/cupom-list/cupom-list.component';
+import { ClienteCuponsComponent } from './componentes/cliente-cupons/cliente-cupons.component';
+import { MeusCuponsComponent } from './componentes/meus-cupons/meus-cupons.component';
+import { PontosInfoComponent } from './componentes/pontos-info/pontos-info.component';
+import { ModalConfirmacaoComponent } from './componentes/shared/modal-confirmacao/modal-confirmacao.component';
+
+
+Chart.register(...registerables);
+
+export function tokenGetter() {
+  return localStorage.getItem('token');
+}
+
+// ✅ CORREÇÃO 2: Função de fábrica para o ngx-translate apontando para o caminho certo.
+export function createTranslateLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -91,23 +126,46 @@ import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir
     AvaliacaoPratoFormComponent,
     RecuperarSenhaComponent,
     RedefinirSenhaComponent,
+    CupomFormComponent,
+    CupomListComponent,
+    ClienteCuponsComponent,
+    MeusCuponsComponent,
+    PontosInfoComponent,
+    RestaurantesProximosComponent,
+    DenunciasRestauranteComponent,
+    NotificacoesComponent,
+    FiltroAvancadoComponent,
+    ComplementarCadastroComponent,
+    GraficoEvolucaoComponent,
+    GraficoMensalComparativoComponent,
+    GraficoComparacaoPratosComponent,
+    TagsSelectorComponent,
+    RestaurantTagsBadgesComponent,
+    ModalConfirmacaoComponent,
   ],
   imports: [
     JwtModule.forRoot({
-    config: {
-      tokenGetter: () => localStorage.getItem('token'),
-      allowedDomains: ['localhost:5000'],
-      disallowedRoutes: ['http://localhost:5000/auth/login'],
-    },
-  }),
+      config: {
+        tokenGetter: tokenGetter,
+        allowedDomains: ['localhost:5000'],
+        disallowedRoutes: ['http://localhost:5000/auth/login'],
+      },
+    }),
     BrowserModule,
     CommonModule,
     RouterModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-  
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+    }),  
     // Angular Material
     MatIconModule,
     MatButtonModule,
@@ -120,6 +178,9 @@ import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir
     MatTableModule,
     MatTabsModule,
     MatDialogModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatOptionModule,
   
     // ng2-charts
     NgChartsModule,
@@ -128,9 +189,11 @@ import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
+        useFactory: createTranslateLoader,
+        deps: [HttpClient]
       },
+      defaultLanguage: 'pt',
+      useDefaultLang: true
     }),
   
     // ngx-mask
@@ -139,22 +202,17 @@ import { RedefinirSenhaComponent } from './componentes/redefinir-senha/redefinir
   ],
   
   providers: [
-  provideNgxMask(),
-  CabecalhoComponent,
-  { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
-  JwtHelperService,
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: AuthInterceptor,
-    multi: true,
-  },
-  provideAnimationsAsync()
-],
+    provideNgxMask(),
+    TagService,
+    CacheService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
+    provideAnimationsAsync()
+  ],
 
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http);
-}

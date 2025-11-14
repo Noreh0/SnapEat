@@ -52,14 +52,31 @@ onSubmit() {
   }
   const formValue = this.formulario.value;
   const pratoPayload = {
-    Nome: formValue.nome, // <-- N maiúsculo!
+    Nome: formValue.nome, // <-- N maiúsculo
     descricao: formValue.descricao,
     preco: formValue.preco,
     restaurante_id: this.restauranteId,
+    // imagem: this.selectedFile, // <-- não é necessário enviar o arquivo aqui
     // imagem_url: será enviado depois via upload, se necessário
   };
+  
+  
   this.svc.create(pratoPayload).subscribe({
-    next: () => this.router.navigate(['/restaurante', this.restauranteId, 'pratos']),
+    next: (prato) => {
+      // Se houver imagem, faça upload antes de redirecionar
+      if (this.selectedFile) {
+        this.svc.uploadImage(prato.ID, this.selectedFile).subscribe({
+          next: () => this.router.navigate(['/restaurante', this.restauranteId, 'pratos']),
+          error: (err) => {
+            alert('Erro ao fazer upload da imagem!');
+            console.error(err);
+            this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+          }
+        });
+      } else {
+        this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+      }
+    },
     error: (err) => {
       alert('Erro ao cadastrar prato!');
       console.error(err);

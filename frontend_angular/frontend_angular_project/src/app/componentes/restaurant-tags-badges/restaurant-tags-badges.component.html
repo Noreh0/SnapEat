@@ -1,0 +1,28 @@
+<div class="tags-badges-container" *ngIf="tagsExibidas.length > 0">
+  <div 
+    class="tag-badge" 
+    *ngFor="let tag of tagsExibidas"
+    [class]="getClasseNivel(tag)"
+    [attr.data-categoria]="tag.categoria"
+    [title]="tag.posicao_ranking ? '#' + tag.posicao_ranking + ' em ' + tag.nome + ' - ' + (tag.media_categoria | number:'1.1-1') + '⭐' : tag.nome + ' - Categoria em desenvolvimento'">
+    
+    <span class="badge-icon">{{ getIconeTag(tag) }}</span>
+    <span class="badge-rank" *ngIf="tag.posicao_ranking">#{{ tag.posicao_ranking }}</span>
+    <span class="badge-name" *ngIf="!tag.posicao_ranking">{{ tag.nome }}</span>
+    
+    <!-- Tooltip com informações -->
+    <div class="badge-tooltip">
+      <strong>{{ tag.nome }}</strong>
+      <span class="tooltip-rank" *ngIf="tag.posicao_ranking">{{ getNivelExcelencia(tag) }} - #{{ tag.posicao_ranking }}</span>
+      <span class="tooltip-rank" *ngIf="!tag.posicao_ranking">Categoria em desenvolvimento</span>
+      <span class="tooltip-rating" *ngIf="tag.media_categoria">{{ tag.media_categoria | number:'1.1-1' }} ⭐</span>
+      <span class="tooltip-desc" *ngIf="tag.descricao">{{ tag.descricao }}</span>
+    </div>
+  </div>
+  
+  <!-- Badge de "mais tags" se houver -->
+  <div class="tag-badge badge-mais" *ngIf="tagsRestantes > 0" 
+       [title]="'Mais ' + tagsRestantes + ' certificação(ões)'">
+    <span class="badge-icon">+{{ tagsRestantes }}</span>
+  </div>
+</div>

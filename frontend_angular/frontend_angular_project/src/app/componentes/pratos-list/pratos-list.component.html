@@ -1,39 +1,92 @@
 <section class="pratos-list-page">
-  <div class="page-header">
-    <h1>Pratos</h1>
-    <button class="btn-primary" routerLink="/restaurante/{{restauranteId}}/pratos/criar">
-      + Novo Prato
+  <!-- Cabeçalho -->
+  <header class="page-header">
+    <h1>Cardápio</h1>
+    <button
+      *ngIf="isOwner"
+      class="btn-primary"
+      [routerLink]="['/restaurante',restauranteId,'pratos','criar']"
+    >
+      <svg viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      Adicionar Prato
     </button>
-  </div>
+  </header>
 
-  <div class="filter">
-    <input
-      type="text"
-      [(ngModel)]="searchTerm"
-      placeholder="Buscar prato..."
-      (ngModelChange)="onSearch()"
-    />
-  </div>
-
-  <div class="pratos-grid">
-    <div *ngFor="let p of pratos" class="prato-card">
-      <img
-        *ngIf="p.imagem_url"
-        [src]="p.imagem_url"
-        alt="{{ p.Nome }}"
-        class="prato-img"
+  <!-- Filtros de Busca -->
+  <div class="filters">
+    <div class="filter-box">
+      <i class="icon-search"></i>
+      <input
+        type="text"
+        placeholder="Buscar por nome do prato..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
       />
-      <h2>{{ p.Nome }}</h2>
-      <p class="descricao">{{ p.descricao }}</p>
-      <p class="preco">R$ {{ p.preco | number:'1.2-2' }}</p>
-      <div class="actions">
-        <button class="btn-secondary" (click)="editPrato(p)">
-          Editar
-        </button>
-        <button class="btn-secondary" (click)="deletePrato(p.ID)">
-          Excluir
-        </button>
-      </div>
     </div>
+  </div>
+
+  <!-- Grid de Cartões de Pratos -->
+  <div class="pratos-grid">
+    <ng-container *ngIf="filteredPratos.length; else noPratos">
+      <div *ngFor="let p of filteredPratos" class="prato-card">
+        <!-- Imagem do Prato -->
+        <div
+          class="card-image"
+          [ngStyle]="{
+            'background-image': p.imagem_url ? 'url(' + p.imagem_url + ')' : 'url(/assets/images/default-dish.jpg)'
+          }"
+        ></div>
+        
+        <!-- Conteúdo do Cartão -->
+        <div class="card-content">
+          <h2 class="prato-title">{{ p.Nome }}</h2>
+          <p class="prato-desc" [title]="p.descricao">{{ p.descricao || 'Sem descrição disponível' }}</p>
+          
+          <div class="card-footer">
+            <span class="prato-price">R$ {{ p.preco | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="card-actions">
+          <button
+            *ngIf="isOwner"
+            class="action-btn edit"
+            (click)="editPrato(p)"
+            title="Editar prato"
+          >
+            <i>✎</i>
+          </button>
+          
+          <button
+            *ngIf="isOwner"
+            class="action-btn delete"
+            (click)="deletePrato(p.ID)"
+            title="Excluir prato"
+          >
+            <i>🗑️</i>
+          </button>
+          
+          <button
+            *ngIf="isCliente"
+            class="action-btn eval"
+            [routerLink]="['/prato',p.ID,'avaliacoes','criar']"
+            title="Avaliar prato"
+          >
+            <i>★</i>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    
+    <!-- Mensagem quando não há pratos -->
+    <ng-template #noPratos>
+      <div class="no-pratos">
+        <p>Nenhum prato encontrado.</p>
+        <p *ngIf="isOwner">Clique em "Adicionar Prato" para começar seu cardápio.</p>
+      </div>
+    </ng-template>
   </div>
 </section>

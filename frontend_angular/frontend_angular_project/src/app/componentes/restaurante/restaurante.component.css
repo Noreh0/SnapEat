@@ -1,250 +1,1192 @@
-/* ======================================
-   1. FUNDO GERAL DA TELA
-   ====================================== */
-.perfil-restaurante-page {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Variáveis de fonte - Sistema Deezer */
+:host {
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
+}
+/* === Layout Base === */
+.restaurant-page {
   min-height: 100vh;
-  padding: 2rem;
+  background-color: var(--bg-primary);
+  padding: 50px 20px;
+  font-family: var(--fonte-primaria);
+  color: var(--text-primary);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(to right, #1c1c1f, #111113);
-  /* Se preferir cor sólida:
-     background-color: #121212;
-  */
 }
 
-/* ======================================
-   2. CARD PRINCIPAL (rest-card)
-   ====================================== */
-.rest-card {
-  background-color: #202024;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  padding: 2rem;
+.restaurant-container {
   width: 100%;
-  max-width: 700px;
-  color: #ffffff;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 30px;
 }
 
-/* ======================================
-   3. CABEÇALHO DO CARD (rest-header)
-   ====================================== */
-.rest-header {
+/* === Card Principal do Restaurante === */
+.restaurant-card {
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-light);
+  overflow: hidden;
+}
+
+/* === Cabeçalho do Restaurante === */
+.restaurant-header {
+  padding: 40px;
   display: flex;
+  gap: 30px;
   align-items: flex-start;
-  gap: 1.5rem;
+  position: relative;
 }
 
-/* 3.1. AVATAR DO RESTAURANTE (quadrado/circular) */
-.rest-avatar-container {
-  flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+/* Imagem de perfil */
+.restaurant-image-container {
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #3b82f6; /* borda azul para dar destaque */
+  flex-shrink: 0;
+  box-shadow: 0 5px 15px var(--shadow-medium);
+  border: 4px solid white;
 }
 
-.rest-avatar {
+.restaurant-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  background-color: #444; /* caso a imagem não carregue */
 }
 
-/* 3.2. INFORMAÇÕES DO RESTAURANTE (rest-info) */
-.rest-info {
+/* Informações do restaurante */
+.restaurant-info {
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
-.rest-name {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0;
-  color: #f3f3f3;
+.restaurant-name {
+  margin: 0 0 10px;
+  font-family: var(--fonte-primaria);
+  font-size: 2.4rem;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
-.rest-meta {
-  font-size: 0.9rem;
-  color: #9ca3af;
-  margin: 0;
+.restaurant-meta {
   display: flex;
   flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
   align-items: center;
-  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
-.rest-type {
-  text-transform: capitalize;
+.meta-item {
+  display: inline-flex;
+  align-items: center;
 }
 
-.rest-separator {
-  color: #555;
+.meta-separator {
+  display: inline-block;
+  margin: 0 8px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--border-color);
 }
 
-.rest-cnpj {
-  font-family: monospace;
+.restaurant-address {
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
 }
 
-.rest-description {
-  font-size: 1rem;
-  color: #d1d5db;
-  margin: 0.25rem 0;
-  line-height: 1.4;
+.restaurant-description {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
 }
 
-.rest-rating {
-  font-size: 1rem;
-  color: #d1d5db;
-  margin: 0;
+.restaurant-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  color: var(--text-primary);
 }
 
-/* ======================================
-   4. BOTÕES DE AÇÃO (rest-actions)
-   ====================================== */
-.rest-actions {
+.rating-stars {
+  color: var(--color-primary);
+  letter-spacing: 2px;
+  font-size: 1.2rem;
+}
+
+.rating-count {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* === Botões de Ação === */
+.restaurant-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 15px;
+  padding: 0 40px 40px;
+  flex-wrap: wrap;
 }
 
-/* 4.1. BOTÃO PRIMÁRIO (Avaliar este Restaurante) */
-.btn-primary {
-  background-color: #3b82f6; /* azul vivo */
-  color: #ffffff;
-  border: none;
-  padding: 0.75rem 1.5rem;
+.btn {
+  padding: 12px 24px;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px var(--accent-shadow-light);
 }
 
 .btn-primary:hover {
-  background-color: #2563eb; /* azul mais escuro no hover */
+  background-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-shadow-medium);
 }
 
-/* 4.2. BOTÃO SECUNDÁRIO (Voltar ao Menu) */
 .btn-secondary {
   background-color: transparent;
-  border: 2px solid #ffffff;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background-color: var(--border-color);
 }
 
-/* ======================================
-   5. RESPONSIVIDADE
-   ====================================== */
+/* === Seção de Avaliações === */
+.reviews-section {
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-light);
+  overflow: hidden;
+}
+
+/* Título da seção */
+.reviews-header {
+  padding: 30px 40px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reviews-header h2 {
+  margin: 0;
+  font-family: var(--fonte-primaria);
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Filtros de avaliações */
+.reviews-filters {
+  padding: 20px 40px;
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.filter-select,
+.filter-date {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--fonte-primaria);
+  min-width: 120px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus,
+.filter-date:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-primary);
+}
+
+.filter-select:hover,
+.filter-date:hover {
+  border-color: var(--color-secondary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Lista de avaliações */
+.reviews-list {
+  padding: 20px 40px 40px;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.review-card {
+  padding: 25px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.review-card:last-child {
+  border-bottom: none;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 15px;
+  min-height: 30px;
+}
+
+.reviewer-name {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.review-stars {
+  color: var(--color-primary);
+  letter-spacing: 2px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.review-content {
+  line-height: 1.6;
+  margin: 0;
+  color: var(--text-primary);
+}
+.review-images-section {
+  margin-top: 15px;
+}
+
+.imagens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.imagem-item {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid var(--border-color);
+  position: relative;
+  background-color: var(--bg-primary);
+}
+
+.imagem-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  border-color: var(--color-primary);
+}
+
+.imagem-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.imagem-item:hover img {
+  transform: scale(1.1);
+}
+
+.imagem-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.imagem-item:hover .imagem-overlay {
+  opacity: 1;
+}
+
+.imagem-overlay i {
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* === Footer da Avaliação === */
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.review-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* === Botão Ver Imagens === */
+.btn-view-images {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-warning) 100%);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px var(--primary-shadow-light);
+}
+
+.btn-view-images:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--primary-shadow-medium);
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-primary) 100%);
+}
+
+.btn-view-images:active {
+  transform: translateY(0);
+}
+
+.btn-view-images i {
+  font-size: 0.9rem;
+}
+
+/* === Botão Denunciar === */
+.btn-report {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-report:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-danger);
+  border-color: var(--border-danger);
+  transform: translateY(-2px);
+}
+
+.btn-report:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* === Modal de Imagem === */
+.modal-imagem {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--overlay-dark);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 2rem;
+}
+
+.modal-imagem__conteudo {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-imagem__conteudo img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px var(--shadow-dark);
+  object-fit: contain;
+}
+
+.modal-imagem__fechar {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: var(--overlay-light);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  z-index: 10000;
+}
+
+.modal-imagem__fechar:hover {
+  background: white;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+/* === Estilos específicos para tema escuro === */
+[data-theme="dark"] {
+  .filter-select,
+  .filter-date {
+    background-color: rgba(45, 45, 45, 0.9);
+    border-color: rgba(64, 64, 64, 0.7);
+    color: #e8e8e8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .filter-select:focus,
+  .filter-date:focus {
+    background-color: rgba(45, 45, 45, 0.95);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.2), 0 2px 8px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+  }
+  
+  .filter-select:hover,
+  .filter-date:hover {
+    border-color: rgba(106, 156, 137, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+  
+  .filter-label {
+    color: rgba(224, 224, 224, 0.9);
+  }
+  
+  .reviews-filters {
+    background-color: rgba(26, 26, 26, 0.6);
+    border-bottom-color: rgba(64, 64, 64, 0.5);
+  }
+  
+  /* Setas dos selects no modo escuro */
+  .filter-select {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%23a0a0a0" d="M6 8L0 0h12z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px 8px;
+    padding-right: 35px;
+    appearance: none;
+  }
+  
+  /* Ícones de calendário no modo escuro */
+  .filter-date::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) opacity(0.8);
+    cursor: pointer;
+  }
+  
+  .filter-date::-webkit-calendar-picker-indicator:hover {
+    filter: invert(1) opacity(1);
+  }
+}
+
+/* === Estilos específicos para tema claro === */
+[data-theme="light"] {
+  .filter-select,
+  .filter-date {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(224, 224, 224, 0.8);
+    color: #2d2d2d;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  
+  .filter-select:focus,
+  .filter-date:focus {
+    background-color: #ffffff;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.1), 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-select:hover,
+  .filter-date:hover {
+    border-color: var(--color-secondary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+  
+  .reviews-filters {
+    background-color: rgba(250, 249, 247, 0.8);
+  }
+  
+  /* Setas dos selects no modo claro */
+  .filter-select {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%23718096" d="M6 8L0 0h12z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px 8px;
+    padding-right: 35px;
+    appearance: none;
+  }
+}
+
+/* === Responsividade === */
 @media (max-width: 768px) {
-  .rest-card {
-    padding: 1.5rem;
-    max-width: 90%;
+  /* ...existing responsive styles... */
+  
+  .imagens-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
   }
-  .rest-header {
+  
+  .review-footer {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 1rem;
+    align-items: flex-start;
   }
-  .rest-avatar-container {
-    width: 100px;
-    height: 100px;
+  
+  .review-actions {
+    width: 100%;
+    justify-content: space-between;
   }
-  .rest-name {
-    font-size: 1.75rem;
+  
+  .btn-view-images,
+  .btn-report {
+    flex: 1;
+    justify-content: center;
   }
-  .rest-meta,
-  .rest-description,
-  .rest-rating {
-    font-size: 0.9rem;
-  }
-  .rest-actions {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
+  
+  .modal-imagem__fechar {
+    top: 10px;
+    right: 10px;
   }
 }
 
 @media (max-width: 480px) {
-  .rest-avatar-container {
-    width: 80px;
-    height: 80px;
+  /* ...existing responsive styles... */
+  
+  .imagens-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  .rest-name {
-    font-size: 1.5rem;
-  }
-  .rest-meta,
-  .rest-description,
-  .rest-rating {
-    font-size: 0.8rem;
-  }
-  .btn-primary,
-  .btn-secondary {
+  
+  .review-actions {
+    flex-direction: column;
     width: 100%;
+  }
+  
+  .btn-view-images,
+  .btn-report {
+    width: 100%;
+  }
+  
+  .modal-imagem {
+    padding: 1rem;
+  }
+}
+
+/* === Responsividade === */
+@media (max-width: 768px) {
+  .restaurant-page {
+    padding: 30px 15px;
+  }
+  
+  .restaurant-header {
+    padding: 30px;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
-  /* === FILTRO POR NOTA === */
-.filter-container {
-  margin: 1.5rem 0;
+  
+  .restaurant-info {
+    width: 100%;
+  }
+  
+  .restaurant-name {
+    font-size: 2rem;
+  }
+  
+  .restaurant-meta {
+    justify-content: center;
+  }
+  
+  .restaurant-actions {
+    padding: 0 30px 30px;
+    justify-content: center;
+  }
+  
+  .btn {
+    flex: 1 0 calc(50% - 10px);
+  }
+  
+  .reviews-header,
+  .reviews-filters,
+  .reviews-list {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .reviews-filters {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .filter-select,
+  .filter-date {
+    flex: 1;
+  }
+  
+  /* Ajustes específicos para avaliações em tablets */
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-height: auto;
+  }
+  
+  .review-stars {
+    align-self: flex-end;
+    font-size: 1rem;
+  }
+  
+  .review-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .review-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .restaurant-header {
+    padding: 25px 20px;
+  }
+  
+  .restaurant-image-container {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .restaurant-name {
+    font-size: 1.8rem;
+  }
+  
+  .btn {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .reviews-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .review-card {
+    padding: 20px 15px;
+  }
+  
+  .review-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .reviewer-name {
+    font-size: 1rem;
+  }
+  
+  .review-stars {
+    align-self: flex-start;
+    font-size: 0.95rem;
+  }
+  
+  .review-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .review-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .btn-view-images,
+  .btn-report {
+    width: 100%;
+    justify-content: center;
+  }
+  
+}
+
+/* === Modal de Denúncia Personalizado === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-.filter-container label {
-  color: #e5e5e5;
-  font-weight: 600;
-}
-.filter-container .form-select {
-  width: auto;
-  max-width: 200px;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(2px);
 }
 
-/* === SEÇÃO DE AVALIAÇÕES === */
-.avaliacoes-section {
+.modal-content {
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid var(--border-color);
+}
+
+.modal-denuncia {
+  max-width: 650px;
+}
+
+.modal-success {
+  max-width: 480px;
+}
+
+.modal-header {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 16px 16px 0 0;
 }
 
-/* lista de cards já tinha .eval-list; ajusta gap */
-.eval-list {
+.modal-header h3 {
+  margin: 0;
+  font-family: var(--fonte-primaria);
+  font-size: 1.4rem;
+  color: var(--text-primary);
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-/* mensagem quando não há avaliações */
-.sem-avaliacoes {
-  color: #9ca3af;
-  text-align: center;
-  font-style: italic;
-  padding: 1rem;
+.success-header h3 {
+  color: var(--color-success, #28a745);
 }
 
-/* cada card de avaliação */
-.avaliacao-card {
-  background-color: #2c2c2f;
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+/* === Preview da Avaliação === */
+.denuncia-info {
+  margin-bottom: 1.5rem;
+}
+
+.avaliacao-preview {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.cliente-nome {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.avaliacao-nota {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
+.avaliacao-comentario {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* === Formulário de Denúncia === */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.required {
+  color: var(--color-danger, #e74c3c);
+}
+
+.motivo-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--fonte-primaria);
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.motivo-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
+}
+
+.motivo-textarea::placeholder {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.textarea-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.char-count {
+  color: var(--text-secondary);
+}
+
+.char-count.error {
+  color: var(--color-danger, #e74c3c);
+  font-weight: 600;
+}
+
+.min-chars {
+  color: var(--color-danger, #e74c3c);
+}
+
+.min-chars.valid {
+  color: var(--color-success, #28a745);
+}
+
+.error-message {
+  color: var(--color-danger, #e74c3c);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* === Warning Box === */
+.warning-box {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.warning-box p {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-warning, #ffc107);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.warning-box ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.warning-box li {
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* === Modal Footer === */
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 0 0 16px 16px;
+}
+
+.btn-cancel,
+.btn-submit,
+.btn-primary {
+  flex: 1;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid;
+  font-family: var(--fonte-primaria);
+}
+
+.btn-cancel {
+  background: transparent;
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.btn-cancel:hover {
+  background: var(--bg-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.btn-submit {
+  background: var(--color-warning, #ffc107);
+  border-color: var(--color-warning, #ffc107);
+  color: var(--text-inverse, #000);
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--color-warning-hover, #e0a800);
+  border-color: var(--color-warning-hover, #e0a800);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--text-inverse, white);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 70, 0.3);
+}
+
+/* === Modal de Sucesso === */
+.success-message {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.success-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.success-message p {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.success-details {
+  font-size: 0.95rem !important;
+  color: var(--text-secondary) !important;
+  font-weight: normal !important;
+}
+
+/* === Loading Spinner === */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.loading-spinner::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* === Cores e Variáveis === */
+:host {
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-warning-hover: #e0a800;
+  --color-danger: #e74c3c;
+}
+
+/* === Animações === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Responsividade para Modais === */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .motivo-textarea {
+    font-size: 16px; /* Evitar zoom no iOS */
+  }
 }

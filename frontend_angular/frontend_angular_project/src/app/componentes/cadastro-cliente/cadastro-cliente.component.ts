@@ -21,13 +21,14 @@ export class CadastroClienteComponent implements OnInit {
     private cliente: ClienteService,
     private formbuild: FormBuilder,
     private router: Router,
-    private lingua: CabecalhoComponent,
     private translate: TranslateService,
     private apiService: ApiService
   ) {}
   hide = true;
   value!: string;
   formulario!: FormGroup;
+  // ...dentro da classe CadastroClienteComponent...
+  mostrarPopup = false;
 
   ngOnInit(): void {
     this.formulario = this.formbuild.group({
@@ -72,6 +73,11 @@ export class CadastroClienteComponent implements OnInit {
         '',
         Validators.compose([Validators.required, Validators.minLength(11)])
       ),
+      rede_social: new FormControl(
+        '',
+        // Campo opcional com validação de URL quando preenchido
+        [this.urlValidator]
+      )
     });
   }
 
@@ -90,59 +96,22 @@ export class CadastroClienteComponent implements OnInit {
       return 'botao_desabilitado';
     }
   }
-  getLingua() {
-    return this.translate.currentLang;
-  }
-  ValidaPlaceholderNome() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Name';
-    } else {
-      return 'Digite seu Nome';
-    }
-  }
-  ValidaPlaceholderCPF() {
-    if (this.getLingua() == 'en') {
-      return 'Type your CPF';
-    } else {
-      return 'Digite seu CPF';
-    }
-  }
-  ValidaPlaceholderEmail() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Email (Ex: Email@gmail.com)';
-    } else {
-      return 'Digite seu Email (Ex: Email@gmail.com)';
-    }
-  }
-  ValidaPlaceholderSenha() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Password';
-    } else {
-      return 'Digite sua Senha';
-    }
-  }
-  ValidaPlaceholderConfirma() {
-    if (this.getLingua() == 'en') {
-      return 'Confirm your Password';
-    } else {
-      return 'Confirme sua Senha';
-    }
-  }
-  ValidaPlaceholderCidade() {
-    if (this.getLingua() == 'en') {
-      return 'Type your City';
-    } else {
-      return 'Digite sua Cidade';
-    }
-  }
-  ValidaPlaceholderTelefone() {
-    if (this.getLingua() == 'en') {
-      return 'Type your Phone';
-    } else {
-      return 'Digite seu Telefone';
-    }
-  }
   cancelarCadastro() {
     this.router.navigate(['/login']);
+  }
+
+  // Validador customizado para URLs de rede social
+  urlValidator(control: any) {
+    if (!control.value) {
+      return null; // Campo opcional
+    }
+
+    const urlPattern = /^(https?:\/\/)?(www\.)?(instagram\.com|facebook\.com|twitter\.com|x\.com|linkedin\.com|tiktok\.com|youtube\.com|github\.com|snapchat\.com)\/.*$/i;
+    
+    if (!urlPattern.test(control.value)) {
+      return { invalidUrl: true };
+    }
+    
+    return null;
   }
 }

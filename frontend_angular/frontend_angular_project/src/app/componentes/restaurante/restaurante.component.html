@@ -1,82 +1,282 @@
-<section class="perfil-restaurante-page" *ngIf="restaurante">
-  <div class="rest-card">
-
-    <!-- cabeçalho do restaurante (igual antes) -->
-    <header class="rest-header">
-      <div class="rest-avatar-container">
-        <img
-          [src]="restaurante.imagem_url ? 'http://localhost:5000' + restaurante.imagem_url : 'assets/images/default-restaurant.png'"
-          alt="{{ restaurante.Nome }}"
-          class="rest-avatar"
-        />
-      </div>
-      <div class="rest-info">
-        <h1 class="rest-name">{{ restaurante.Nome }}</h1>
-        <p class="rest-meta">
-          {{ restaurante.tipo_restaurante | titlecase }}
-          <span class="rest-separator">·</span>
-          CNPJ: {{ restaurante.CNPJ }}
-        </p>
-        <p class="rest-Endereco">Localização - {{ restaurante.Endereco }}</p>
-        <p class="rest-description">{{ restaurante.descricao }}</p>
-        <p class="rest-rating">
-          {{ mediaAval | number:'1.1-1' }} ★ ({{ totalAval }} opiniões)
-        </p>
-      </div>
-    </header>
-
-    <!-- botões padrão -->
-    <!-- ... -->
-  <div class="rest-actions">
-    <button class="btn-secondary" routerLink="/menu">Voltar ao Menu</button>
-
-    <!-- 🆕 BOTÃO CARDÁPIO -->
-    <button
-      class="btn-secondary"
-      routerLink="/restaurante/{{ restaurante.ID }}/cardapio"
-    >
-      Cardápio
-    </button>
-
-    <button
-      class="btn-primary"
-      [routerLink]="['/perfilRestaurante', restaurante.ID, 'criaAvaliacao']"
-    >
-      Avaliar este Restaurante
-    </button>
-  </div>
-  <!-- ... -->
-
-
-    <!-- ----- FILTRO POR NOTA ----- -->
-    <div class="filter-container">
-      <label for="filterNota">Filtrar por nota:</label>
-      <select
-        id="filterNota"
-        class="form-select"
-        [(ngModel)]="selectedFilter"
-        (ngModelChange)="filterAvaliacoes()"
-      >
-        <option [ngValue]="0">Todas</option>
-        <option *ngFor="let n of [5,4,3,2,1]" [ngValue]="n">
-          {{ n }} estrela{{ n>1?'s':'' }}
-        </option>
-      </select>
-    </div>
-
-    <!-- ----- LISTA DE AVALIAÇÕES ----- -->
-    <section class="avaliacoes-section">
-      <div *ngIf="filteredAvaliacoes.length === 0" class="sem-avaliacoes">
-        Ainda não há avaliações com essa nota.
-      </div>
-      <div class="eval-list">
-        <div *ngFor="let a of filteredAvaliacoes" class="avaliacao-card">
-          <div class="eval-header">
-            <span class="stars">{{ renderStars(a.Nota) }}</span>
+<section class="restaurant-page" *ngIf="restaurante">
+  <div class="restaurant-container">
+    <!-- Card Principal do Restaurante -->
+    <div class="restaurant-card">
+      <!-- Cabeçalho com Informações -->
+      <div class="restaurant-header">
+        <!-- Imagem do Restaurante -->
+        <div class="restaurant-image-container">
+          <img
+            [src]="restaurante.imagem_url || 'assets/images/default-restaurant.png'"
+            alt="Logo do restaurante {{ restaurante.Nome }}"
+            class="restaurant-image"
+            onerror="this.src='assets/images/default-restaurant.png'"
+          />
+        </div>
+        
+        <!-- Informações do Restaurante -->
+        <div class="restaurant-info">
+          <h1 class="restaurant-name">{{ restaurante.Nome }}</h1>
+          
+          <div class="restaurant-meta">
+            <div class="meta-item">{{ restaurante.tipo_restaurante | titlecase }}</div>
+            <span class="meta-separator"></span>
+            <div class="meta-item">CNPJ: {{ restaurante.CNPJ }}</div>
           </div>
-          <p class="comentario">{{ a.Comentario }}</p>
+          
+          <div class="restaurant-address">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 5px; vertical-align: -2px;">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            {{ restaurante.Endereco }}, {{ restaurante.bairro }}, {{ restaurante.Cidade }}
+          </div>
+          
+          <div class="restaurant-description">
+            {{ restaurante.descricao || 'Sem descrição disponível.' }}
+          </div>
+          
+          <div class="restaurant-rating">
+            <div class="rating-stars">
+              {{ renderStars(mediaAval) }}
+            </div>
+            <div class="rating-count">
+              {{ mediaAval | number:'1.1-1' }} ({{ totalAval }} {{ totalAval === 1 ? 'avaliação' : 'avaliações' }})
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+      
+      <!-- Botões de Ação -->
+      <div class="restaurant-actions">
+        <button class="btn btn-secondary" routerLink="/menu">
+          Voltar ao Menu
+        </button>
+        
+        <button class="btn btn-secondary" routerLink="/restaurante/{{ restaurante.ID }}/cardapio">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          Cardápio
+        </button>
+        
+        <button class="btn btn-secondary" *ngIf="ClienteComponent" [routerLink]="['/cliente/cupons', restaurante.ID]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polygon points="3.27 6.96 12 12.01 20.73 6.96"></polygon>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          Cupons Disponíveis
+        </button>
+        
+        <button class="btn btn-primary" *ngIf="ClienteComponent" [routerLink]="['/perfilRestaurante', restaurante.ID, 'criaAvaliacao']">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Avaliar
+        </button>
+      </div>
+    </div>
+    
+    <!-- Seção de Avaliações -->
+    <div class="reviews-section">
+      <header class="reviews-header">
+        <h2>Avaliações</h2>
+      </header>
+      
+      <!-- Filtros de Avaliações -->
+      <div class="reviews-filters">
+        <div class="filter-group">
+          <label class="filter-label" for="filterNota">Filtrar por:</label>
+          <select
+            id="filterNota"
+            class="filter-select"
+            [(ngModel)]="selectedFilter"
+            (ngModelChange)="filterAvaliacoes()"
+          >
+            <option [ngValue]="0">Todas as notas</option>
+            <option *ngFor="let n of [5,4,3,2,1]" [ngValue]="n">
+              {{ n }} estrela{{ n > 1 ? 's' : '' }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label" for="filtroDataInicio">De:</label>
+          <input
+            id="filtroDataInicio"
+            type="date"
+            class="filter-date"
+            [(ngModel)]="filtroDataInicio"
+            (change)="filterAvaliacoes()"
+          />
+        </div>
+        
+        <div class="filter-group">
+          <label class="filter-label" for="filtroDataFim">Até:</label>
+          <input
+            id="filtroDataFim"
+            type="date"
+            class="filter-date"
+            [(ngModel)]="filtroDataFim"
+            (change)="filterAvaliacoes()"
+          />
+        </div>
+      </div>
+      
+      <!-- Lista de Avaliações -->
+      <div class="reviews-list">
+        <div *ngIf="filteredAvaliacoes.length === 0" class="no-reviews">
+          Nenhuma avaliação encontrada com os filtros selecionados.
+        </div>
+        
+        <div *ngFor="let a of filteredAvaliacoes" class="review-card">
+          <div class="review-header">
+            <div class="reviewer-name">{{ a.Nome_Cliente || 'Usuário' }}</div>
+            <div class="review-stars">{{ renderStars(a.Nota) }}</div>
+          </div>
+          
+          <p class="review-content">{{ a.Comentario }}</p>
+
+          <div class="review-images-section" *ngIf="a.tem_imagens && a.imagens_urls && a.imagens_urls.length > 0">
+            <!-- Imagens (visíveis apenas quando expandido) -->
+            <div class="imagens-grid" *ngIf="imagensEstaoExpandidas(a.ID!)" [@expandCollapse]>
+              <div class="imagem-item" *ngFor="let imagem of a.imagens_urls" (click)="abrirImagemModal(imagem)">
+                <img [src]="imagem" [alt]="'Foto da avaliação de ' + a.Nome_Cliente" loading="lazy">
+                <div class="imagem-overlay">
+                  <i class="fas fa-search-plus"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Corrigindo posicionamento do botão de denúncia -->
+          <div class="review-footer">
+            <div class="review-date" *ngIf="a.data_avaliacao">
+              {{ a.data_avaliacao | date:'dd/MM/yyyy' }}
+            </div>
+            
+            <div class="review-actions">
+              <!-- Botão para ver imagens -->
+              <button 
+                class="btn-view-images" 
+                *ngIf="a.tem_imagens && a.imagens_urls && a.imagens_urls.length > 0"
+                (click)="toggleImagens(a.ID!)">
+                <i class="fas" [ngClass]="imagensEstaoExpandidas(a.ID!) ? 'fa-eye-slash' : 'fa-images'"></i>
+                {{ getTextoToggleImagens(a.ID!, a.imagens_urls.length) }}
+              </button>
+              
+              <!-- Botão de denúncia -->
+              <button class="btn-report" *ngIf="podeDenunciar(a)" (click)="abrirDenuncia(a)">
+                <i class="fas fa-flag"></i> Denunciar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+<div class="modal-imagem" *ngIf="imagemModalAberto" (click)="fecharImagemModal()" [@fadeIn]>
+  <div class="modal-imagem__conteudo" (click)="$event.stopPropagation()" [@slideUp]>
+    <button class="modal-imagem__fechar" (click)="fecharImagemModal()" aria-label="Fechar">
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="imagemSelecionada" alt="Imagem ampliada">
+  </div>
+</div>
+
+<!-- Modal de Denúncia Personalizado -->
+<div class="modal-overlay" *ngIf="showDenunciaModal" (click)="cancelarDenuncia()">
+  <div class="modal-content modal-denuncia" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>🚨 Denunciar Avaliação</h3>
+      <button class="modal-close" (click)="cancelarDenuncia()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="denuncia-info" *ngIf="avaliacaoSelecionada">
+        <div class="avaliacao-preview">
+          <div class="preview-header">
+            <span class="cliente-nome">{{ avaliacaoSelecionada.Nome_Cliente || 'Usuário' }}</span>
+            <span class="avaliacao-nota">{{ renderStars(avaliacaoSelecionada.Nota) }}</span>
+          </div>
+          <p class="avaliacao-comentario">{{ avaliacaoSelecionada.Comentario }}</p>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="motivoDenuncia">Descreva o motivo da denúncia <span class="required">*</span></label>
+        <textarea
+          id="motivoDenuncia"
+          [(ngModel)]="motivoDenuncia"
+          placeholder="Explique por que esta avaliação é inadequada (mínimo 5 caracteres)..."
+          class="motivo-textarea"
+          rows="4"
+          maxlength="500"
+          (input)="validarMotivo()"
+        ></textarea>
+        <div class="textarea-info">
+          <span class="char-count" [class.error]="motivoDenuncia.length > 500">
+            {{ motivoDenuncia.length }}/500
+          </span>
+          <span class="min-chars" [class.valid]="motivoDenuncia.length >= 5">
+            Mínimo: 5 caracteres
+          </span>
+        </div>
+        <div class="error-message" *ngIf="motivoError">
+          {{ motivoError }}
+        </div>
+      </div>
+      
+      <div class="warning-box">
+        <p><strong>⚠️ Importante:</strong></p>
+        <ul>
+          <li>Denúncias falsas podem resultar em penalizações</li>
+          <li>Sua denúncia será analisada pela moderação</li>
+          <li>O processo pode levar até 48 horas</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelarDenuncia()">
+        Cancelar
+      </button>
+      <button 
+        class="btn-submit" 
+        (click)="enviarDenuncia()" 
+        [disabled]="!podeEnviarDenuncia() || enviandoDenuncia"
+      >
+        <span *ngIf="!enviandoDenuncia">Enviar Denúncia</span>
+        <span *ngIf="enviandoDenuncia" class="loading-spinner">Enviando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso da Denúncia -->
+<div class="modal-overlay" *ngIf="showSuccessModal" (click)="fecharModalSucesso()">
+  <div class="modal-content modal-success" (click)="$event.stopPropagation()">
+    <div class="modal-header success-header">
+      <h3>✅ Denúncia Enviada</h3>
+      <button class="modal-close" (click)="fecharModalSucesso()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="success-message">
+        <div class="success-icon">🎉</div>
+        <p>Sua denúncia foi enviada com sucesso!</p>
+        <p class="success-details">Nossa equipe irá analisar o caso e tomar as medidas necessárias.</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-primary" (click)="fecharModalSucesso()">
+        Entendido
+      </button>
+    </div>
+  </div>
+</div>

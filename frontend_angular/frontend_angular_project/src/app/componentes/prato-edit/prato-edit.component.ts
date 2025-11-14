@@ -16,6 +16,7 @@ export class PratoEditComponent implements OnInit {
   selectedFile?: File;
   previewImg?: string;
   prato!: Prato;
+  carregando = false;
 
   constructor(
     private fb: FormBuilder,
@@ -27,31 +28,56 @@ export class PratoEditComponent implements OnInit {
   ngOnInit() {
     this.restauranteId = +this.route.snapshot.paramMap.get('restauranteId')!;
     this.pratoId = +this.route.snapshot.paramMap.get('pratoId')!;
+    
+    this.inicializarFormulario();
+    this.carregarDadosPrato();
+  }
+  private inicializarFormulario() {
     this.formulario = this.fb.group({
       nome: ['', Validators.required],
       descricao: [''],
-      preco: [null, Validators.required],
-    });
-
-    this.svc.getById(this.pratoId).subscribe((p) => {
-      this.prato = p;
-      this.formulario.patchValue({
-        Nome: p.Nome,
-        descricao: p.descricao,
-        preco: p.preco,
-      });
-      this.previewImg = p.imagem_url;
+      preco: [null, [Validators.required, Validators.min(0)]],
     });
   }
-
+  private carregarDadosPrato() {
+    this.carregando = true;
+    
+    this.svc.getById(this.pratoId).subscribe({
+      next: (p) => {
+        this.prato = p;
+        
+        // Atualiza o formulário com os dados
+        this.formulario.patchValue({
+          nome: p.Nome,  // Atenção: campo Nome com 'N' maiúsculo no backend
+          descricao: p.descricao,
+          preco: p.preco,
+        });
+        
+        // Define a imagem de preview se existir
+        if (p.imagem_url) {
+          this.previewImg = p.imagem_url;
+        }
+        
+        this.carregando = false;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar prato:', err);
+        alert('Não foi possível carregar os dados do prato.');
+        this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+      }
+    });
+  }
+  
   get f() {
     return this.formulario.controls;
   }
 
-  onFileSelected(ev: Event) {
-    const input = ev.target as HTMLInputElement;
-    if (input.files?.[0]) {
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
+      
+      // Cria preview da imagem selecionada
       const reader = new FileReader();
       reader.onload = () => (this.previewImg = reader.result as string);
       reader.readAsDataURL(this.selectedFile);
@@ -60,28 +86,49 @@ export class PratoEditComponent implements OnInit {
 
   // ...existing code...
 onSubmit() {
-  if (this.formulario.invalid) {
-    this.formulario.markAllAsTouched();
-    return;
-  }
-  const formValue = this.formulario.value;
-  const dados = {
-    Nome: formValue.nome, // N maiúsculo!
-    descricao: formValue.descricao,
-    preco: formValue.preco,
-    restaurante_id: this.restauranteId
-    // não envie imagem_blob aqui, pois é feito via upload separado
-  };
-  this.svc.update(this.pratoId, dados).subscribe(() => {
-    if (this.selectedFile) {
-      this.svc.uploadImage(this.pratoId, this.selectedFile).subscribe(() => {
-        this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
-      });
-    } else {
-      this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+    if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
+      return;
     }
-  });
-}
+    
+    this.carregando = true;
+    const formValue = this.formulario.value;
+    
+    const dados = {
+      Nome: formValue.nome, // N maiúsculo conforme backend
+      descricao: formValue.descricao,
+      preco: formValue.preco,
+      restaurante_id: this.restauranteId
+    };
+    
+    this.svc.update(this.pratoId, dados).subscribe({
+      next: () => {
+        // Se houver nova imagem, faz o upload
+        if (this.selectedFile) {
+          this.svc.uploadImage(this.pratoId, this.selectedFile).subscribe({
+            next: () => {
+              this.carregando = false;
+              this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+            },
+            error: (err) => {
+              console.error('Erro no upload da imagem:', err);
+              alert('Dados atualizados, mas houve um problema ao enviar a imagem.');
+              this.carregando = false;
+              this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+            }
+          });
+        } else {
+          this.carregando = false;
+          this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar prato:', err);
+        alert('Ocorreu um erro ao salvar as alterações.');
+        this.carregando = false;
+      }
+    });
+  }
 
   cancel() {
     this.router.navigate(['/restaurante', this.restauranteId, 'pratos']);

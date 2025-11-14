@@ -1,0 +1,142 @@
+.filtro-avancado-container {
+  margin-bottom: 2rem;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+.toggle-filtro {
+  width: 100%;
+  background-color: var(--bg-tertiary);
+  border: none;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: background-color 0.2s;
+}
+
+.toggle-filtro:hover {
+  background-color: var(--bg-primary);
+}
+
+.icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.filtro-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.filtro-panel.expanded {
+  max-height: 600px;
+}
+
+form {
+  padding: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1 1 200px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.form-group input[type="text"],
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-tertiary);
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: var(--bg-secondary);
+}
+
+.location-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.raio-container {
+  margin-top: 10px;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin-top: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 5px;  
+  background: var(--bg-tertiary);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-aplicar, .btn-limpar {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.btn-aplicar {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-aplicar:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-limpar {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.btn-limpar:hover {
+  background-color: var(--bg-tertiary);
+}

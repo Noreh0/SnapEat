@@ -1,0 +1,326 @@
+/* ===========================
+   VARIÁVEIS DE TEMA GLOBAL
+   SnapEats - Light & Dark Mode
+   =========================== */
+
+/* === TEMA CLARO (Padrão) === */
+:root,
+.theme-light {
+  /* Fontes */
+  --font-primary: 'Montserrat', sans-serif;
+  --font-display: 'Playfair Display', serif;
+  
+  /* Paleta principal */
+  --color-primary: #D97746;          /* Terracota principal */
+  --color-primary-hover: #C0653A;     /* Terracota escuro */
+  --color-secondary: #6A7B53;         /* Verde oliva */
+  --color-secondary-hover: #586744;   /* Verde oliva escuro */
+  --color-accent: #EAE3DB;            /* Creme */
+  
+  /* Backgrounds */
+  --bg-primary: #F9F6F2;             /* Fundo principal (bege claro) */
+  --bg-secondary: #FFFFFF;            /* Fundo de cards/elementos */
+  --bg-tertiary: #EAE3DB;            /* Fundo alternativo */
+  --bg-footer: #3D352E;              /* Fundo do rodapé */
+  --bg-overlay: rgba(0, 0, 0, 0.1);   /* Overlay claro */
+  
+  /* Textos */
+  --text-primary: #2d2d2d;           /* Texto principal (escuro) */
+  --text-secondary: #4a4a4a;         /* Texto secundário */
+  --text-muted: #7A736D;             /* Texto esmaecido */
+  --text-light: #2d2d2d;        /* Texto claro */
+  --text-inverse: #FFFFFF;           /* Texto inverso (para backgrounds escuros) */
+  
+  /* Bordas e divisores */
+  --border-color: #e2ddd6;           /* Bordas padrão */
+  --border-light: rgba(122, 115, 109, 0.2); /* Bordas claras */
+  --divider-color: #e8e2da;          /* Divisores */
+  
+  /* Estados */
+  --success-color: #28a745;          /* Verde sucesso */
+  --error-color: #dc3545;            /* Vermelho erro */
+  --warning-color: #ffc107;          /* Amarelo aviso */
+  --info-color: #17a2b8;             /* Azul informação */
+  
+  /* Sombras */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-heavy: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow: var(--shadow-medium); /* Alias para shadow padrão */
+  
+  /* Border radius */
+  --radius: 12px;
+  --radius-small: 6px;
+  --radius-large: 16px;
+  
+  /* Gradientes e opacidades */
+  --bg-gradient: #F5F0E8;
+  --color-primary-opacity: rgba(217, 119, 70, 0.03);
+  --color-secondary-opacity: rgba(106, 123, 83, 0.03);
+  
+  /* Cores de erro específicas */
+  --error-bg: #f9e0de;
+  --error-border: #f1c0bb;
+  --text-danger: #d84545;
+  --border-danger: #f8d7d7;
+  --color-danger: #dc3545;           /* Vermelho para botão de perigo */
+  --color-danger-dark: #a71e2a;      /* Vermelho escuro para hover */
+  --color-danger-hover: #c82333;     /* Vermelho hover */
+  --danger-shadow-medium: rgba(220, 53, 69, 0.3);  /* Sombra do botão danger */
+  --bg-secondary-alpha: rgba(234, 227, 219, 0.2);
+  
+  /* Overlays e shadows adicionais */
+  --overlay-bg: rgba(61, 53, 46, 0.7);
+  --overlay-light: rgba(255, 255, 255, 0.9);
+  --overlay-dark: rgba(0, 0, 0, 0.9);
+  --shadow-dark: rgba(0, 0, 0, 0.5);
+  --primary-shadow-light: rgba(217, 119, 70, 0.15);
+  --primary-shadow-medium: rgba(217, 119, 70, 0.3);
+  --accent-shadow-light: rgba(106, 123, 83, 0.2);
+  --accent-shadow-medium: rgba(106, 123, 83, 0.3);
+  
+  /* Variáveis específicas do Dashboard */
+  --warning-text: #856404;
+  --warning-shadow: rgba(255, 199, 44, 0.25);
+  --success-shadow: rgba(106, 156, 137, 0.25);
+  --warning-bg-light: rgba(255, 193, 7, 0.1);
+  --primary-bg-light: rgba(217, 119, 70, 0.05);
+  --success-bg-light: rgba(106, 156, 137, 0.05);
+  
+  /* Variáveis adicionais para Dashboard */
+  --success-text: #155724;
+  --success-dark: #1A5653;
+  --success-medium: #588574;
+  --success-shadow-light: rgba(106, 156, 137, 0.2);
+  --success-shadow-medium: rgba(106, 156, 137, 0.3);
+  --bg-hover-light: rgba(0, 0, 0, 0.02);
+  --bg-hover-medium: rgba(0, 0, 0, 0.04);
+  --bg-hover-dark: rgba(0, 0, 0, 0.08);
+  --overlay-light-subtle: rgba(0, 0, 0, 0.05);
+  --error-bg-light: rgba(214, 35, 0, 0.1);
+  
+  /* Variáveis específicas do rodapé */
+  --text-light-70: rgba(249, 246, 242, 0.7);
+  --text-light-80: rgba(249, 246, 242, 0.8);
+  --text-light-60: rgba(249, 246, 242, 0.6);
+  --bg-light-10: rgba(249, 246, 242, 0.1);
+  --border-light-10: rgba(249, 246, 242, 0.1);
+}
+
+/* === TEMA ESCURO === */
+.theme-dark {
+  /* Fontes (herdam do tema claro) */
+  --font-primary: 'Montserrat', sans-serif;
+  --font-display: 'Playfair Display', serif;
+  
+  /* Paleta principal (mantém a identidade da marca) */
+  --color-primary: #E88B5A;          /* Terracota mais claro para contraste */
+  --color-primary-hover: #D97746;     /* Terracota original */
+  --color-secondary: #7A8B63;         /* Verde oliva mais claro */
+  --color-secondary-hover: #6A7B53;   /* Verde oliva original */
+  --color-accent: #3D3D3D;            /* Cinza escuro para accent */
+  
+  /* Backgrounds */
+  --bg-primary: #1a1a1a;             /* Fundo principal escuro */
+  --bg-secondary: #2d2d2d;           /* Fundo de cards (cinza escuro) */
+  --bg-tertiary: #3d3d3d;            /* Fundo alternativo */
+  --bg-footer: #0f0f0f;              /* Fundo do rodapé escuro */
+  --bg-overlay: rgba(255, 255, 255, 0.1); /* Overlay claro */
+  
+  /* Textos */
+  --text-primary: #f5f5f5;           /* Texto principal (claro) */
+  --text-secondary: #e0e0e0;         /* Texto secundário */
+  --text-muted: #b0b0b0;             /* Texto esmaecido */
+  --text-light: #888888;             /* Texto mais claro */
+  --text-inverse: #2d2d2d;           /* Texto inverso (para backgrounds claros) */
+  
+  /* Bordas e divisores */
+  --border-color: #404040;           /* Bordas padrão */
+  --border-light: rgba(176, 176, 176, 0.2); /* Bordas claras */
+  --divider-color: #404040;          /* Divisores */
+  
+  /* Estados (mantém cores reconhecíveis) */
+  --success-color: #4caf50;          /* Verde sucesso mais claro */
+  --error-color: #f44336;            /* Vermelho erro mais claro */
+  --warning-color: #ff9800;          /* Laranja aviso */
+  --info-color: #2196f3;             /* Azul informação */
+  
+  /* Sombras (mais suaves no tema escuro) */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-heavy: 0 8px 25px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.4);
+  --shadow-color: rgba(255, 255, 255, 0.1);
+  --shadow: var(--shadow-medium); /* Alias para shadow padrão */
+  
+  /* Border radius (herda do tema claro) */
+  --radius: 12px;
+  --radius-small: 6px;
+  --radius-large: 16px;
+  
+  /* Gradientes e opacidades para tema escuro */
+  --bg-gradient: #2a2a2a;
+  --color-primary-opacity: rgba(232, 139, 90, 0.05);
+  --color-secondary-opacity: rgba(122, 139, 99, 0.05);
+  
+  /* Cores de erro específicas para tema escuro */
+  --error-bg: #3d2626;
+  --error-border: #4d2d2d;
+  --text-danger: #ff6b6b;
+  --border-danger: #4d2d2d;
+  --color-danger: #ff4757;           /* Vermelho mais claro para tema escuro */
+  --color-danger-dark: #ff3742;      /* Vermelho mais intenso para hover */
+  --color-danger-hover: #ff5722;     /* Vermelho hover tema escuro */
+  --danger-shadow-medium: rgba(255, 71, 87, 0.4);  /* Sombra do botão danger tema escuro */
+  --bg-secondary-alpha: rgba(61, 61, 61, 0.2);
+  
+  /* Overlays e shadows adicionais para tema escuro */
+  --overlay-bg: rgba(26, 26, 26, 0.8);
+  --overlay-light: rgba(45, 45, 45, 0.9);
+  --overlay-dark: rgba(0, 0, 0, 0.9);
+  --shadow-dark: rgba(0, 0, 0, 0.8);
+  --primary-shadow-light: rgba(232, 139, 90, 0.15);
+  --primary-shadow-medium: rgba(232, 139, 90, 0.3);
+  --accent-shadow-light: rgba(122, 139, 99, 0.2);
+  --accent-shadow-medium: rgba(122, 139, 99, 0.3);
+  
+  /* Variáveis específicas do Dashboard para tema escuro */
+  --warning-text: #ffab00;
+  --warning-shadow: rgba(255, 199, 44, 0.15);
+  --success-shadow: rgba(122, 139, 99, 0.15);
+  --warning-bg-light: rgba(255, 152, 0, 0.1);
+  --primary-bg-light: rgba(232, 139, 90, 0.05);
+  --success-bg-light: rgba(122, 139, 99, 0.05);
+  
+  /* Variáveis adicionais para Dashboard - tema escuro */
+  --success-text: #81c784;
+  --success-dark: #2e7d32;
+  --success-medium: #66bb6a;
+  --success-shadow-light: rgba(122, 139, 99, 0.15);
+  --success-shadow-medium: rgba(122, 139, 99, 0.25);
+  --bg-hover-light: rgba(255, 255, 255, 0.02);
+  --bg-hover-medium: rgba(255, 255, 255, 0.04);
+  --bg-hover-dark: rgba(255, 255, 255, 0.08);
+  --overlay-light-subtle: rgba(255, 255, 255, 0.05);
+  --error-bg-light: rgba(244, 67, 54, 0.1);
+  
+  /* Variáveis específicas do rodapé - tema escuro */
+  --text-light-70: rgba(245, 245, 245, 0.7);
+  --text-light-80: rgba(245, 245, 245, 0.8);
+  --text-light-60: rgba(245, 245, 245, 0.6);
+  --bg-light-10: rgba(255, 255, 255, 0.1);
+  --border-light-10: rgba(255, 255, 255, 0.1);
+}
+
+/* === TRANSIÇÕES GLOBAIS === */
+* {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* === SCROLLBAR CUSTOMIZADA === */
+/* Tema claro */
+:root::-webkit-scrollbar,
+.theme-light::-webkit-scrollbar {
+  width: 8px;
+}
+
+:root::-webkit-scrollbar-track,
+.theme-light::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+:root::-webkit-scrollbar-thumb,
+.theme-light::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+:root::-webkit-scrollbar-thumb:hover,
+.theme-light::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Tema escuro */
+.theme-dark::-webkit-scrollbar {
+  width: 8px;
+}
+
+.theme-dark::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+.theme-dark::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+.theme-dark::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* === CLASSES UTILITÁRIAS PARA TEMA === */
+.theme-transition {
+  transition: all 0.3s ease;
+}
+
+.bg-primary {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary) !important;
+}
+
+.text-primary {
+  color: var(--text-primary) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.border-themed {
+  border-color: var(--border-color) !important;
+}
+
+/* === OVERRIDE PARA ELEMENTOS NATIVOS === */
+input, textarea, select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
+}
+
+/* Placeholder */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* === RESPONSIVIDADE === */
+@media (max-width: 768px) {
+  :root {
+    --shadow-light: 0 1px 4px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-heavy: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .theme-dark {
+    --shadow-light: 0 1px 4px rgba(0, 0, 0, 0.4);
+    --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow-heavy: 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+}

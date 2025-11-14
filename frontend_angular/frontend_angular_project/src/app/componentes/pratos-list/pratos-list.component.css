@@ -1,57 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Variáveis de fonte - Sistema Deezer */
+:host {
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
+}
 .pratos-list-page {
   min-height: 100vh;
-  padding: 2rem;
-  background: linear-gradient(90deg, #1c1c1f, #111113);
+  padding: 2.5rem 1.5rem;
+  background-color: var(--bg-primary);
+  box-sizing: border-box;
+  font-family: var(--fonte-primaria);
+  color: var(--text-primary);
+  max-width: 1400px;
+  margin: 0 auto;
 }
+
+/* ===== Cabeçalho ===== */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
-.filter {
-  margin-bottom: 1rem;
+
+.page-header h1 {
+  font-family: var(--fonte-primaria);
+  font-size: 2.5rem;
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
 }
-.filter input {
-  width: 100%;
-  max-width: 300px;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: white;
+  padding: 0.75rem 1.5rem;
   border: none;
-  background: #2c2c2f;
-  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(106, 123, 83, 0.2);
 }
+
+.btn-primary:hover {
+  background-color: #586744;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 123, 83, 0.3);
+}
+
+.btn-primary svg {
+  width: 16px;
+  height: 16px;
+  fill: white;
+}
+
+/* ===== Filtros ===== */
+.filters {
+  margin-bottom: 2.5rem;
+}
+
+.filter-box {
+  position: relative;
+  max-width: 380px;
+}
+
+.filter-box input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.filter-box input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
+}
+
+.filter-box input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.filter-box .icon-search {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: url('/assets/icons/search.svg') no-repeat center;
+  background-size: contain;
+  opacity: 0.4;
+}
+
+/* ===== Grid de Pratos ===== */
 .pratos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
 }
+
+/* ===== Cartão de Prato ===== */
 .prato-card {
-  background: #202024;
+  background-color: var(--bg-card);
   border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  color: #fff;
+  transition: all 0.3s ease;
+  position: relative;
+  height: 100%;
 }
-.prato-img {
+
+.prato-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Imagem do Prato ===== */
+.card-image {
   width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
-.descricao {
-  flex: 1;
-  color: #d1d5db;
+
+.card-image::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to top, rgba(0,0,0,0.3), rgba(0,0,0,0));
+  z-index: 1;
 }
-.preco {
-  font-weight: bold;
-  color: #f3f3f3;
-}
-.actions {
+
+/* ===== Conteúdo do Cartão ===== */
+.card-content {
+  padding: 1.5rem;
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
+  flex-direction: column;
+  flex: 1;
+}
+
+.prato-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  font-family: var(--fonte-primaria);
+  font-weight: 600;
+}
+
+.prato-desc {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.9rem;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.prato-price {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* ===== Botões de Ação ===== */
+.card-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.prato-card:hover .card-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+.action-btn.edit {
+  background-color: var(--color-accent);
+}
+
+.action-btn.delete {
+  background-color: #E66767; /* Vermelho suavizado */
+}
+
+.action-btn.eval {
+  background-color: #F4B942; /* Amarelo estrela */
+}
+
+/* ===== Mensagem de Nenhum Prato ===== */
+.no-pratos {
+  grid-column: 1/-1;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 3rem 0;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 768px) {
+  .pratos-list-page {
+    padding: 1.5rem 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .filter-box {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .pratos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .pratos-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-actions {
+    opacity: 1;
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+  }
+  
+  .card-image::after {
+    height: 80px;
+  }
 }

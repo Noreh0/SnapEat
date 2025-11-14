@@ -1,0 +1,24 @@
+<div class="notificacoes-container">
+  <h3>Minhas Notificações</h3>
+  
+  <div *ngIf="notificacoes.length === 0" class="sem-notificacoes">
+    <p>Você não tem notificações.</p>
+  </div>
+  
+  <div *ngFor="let notificacao of notificacoes" 
+       class="notificacao-item" 
+       [class.nao-lida]="!notificacao.lido"
+       (click)="marcarComoLida(notificacao)">
+    
+    <div class="notificacao-header">
+      <span class="notificacao-titulo">{{ notificacao.titulo }}</span>
+      <span class="notificacao-data">{{ notificacao.dataHora | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    
+    <div class="notificacao-corpo">
+      {{ notificacao.mensagem }}
+    </div>
+    
+    <div *ngIf="!notificacao.lido" class="notificacao-badge">Novo</div>
+  </div>
+</div>

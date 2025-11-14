@@ -1,15 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Poppins:wght@300;400;500&display=swap');
+
+/* Remove local color variables and use global theme variables */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Estilos para header */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Container principal do conteúdo */
 main {
-    background-color: rgb(0, 0, 0);
-    min-height: 60vh;
-    padding: 3rem;
-    margin: -8px;
+  min-height: calc(100vh - 160px); /* Altura ajustada para considerar header e footer */
+  background: linear-gradient(135deg, 
+    var(--bg-primary) 0%, 
+    var(--bg-gradient) 50%, 
+    var(--bg-primary) 100%);
+  position: relative;
+  padding: 40px 20px;
+  overflow: hidden;
+}
+
+/* Elementos decorativos no background */
+main::before {
+  content: "";
+  position: absolute;
+  top: -150px;
+  right: -150px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background-color: var(--color-primary-opacity);
+  z-index: 1;
+}
+
+main::after {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: var(--color-secondary-opacity);
+  z-index: 1;
+}
+
+/* Container para o conteúdo dinâmico */
+.content-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1440px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+/* Estilos para footer */
+footer {
+  width: 100%;
+  z-index: 10;
+}
+
+/* Animação de fade-in para o conteúdo */
+router-outlet + * {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
- header{
-  margin: -8px;
- }
-  :host{
-    margin: 0;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  footer{
-    margin: -8px;
+}
+
+/* Pattern decorativo no background (opcional) */
+.bg-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d97746' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  main {
+    padding: 30px 15px;
   }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 20px 15px;
+  }
+}

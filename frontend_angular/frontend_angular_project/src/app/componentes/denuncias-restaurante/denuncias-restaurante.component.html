@@ -1,0 +1,114 @@
+<div class="container">
+  <!-- Cabeçalho da Página -->
+  <header class="page-header" *ngIf="restaurante">
+    <img 
+      [src]="restaurante.imagem_url || 'assets/images/default-restaurant.png'"
+      alt="Foto do restaurante {{ restaurante.Nome }}" 
+      class="restaurant-image"
+      onerror="this.src='assets/images/default-restaurant.png'"
+    >
+    <div class="header-title">
+      <h1>Gerenciar Denúncias</h1>
+      <p>{{ restaurante.Nome }}</p>
+    </div>
+  </header>
+
+  <!-- Indicadores -->
+  <section class="indicadores">
+    <div class="ind">
+      <span>Pendentes</span>
+      <b>{{ indicadores.pendentes || 0 }}</b>
+    </div>
+    <div class="ind">
+      <span>Aceitas</span>
+      <b>{{ indicadores.aceitas || 0 }}</b>
+    </div>
+    <div class="ind">
+      <span>Recusadas</span>
+      <b>{{ indicadores.recusadas || 0 }}</b>
+    </div>
+    <div class="ind">
+      <span>Total</span>
+      <b>{{ indicadores.total || 0 }}</b>
+    </div>
+  </section>
+
+  <!-- Ações Globais -->
+  <section class="acoes-globais" *ngIf="indicadores.pendentes > 0 && !carregando">
+    <button class="btn-processar-todas" (click)="processarTodas()">
+      Analisar {{ indicadores.pendentes }} denúncias com IA
+    </button>
+  </section>
+
+  <!-- Lista de Denúncias Pendentes -->
+  <section>
+    <div *ngFor="let denuncia of denunciasFiltradas">
+      <h2 class="section-title">Denúncias Pendentes</h2>
+
+      <div *ngIf="carregando" class="carregando">Carregando denúncias...</div>
+      <div *ngIf="!pendentes.length && !carregando" class="empty">Nenhuma denúncia pendente.</div>
+
+      <div class="lista" *ngIf="!carregando">
+        <div *ngFor="let d of pendentes" class="card">
+          <div class="card-content">
+            <div class="card-header">
+              <span class="denuncia-id">Denúncia #{{ d.ID }}</span>
+              <span class="denuncia-data">{{ d.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+
+            <div class="denuncia-body">
+              <!-- Coluna da Avaliação -->
+              <div class="avaliacao-denunciada" *ngIf="d.avaliacao">
+                <div class="avaliacao-header">
+                  <b>{{ d.avaliacao.Nome_Cliente || 'Cliente' }}</b>
+                  <span class="avaliacao-nota">{{ d.avaliacao.Nota }}★</span>
+                </div>
+                <p class="avaliacao-comentario">"{{ d.avaliacao.Comentario }}"</p>
+                <div class="avaliacao-data">
+                  Publicado em {{ d.avaliacao.data_avaliacao | date:'dd/MM/yyyy' }}
+                </div>
+              </div>
+
+              <!-- Coluna do Motivo -->
+              <div class="motivo-denuncia">
+                <h4>Motivo da denúncia</h4>
+                <p>{{ d.motivo }}</p>
+              </div>
+            </div>
+
+            <!-- Análise da IA -->
+            <div *ngIf="d.analise_ia" class="analise-ia">
+              <h4>Análise do Sistema</h4>
+              <p>{{ d.analise_ia.explicacao }}</p>
+              <div class="confianca">
+                <span>Confiança: {{ d.analise_ia.confianca * 100 | number:'1.0-0' }}%</span>
+                <div class="confianca-barra">
+                  <div [style.width.%]="d.analise_ia.confianca * 100"
+                      [class.alta]="d.analise_ia.confianca >= 0.7"
+                      [class.media]="d.analise_ia.confianca >= 0.4 && d.analise_ia.confianca < 0.7"
+                      [class.baixa]="d.analise_ia.confianca < 0.4">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ações -->
+          <div class="acoes">
+            <button class="btn btn-recusar" (click)="decidir(d, 'recusar')">Recusar</button>
+            <button class="btn btn-aceitar" (click)="decidir(d, 'aceitar')">Aceitar e Ocultar Avaliação</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de Confirmação -->
+<app-modal-confirmacao 
+  [mostrar]="mostrarModal"
+  [dados]="dadosModal"
+  (confirmado)="onModalConfirmado()"
+  (cancelado)="onModalCancelado()"
+  (fechado)="onModalFechado()">
+</app-modal-confirmacao>

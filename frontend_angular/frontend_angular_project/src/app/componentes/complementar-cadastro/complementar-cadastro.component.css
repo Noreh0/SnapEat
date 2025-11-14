@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Tipografia padronizada no estilo Deezer */
+:host {
+  --fonte-primaria: 'Inter', sans-serif;
+  --fonte-secundaria: 'Poppins', sans-serif;
+  --fonte-mono: 'Roboto', sans-serif;
+  
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-primary);
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: var(--fonte-primaria);
+}
+
+.container {
+  width: 100%;
+  max-width: 700px;
+  background-color: var(--bg-secondary);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+h1 {
+  font-family: var(--fonte-secundaria);
+  font-size: 2.5rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+p {
+  color: var(--text-secondary); /* Um cinza mais suave */
+  margin-bottom: 30px;
+  font-size: 1rem;
+}
+
+.tipo-selector {
+  display: flex;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  margin-bottom: 40px;
+  padding: 5px;
+  background-color: var(--bg-primary);
+}
+
+.tipo-selector button {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  background-color: transparent;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: var(--fonte-primaria);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.tipo-selector button.active {
+  background-color: var(--color-primary); /* Terracota, uma cor quente e convidativa */
+  color: var(--bg-secondary);
+  box-shadow: 0 4px 15px rgba(217, 119, 70, 0.3);
+}
+
+form {
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.form-control,
+select.form-control {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background-color: transparent;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+select.form-control {
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237A736D%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: .65em auto;
+  padding-right: 30px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.form-control[readonly] {
+  background-color: var(--bg-primary);
+  border-bottom-color: var(--border-color);
+  cursor: not-allowed;
+  padding-left: 10px;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+textarea.form-control:focus {
+  border-color: var(--color-primary);
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.8rem;
+  padding-top: 5px;
+}
+
+.error-global {
+  color: var(--error-color);
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-actions {
+  margin-top: 40px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--color-secondary); /* Verde oliva, uma cor fria e sofisticada */
+  color: var(--bg-secondary);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(106, 123, 83, 0.3);
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: var(--color-secondary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(106, 123, 83, 0.4);
+}
+
+.btn-submit:disabled {
+  background-color: var(--color-secondary);
+  cursor: wait;
+  box-shadow: none;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+  :host {
+    padding: 20px 10px;
+  }
+  .container {
+    padding: 30px 25px;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

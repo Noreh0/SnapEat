@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Variáveis de fonte - Sistema Deezer */
+:host {
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
+}
+.tags-badges-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 12px;
+  font-family: var(--fonte-primaria);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: help;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+}
+
+.tag-badge:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Níveis de excelência com gradientes */
+.nivel-ouro {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: var(--text-primary);
+  border-color: #FFD700;
+  animation: pulseGold 2s ease-in-out infinite;
+}
+
+.nivel-prata {
+  background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+  color: var(--text-primary);
+  border-color: #C0C0C0;
+}
+
+.nivel-bronze {
+  background: linear-gradient(135deg, #CD7F32 0%, #B8733D 100%);
+  color: #fff;
+  border-color: #CD7F32;
+}
+
+.nivel-padrao {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.badge-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.badge-rank {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.badge-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+}
+
+/* Badge "mais tags" */
+.badge-mais {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* Tooltip */
+.badge-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  background: rgba(30, 30, 30, 0.95);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-family: var(--fonte-primaria);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.badge-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(30, 30, 30, 0.95);
+}
+
+.tag-badge:hover .badge-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+}
+
+.badge-tooltip strong {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #FFD700;
+  font-family: var(--fonte-primaria);
+}
+
+.tooltip-rank {
+  color: #a0aec0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tooltip-rating {
+  color: #FFC72C;
+  font-weight: 600;
+}
+
+.tooltip-desc {
+  color: #cbd5e0;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  white-space: normal;
+  max-width: 220px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .tags-badges-container {
+    gap: 0.4rem;
+  }
+  
+  .tag-badge {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .badge-icon {
+    font-size: 0.9rem;
+  }
+  
+  .badge-tooltip {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.85rem;
+  }
+}

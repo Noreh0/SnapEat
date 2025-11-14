@@ -1,191 +1,115 @@
-<section class="editar-restaurante-page" *ngIf="formulario">
-  <div class="form-card">
-    <!-- 1) TÍTULO -->
-    <header class="form-header">
-      <h1 translate>Editar Restaurante</h1>
-    </header>
+<div class="form-card" *ngIf="formulario && restaurante">
+  <header class="form-header">
+    <h1>Editar Perfil do Restaurante</h1>
+  </header>
 
-    <!-- 2) FORMULÁRIO REATIVO -->
-    <form [formGroup]="formulario" (ngSubmit)="editarRestaurante()" novalidate>
-      <!-- NOME -->
-      <div class="form-group">
-        <label for="Nome" translate>Nome</label>
-        <input
-          id="Nome"
-          type="text"
-          class="form-input"
-          formControlName="Nome"
-          placeholder="Nome do restaurante"
+  <form [formGroup]="formulario" (ngSubmit)="editarRestaurante()" novalidate>
+    <div class="form-grid">
+      <!-- Seção da Imagem -->
+      <aside class="avatar-section">
+        <img
+          [src]="previewImg || defaultAvatar"
+          alt="Preview da foto do restaurante"
+          class="avatar-preview"
+          (error)="handleImageError($event)"
         />
-        <div class="error" *ngIf="f['Nome'].hasError('required') && f['Nome'].touched">
-          O nome é obrigatório.
-        </div>
-        <div class="error" *ngIf="f['Nome'].hasError('minlength') && f['Nome'].touched" translate>
-          Mínimo de 3 caracteres.
-        </div>
-      </div>
+        <label for="imagem" class="file-input-label">Trocar Imagem</label>
+        <input type="file" id="imagem" (change)="onFileSelected($event)" accept="image/*" />
+      </aside>
 
-      <!-- DESCRIÇÃO -->
-      <div class="form-group">
-        <label for="descricao" translate>Descrição</label>
-        <textarea
-          id="descricao"
-          class="form-textarea"
-          formControlName="descricao"
-          rows="3"
-          placeholder="Breve descrição (até 200 caracteres)"
-        ></textarea>
-        <div class="error" *ngIf="f['descricao'].hasError('maxlength') && f['descricao'].touched" translate>
-          Máximo de 200 caracteres.
+      <!-- Seção dos Campos do Formulário -->
+      <main class="form-fields">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="Nome">Razão Social</label>
+            <input id="Nome" type="text" formControlName="Nome" class="form-control">
+            <div class="error" *ngIf="formulario.get('Nome')?.invalid && formulario.get('Nome')?.touched">
+              Razão Social é obrigatória.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="nome_fantasia">Nome Fantasia</label>
+            <input id="nome_fantasia" type="text" formControlName="nome_fantasia" class="form-control">
+            <div class="error" *ngIf="formulario.get('nome_fantasia')?.invalid && formulario.get('nome_fantasia')?.touched">
+              Nome Fantasia é obrigatório.
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- CNPJ (readonly) -->
-      <div class="form-group">
-        <label for="CNPJ" translate>CNPJ</label>
-        <input
-          id="CNPJ"
-          type="text"
-          class="form-input"
-          formControlName="CNPJ"
-          mask="00.000.000/0000-00"
-          readonly
-        />
-      </div>
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" formControlName="descricao" class="form-control" rows="3"></textarea>
+        </div>
 
-      <!-- EMAIL -->
-      <div class="form-group">
-        <label for="email" translate>Email</label>
-        <input
-          id="email"
-          type="email"
-          class="form-input"
-          formControlName="email"
-          placeholder="email@exemplo.com"
-        />
-        <div class="error" *ngIf="f['email'].hasError('required') && f['email'].touched" translate>
-          O email é obrigatório.
+        <div class="form-row">
+          <div class="form-group">
+            <label for="CNPJ">CNPJ</label>
+            <input id="CNPJ" type="text" formControlName="CNPJ" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="email">Email de Contato</label>
+            <input id="email" type="email" formControlName="email" class="form-control" readonly>
+          </div>
         </div>
-        <div class="error" *ngIf="f['email'].hasError('email') && f['email'].touched" translate>
-          Email inválido.
-        </div>
-      </div>
 
-      <!-- TIPO DE COZINHA -->
-      <div class="form-group">
-        <label for="tipo_restaurante" translate>Tipo de Cozinha</label>
-        <select id="tipo_restaurante" class="form-select" formControlName="tipo_restaurante">
-          <option value="" disabled translate>Selecione</option>
-          <option *ngFor="let t of tipos" [value]="t">{{ t | titlecase }}</option>
-        </select>
-        <div class="error" *ngIf="f['tipo_restaurante'].hasError('required') && f['tipo_restaurante'].touched" translate>
-          Selecione um tipo.
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipo_restaurante">Tipo de Cozinha</label>
+            <select id="tipo_restaurante" formControlName="tipo_restaurante" class="form-control">
+              <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" type="text" formControlName="telefone" class="form-control" mask="(00) 0000-0000">
+          </div>
         </div>
-      </div>
 
-      <!-- SENHA -->
-      <div class="form-group">
-        <label for="senha" translate>Senha</label>
-        <div class="senha-wrapper">
-          <input
-            [type]="hideSenha ? 'password' : 'text'"
-            id="senha"
-            class="form-input input-with-icon"
-            formControlName="senha"
-            placeholder="Nova senha (ou deixe vazio)"
-          />
-          <button type="button" class="icon-btn" (click)="hideSenha = !hideSenha" aria-label="Toggle senha">
-            <img src="assets/images/olho_senha.png" alt="Toggle" class="password-icon" />
-          </button>
+        <div class="form-group">
+          <label for="Endereco">Endereço</label>
+          <input id="Endereco" type="text" formControlName="Endereco" class="form-control">
         </div>
-        <div class="password-hint" translate>
-          Mín. 8 caracteres, incluindo:<br/>
-          • 1 maiúscula • 1 minúscula • 1 número • 1 especial
-        </div>
-        <div class="error" *ngIf="f['senha'].hasError('pattern') && f['senha'].touched" translate>
-          Senha deve conter maiúscula, minúscula, número e símbolo.
-        </div>
-      </div>
 
-      <!-- CONFIRMAR SENHA -->
-      <div class="form-group">
-        <label for="confirmasenha" translate>Confirme a Senha</label>
-        <input
-          type="password"
-          id="confirmasenha"
-          class="form-input"
-          formControlName="confirmasenha"
-          placeholder="Repita a senha"
-        />
-        <div class="error" *ngIf="f['confirmasenha'].hasError('mismatch') && f['confirmasenha'].touched" translate>
-          Senhas não coincidem.
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bairro">Bairro</label>
+            <input id="bairro" type="text" formControlName="bairro" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="Cidade">Cidade</label>
+            <input id="Cidade" type="text" formControlName="Cidade" class="form-control">
+          </div>
         </div>
-      </div>
 
-      <!-- TELEFONE -->
-      <div class="form-group">
-        <label for="telefone" translate>Telefone</label>
-        <input
-          id="telefone"
-          type="text"
-          class="form-input"
-          formControlName="telefone"
-          mask="(00) 0 0000-0000"
-          placeholder="(99) 9 9999-9999"
-        />
-        <div class="error" *ngIf="f['telefone'].hasError('required') && f['telefone'].touched" translate>
-          Telefone obrigatório.
-        </div>
-        <div class="error" *ngIf="f['telefone'].hasError('minlength') && f['telefone'].touched" translate>
-          Telefone incompleto.
-        </div>
-      </div>
+        <hr style="border: none; border-top: 1px solid #EAE3DB; margin: 15px 0;">
 
-      <!-- CIDADE -->
-      <div class="form-group">
-        <label for="Cidade" translate>Cidade</label>
-        <input
-          id="Cidade"
-          type="text"
-          class="form-input"
-          formControlName="Cidade"
-          placeholder="Município"
-        />
-        <div class="error" *ngIf="f['Cidade'].hasError('required') && f['Cidade'].touched" translate>
-          Cidade obrigatória.
+        <div class="form-row">
+          <div class="form-group">
+            <label for="senha">Nova Senha (opcional)</label>
+            <div class="senha-wrapper">
+              <input [type]="hideSenha ? 'password' : 'text'" id="senha" class="form-control" formControlName="senha">
+              <button type="button" class="icon-btn" (click)="hideSenha = !hideSenha">
+                <img src="assets/images/olho_senha.png" alt="Mostrar senha" style="width: 20px;">
+              </button>
+            </div>
+            <div class="error" *ngIf="formulario.get('senha')?.hasError('pattern')">
+              Senha fraca (precisa de maiúscula, minúscula, número e símbolo).
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirmasenha">Confirmar Nova Senha</label>
+            <input type="password" id="confirmasenha" class="form-control" formControlName="confirmasenha">
+            <div class="error" *ngIf="formulario.hasError('mismatch') && formulario.get('confirmasenha')?.touched">
+              As senhas não coincidem.
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+    </div>
 
-      <!-- ENDEREÇO -->
-      <div class="form-group">
-        <label for="Endereco" translate>Endereço</label>
-        <input
-          id="Endereco"
-          type="text"
-          class="form-input"
-          formControlName="Endereco"
-          placeholder="Rua, nº, complemento"
-        />
-        <div class="error" *ngIf="f['Endereco'].hasError('required') && f['Endereco'].touched" translate>
-          Endereço obrigatório.
-        </div>
-      </div>
-      <!-- Adicione no form de cadastro/edição -->
-      <div class="form-group">
-        <label for="imagem">Foto do Restaurante</label>
-        <input type="file" id="imagem" (change)="onFileSelected($event)" />
-        <img *ngIf="previewImg" [src]="previewImg" class="preview-img" />
-      </div>
-
-      <!-- AÇÕES -->
-      <div class="form-actions">
-        <button type="submit" class="btn-primary" [disabled]="!formulario.valid" translate>
-          Salvar Alterações
-        </button>
-        <button type="button" class="btn-secondary" routerLink="/menu" (click)="onCancelar()" translate>
-          Cancelar
-        </button>
-      </div>
-    </form>
-  </div>
-</section>
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancelar()">Cancelar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="formulario.invalid">Salvar Alterações</button>
+    </div>
+  </form>
+</div>

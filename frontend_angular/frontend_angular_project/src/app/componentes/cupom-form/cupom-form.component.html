@@ -1,0 +1,253 @@
+<div class="form-card">
+  <header class="form-card-header">
+    <h1>{{ isEditing ? 'Editar Cupom' : 'Criar Novo Cupom' }}</h1>
+    <p class="subtitle">Configure um cupom de desconto para seus clientes usando o sistema de pontos</p>
+  </header>
+
+  <form [formGroup]="formulario" (ngSubmit)="onSubmit()" novalidate>
+    <div class="form-grid">
+      <!-- Seção de Preview do Cupom -->
+      <div class="preview-section">
+        <div class="cupom-preview">
+          <div class="preview-header">
+            <h3>{{ f['titulo'].value || 'Nome do Cupom' }}</h3>
+            <div class="codigo-preview" *ngIf="!isEditing">
+              <span class="codigo-label">Código será gerado automaticamente</span>
+            </div>
+          </div>
+          
+          <div class="preview-content">
+            <div class="desconto-info">
+              <span class="desconto-valor" *ngIf="isPercentual">
+                {{ f['desconto_percentual'].value || 0 }}% OFF
+              </span>
+              <span class="desconto-valor" *ngIf="!isPercentual">
+                R$ {{ f['desconto_valor'].value || 0 | number:'1.2-2' }} OFF
+              </span>
+            </div>
+            
+            <div class="pontos-info">
+              <i class="star-icon">★</i>
+              <span>{{ f['pontos_necessarios'].value || 0 }} pontos</span>
+            </div>
+            
+            <div class="validade-info" *ngIf="f['data_validade'].value">
+              <span>Válido até: {{ f['data_validade'].value | date:'dd/MM/yyyy' }}</span>
+            </div>
+            
+            <p class="preview-descricao">
+              {{ f['descricao'].value || 'Descrição do cupom aparecerá aqui...' }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="preview-tips">
+          <h4>💡 Dicas para um bom cupom:</h4>
+          <ul>
+            <li>Use um título atrativo e claro</li>
+            <li>Defina pontos justos (sugestão: 50-200)</li>
+            <li>Considere valor mínimo para pedidos grandes</li>
+            <li>Defina data de validade adequada</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Campos do Formulário -->
+      <div class="form-fields">
+        <!-- Nome do Cupom -->
+        <div class="form-group">
+          <label for="titulo">Nome do Cupom <span class="required">*</span></label>
+          <input
+            id="titulo"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ex: Desconto Cliente VIP"
+            class="form-control"
+            [class.error]="isFieldInvalid('titulo')"
+          />
+          <small class="error-message" *ngIf="isFieldInvalid('titulo')">
+            {{ getFieldError('titulo') }}
+          </small>
+        </div>
+
+        <!-- Descrição -->
+        <div class="form-group">
+          <label for="descricao">Descrição de uso</label>
+          <textarea
+            id="descricao"
+            formControlName="descricao"
+            rows="3"
+            placeholder="Explique como usar o cupom, restrições ou condições especiais"
+            class="form-control textarea"
+            [class.error]="isFieldInvalid('descricao')"
+          ></textarea>
+          <small class="error-message" *ngIf="isFieldInvalid('descricao')">
+            {{ getFieldError('descricao') }}
+          </small>
+        </div>
+
+        <!-- Grid de Campos -->
+        <div class="form-grid-2">
+          <!-- Pontos Necessários -->
+          <div class="form-group">
+            <label for="pontos_necessarios">Pontos para Resgatar <span class="required">*</span></label>
+            <input
+              id="pontos_necessarios"
+              type="number"
+              formControlName="pontos_necessarios"
+              placeholder="100"
+              min="10"
+              max="10000"
+              class="form-control"
+              [class.error]="isFieldInvalid('pontos_necessarios')"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('pontos_necessarios')">
+              {{ getFieldError('pontos_necessarios') }}
+            </small>
+          </div>
+
+          <!-- Tipo de Desconto -->
+          <div class="form-group">
+            <label for="tipo_desconto">Tipo de Desconto <span class="required">*</span></label>
+            <select
+              id="tipo_desconto"
+              formControlName="tipo_desconto"
+              class="form-control"
+            >
+              <option value="percentual">Porcentagem (%)</option>
+              <option value="valor">Valor Fixo (R$)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Desconto Percentual -->
+        <div class="form-group" *ngIf="isPercentual">
+          <label for="desconto_percentual">Desconto Percentual <span class="required">*</span></label>
+          <div class="input-with-suffix">
+            <input
+              id="desconto_percentual"
+              type="number"
+              formControlName="desconto_percentual"
+              placeholder="10"
+              min="5"
+              max="100"
+              step="1"
+              class="form-control"
+              [class.error]="isFieldInvalid('desconto_percentual')"
+            />
+            <span class="input-suffix">%</span>
+          </div>
+          <small class="error-message" *ngIf="isFieldInvalid('desconto_percentual')">
+            {{ getFieldError('desconto_percentual') }}
+          </small>
+        </div>
+
+        <!-- Desconto em Valor -->
+        <div class="form-group" *ngIf="!isPercentual">
+          <label for="desconto_valor">Desconto em Valor <span class="required">*</span></label>
+          <div class="input-with-prefix">
+            <span class="input-prefix">R$</span>
+            <input
+              id="desconto_valor"
+              type="number"
+              formControlName="desconto_valor"
+              placeholder="10.00"
+              min="0"
+              step="0.01"
+              class="form-control"
+              [class.error]="isFieldInvalid('desconto_valor')"
+            />
+          </div>
+          <small class="error-message" *ngIf="isFieldInvalid('desconto_valor')">
+            {{ getFieldError('desconto_valor') }}
+          </small>
+        </div>
+
+        <!-- Grid de Configurações -->
+        <div class="form-grid-3">
+          <!-- Valor Mínimo -->
+          <div class="form-group">
+            <label for="valor_minimo">Valor Mínimo do Pedido</label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">R$</span>
+              <input
+                id="valor_minimo"
+                type="number"
+                formControlName="valor_minimo"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                class="form-control"
+              />
+            </div>
+            <small class="field-hint">Opcional: valor mínimo para usar o cupom</small>
+          </div>
+
+          <!-- Data de Validade -->
+          <div class="form-group">
+            <label for="data_validade">Data de Validade <span class="required">*</span></label>
+            <input
+              id="data_validade"
+              type="date"
+              formControlName="data_validade"
+              class="form-control"
+              [class.error]="isFieldInvalid('data_validade')"
+            />
+            <small class="error-message" *ngIf="isFieldInvalid('data_validade')">
+              {{ getFieldError('data_validade') }}
+            </small>
+          </div>
+
+          <!-- Máximo de Usos -->
+          <div class="form-group">
+            <label for="max_usos">Máximo de Usos <span class="required">*</span></label>
+            <input
+              id="max_usos"
+              type="number"
+              formControlName="max_usos"
+              placeholder="1"
+              min="1"
+              max="1000"
+              class="form-control"
+              [class.error]="isFieldInvalid('max_usos')"
+            />
+            <small class="field-hint">Quantas vezes pode ser usado</small>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input
+              id="ativo"
+              type="checkbox"
+              formControlName="ativo"
+              class="form-checkbox"
+            />
+            <label for="ativo" class="checkbox-label">
+              Cupom ativo (pode ser resgatado pelos clientes)
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="cancel()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="formulario.invalid"
+      >
+        {{ isEditing ? 'Atualizar Cupom' : 'Criar Cupom' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,53 +1,264 @@
-<section class="criar-avaliacao-page">
-  <div class="eval-card">
-    <!-- CABEÇALHO -->
-    <header class="eval-header">
-      <h1>
-        {{ avalId ? 'Editar Avaliação' : 'Nova Avaliação' }}
-      </h1>
-    </header>
-    <div *ngIf="prato" class="prato-info">
-      <img [src]="prato.imagem_url ? 'http://localhost:5000' + prato.imagem_url : 'assets/images/default-prato.png'" class="prato-mini-img" alt="Imagem do prato" />
-      <div class="prato-details">
-        <div class="prato-nome">{{ prato.Nome }}</div>
-        <!-- Se quiser mostrar nota média, adicione aqui -->
+<main class="page-container" [@pageAnimation]>
+  <!-- Sistema de Mensagens de Feedback -->
+  <div class="feedback-system" *ngIf="showMessage" [@messageSlide]>
+    <div class="feedback-message" [ngClass]="'feedback-message--' + messageType">
+      <div class="feedback-content">
+        <span class="feedback-icon">
+          <ng-container [ngSwitch]="messageType">
+            <span *ngSwitchCase="'success'">✅</span>
+            <span *ngSwitchCase="'error'">❌</span>
+            <span *ngSwitchCase="'warning'">⚠️</span>
+            <span *ngSwitchDefault>ℹ️</span>
+          </ng-container>
+        </span>
+        <span class="feedback-text">{{ messageText }}</span>
+      </div>
+      <button class="feedback-close" (click)="closeFeedbackMessage()" aria-label="Fechar mensagem">×</button>
+    </div>
+  </div>
+
+  <!-- Indicador de Conectividade -->
+  <div class="connectivity-indicator" *ngIf="!isConnected" [@messageSlide]>
+    <span class="connectivity-icon">📡</span>
+    <span>Sem conexão com a internet</span>
+  </div>
+
+  <!-- Loading Overlay Aprimorado -->
+  <div class="loading-overlay" *ngIf="isSubmitting" [@pageAnimation]>
+    <div class="loading-animation">
+      <div class="plate">
+        <div class="plate-base"></div>
+        <div class="sauce"></div>
+        <div class="plate-pasta">
+          <div class="pasta-strand"></div>
+          <div class="pasta-strand"></div>
+          <div class="pasta-strand"></div>
+          <div class="pasta-strand"></div>
+          <div class="pasta-strand"></div>
+        </div>
+        <div class="basil"></div>
+        <div class="basil"></div>
+        <div class="fork"></div>
+      </div>
+      <div class="loading-message">
+        <h3>{{ getSubmitButtonText() }}</h3>
+        <p>{{ loadingOperation || 'Processando sua avaliação...' }}</p>
+        <div class="loading-progress">
+          <div class="progress-bar"></div>
+        </div>
+        <div class="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card" [@formElementAnimation]>
+    <!-- Header do Prato -->
+    <div *ngIf="prato" class="prato-header" [@formElementAnimation]>
+      <div
+        class="prato-imagem"
+        [ngStyle]="{'background-image': 'url(' + prato.imagem_url + ')'}"
+      ></div>
+      <div class="prato-detalhes">
+        <p class="subtitulo-prato">Sua opinião sobre</p>
+        <h1 class="nome-prato">{{ prato.Nome }}</h1>
       </div>
     </div>
 
-    <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label>Nota</label>
-        <select formControlName="Nota" class="form-select">
-          <option value="" disabled>Selecione</option>
+    <!-- Loading State para Prato -->
+    <div *ngIf="!prato && isLoading" class="prato-loading" [@formElementAnimation]>
+      <div class="shimmer-placeholder">
+        <div class="shimmer-image"></div>
+        <div class="shimmer-text"></div>
+        <div class="shimmer-title"></div>
+      </div>
+    </div>
+
+    <!-- Form Header -->
+    <header class="form-header">
+      <h2>
+        {{ avalId ? 'Editar sua Avaliação' : 'Deixe sua Avaliação' }}
+      </h2>
+    </header>
+
+    <!-- Formulário -->
+    <form [formGroup]="formulario" (ngSubmit)="onSubmit()" [@formElementAnimation]>
+      <!-- Nota -->
+      <div class="form-group" [@formElementAnimation]>
+        <label for="nota">
+          <i class="fas fa-star"></i>
+          Nota *
+        </label>
+        <select 
+          id="nota" 
+          formControlName="Nota" 
+          class="form-select"
+          [class.error]="hasError('Nota')"
+          [disabled]="isSubmitting">
+          <option value="" disabled>Selecione uma nota de 1 a 5 estrelas</option>
           <option *ngFor="let n of [1,2,3,4,5]" [value]="n">
-            {{ n }} estrela{{ n>1?'s':'' }}
+            <span *ngFor="let star of [].constructor(n)">⭐</span>
+            {{ n }} estrela{{ n > 1 ? 's' : '' }}
           </option>
         </select>
-        <div *ngIf="f['Nota'].invalid && f['Nota'].touched" class="error">
-          Nota obrigatória.
+        <div *ngIf="hasError('Nota')" class="error-message" [@messageSlide]>
+          <i class="fas fa-exclamation-circle"></i>
+          {{ getErrorMessage('Nota') }}
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Comentário</label>
+      <!-- Comentário -->
+      <div class="form-group" [@formElementAnimation]>
+        <label for="comentario">
+          <i class="fas fa-comment-alt"></i>
+          Comentário *
+          <span class="char-counter" [class.warning]="(formulario.get('Comentario')?.value?.length || 0) > 450">
+            ({{ formulario.get('Comentario')?.value?.length || 0 }}/500)
+          </span>
+        </label>
         <textarea
+          id="comentario"
           formControlName="Comentario"
-          rows="4"
-          class="form-textarea"
-        ></textarea>
-        <div *ngIf="f['Comentario'].invalid && f['Comentario'].touched" class="error">
-          Comentário mínimo de 10 caracteres.
+          rows="5"
+          class="form-input"
+          [class.error]="hasError('Comentario')"
+          [disabled]="isSubmitting"
+          placeholder="Conte-nos sobre sua experiência com este prato... O que você achou do sabor, apresentação, temperatura? Recomendaria para outros?"
+          maxlength="500">
+        </textarea>
+        <div class="input-help">
+          <i class="fas fa-info-circle"></i>
+          <span>Compartilhe detalhes sobre sabor, apresentação, atendimento e experiência geral.</span>
+        </div>
+        <div *ngIf="hasError('Comentario')" class="error-message" [@messageSlide]>
+          <i class="fas fa-exclamation-circle"></i>
+          {{ getErrorMessage('Comentario') }}
         </div>
       </div>
 
-      <div class="form-actions">
-        <button class="btn-primary" [disabled]="formulario.invalid">
-          Salvar
-        </button>
-        <button class="btn-secondary" type="button" (click)="cancel()">
+      <!-- Seção de Imagens -->
+      <div class="form-group">
+        <label>
+          <i class="fas fa-camera"></i>
+          Fotos do prato 
+          <span class="badge-imagens">({{ totalImagens }}/{{ maxImagens }})</span>
+          <span class="opcional-tag">- opcional</span>
+        </label>
+        
+        <!-- Preview das imagens (existentes + novas) -->
+        <div class="imagens-preview" *ngIf="imagensPreviews.length > 0" [@imageListAnimation]="imagensPreviews.length">
+          <div 
+            class="imagem-preview-item" 
+            *ngFor="let preview of imagensPreviews; let i = index; trackBy: trackByIndex"
+            [class.existente]="preview.tipo === 'existente'"
+            [class.nova]="preview.tipo === 'nova'"
+            [@imagePreviewAnimation]>
+            <img 
+              [src]="preview.url" 
+              [alt]="'Preview ' + (i + 1)"
+              (load)="onImageLoad()"
+              (error)="onImageError(i)">
+            
+            <!-- Badge indicador -->
+            <div class="badge-tipo">
+              <i class="fas" [ngClass]="preview.tipo === 'existente' ? 'fa-check' : 'fa-plus'"></i>
+              <span>{{ preview.tipo === 'existente' ? 'Salva' : 'Nova' }}</span>
+            </div>
+            
+            <!-- Botão remover -->
+            <button 
+              type="button" 
+              class="btn-remover-preview" 
+              (click)="removerImagem(i)"
+              [disabled]="isSubmitting"
+              [title]="preview.tipo === 'existente' ? 'Remover imagem existente' : 'Remover nova imagem'">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Área de upload -->
+        <div class="upload-area" *ngIf="podeAdicionarImagens">
+          <input 
+            type="file" 
+            id="imagens-upload"
+            accept="image/*" 
+            multiple 
+            (change)="onImageSelect($event)"
+            [disabled]="!podeAdicionarImagens"
+            style="display: none;">
+          <label for="imagens-upload" class="upload-label" [class.disabled]="!podeAdicionarImagens">
+            <i class="fas fa-camera"></i>
+            <span>Adicionar fotos ({{ totalImagens }}/{{ maxImagens }})</span>
+          </label>
+        </div>
+        
+        <!-- Mensagem quando atingir o máximo -->
+        <div class="alert-max-imagens" *ngIf="!podeAdicionarImagens">
+          <i class="fas fa-info-circle"></i>
+          <span>Limite de {{ maxImagens }} imagens atingido</span>
+        </div>
+        
+        <!-- Legenda de tipos (apenas na edição com imagens) -->
+        <div class="legenda-tipos" *ngIf="avalId && imagensPreviews.length > 0">
+          <div class="legenda-item">
+            <span class="badge-exemplo existente">
+              <i class="fas fa-check"></i> Salva
+            </span>
+            <small>Imagem já salva no servidor</small>
+          </div>
+          <div class="legenda-item">
+            <span class="badge-exemplo nova">
+              <i class="fas fa-plus"></i> Nova
+            </span>
+            <small>Será enviada ao salvar</small>
+          </div>
+        </div>
+        
+        <small class="form-text">
+          <i class="fas fa-info-circle"></i>
+          Formatos aceitos: JPG, PNG, GIF, WEBP (máx. 5MB por imagem)
+        </small>
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="form-actions" [@formElementAnimation]>
+        <button 
+          class="btn-cancelar" 
+          type="button" 
+          (click)="cancel()" 
+          [disabled]="isSubmitting">
+          <i class="fas fa-arrow-left"></i>
           Cancelar
         </button>
+        <button 
+          class="btn-salvar" 
+          type="submit" 
+          [disabled]="!canSubmit()"
+          [@buttonAnimation]="getSubmitButtonState()">
+          <span class="btn-content">
+            <i class="fas" 
+               [ngClass]="isSubmitting ? 'fa-spinner fa-spin' : (avalId ? 'fa-save' : 'fa-paper-plane')"></i>
+            {{ getSubmitButtonText() }}
+          </span>
+          <div class="btn-progress" *ngIf="isSubmitting"></div>
+        </button>
+      </div>
+
+      <!-- Status do Formulário -->
+      <div class="form-status" *ngIf="!isConnected || formTouched" [@messageSlide]>
+        <div class="status-item" *ngIf="!isConnected">
+          <i class="fas fa-wifi text-warning"></i>
+          <span>Sem conexão - suas alterações serão salvas localmente</span>
+        </div>
+        <div class="status-item" *ngIf="formTouched && !isSubmitting">
+          <i class="fas fa-edit text-info"></i>
+          <span>Você tem alterações não salvas</span>
+        </div>
       </div>
     </form>
   </div>
-</section>
+</main>

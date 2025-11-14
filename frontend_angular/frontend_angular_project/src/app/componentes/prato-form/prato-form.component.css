@@ -1,59 +1,266 @@
-.prato-form-page {
-  min-height: 100vh;
-  padding: 2rem;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Variáveis de fonte - Sistema Deezer */
+:host {
+  --fonte-primaria: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --fonte-secundaria: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fonte-mono: 'Roboto', 'Courier New', monospace;
   display: flex;
   justify-content: center;
-  background: linear-gradient(90deg, #1c1c1f, #111113);
-}
-.form-card {
-  background: #202024;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 600px;
+  align-items: flex-start;
+  min-height: 100vh;
   width: 100%;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  background-color: var(--bg-primary);
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: var(--fonte-primaria);
 }
-.form-header h1 {
-  margin: 0 0 1.5rem;
-  font-size: 2rem;
+
+/* === Card principal === */
+.form-card {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--bg-card);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
 }
-.form-group {
-  margin-bottom: 1.5rem;
+
+/* === Cabeçalho === */
+.form-card-header {
+  margin-bottom: 35px;
+  text-align: center;
+}
+
+.form-card-header h1 {
+  font-family: var(--fonte-primaria);
+  font-size: 2.4rem;
+  color: var(--text-primary);
+  margin: 0;
+  font-weight: 600;
+}
+
+/* === Layout do formulário === */
+.form-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 40px;
+}
+
+/* === Seção de preview da imagem === */
+.image-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-container {
+  width: 100%;
+  height: 300px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+  border: 2px dashed var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.placeholder-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0 15px;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+  color: var(--color-accent); /* Verde oliva */
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-btn:hover {
+  background-color: var(--border-color);
+}
+
+.upload-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--color-accent);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-name {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+/* === Campos do formulário === */
+.form-fields {
   display: flex;
   flex-direction: column;
 }
-.form-input,
-.form-textarea {
-  background: #2c2c2f;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  color: #fff;
-  font-size: 1rem;
+
+.form-group {
+  margin-bottom: 25px;
 }
-.form-textarea {
-  resize: vertical;
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
 }
-.form-input:focus,
-.form-textarea:focus {
-  outline: 2px solid #3b82f6;
+
+.form-group label span {
+  color: var(--color-primary); /* Terracota */
+  margin-left: 2px;
 }
-.preview-img {
-  margin-top: 0.5rem;
+
+.form-control {
   width: 100%;
-  max-height: 200px;
-  object-fit: cover;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
+  background-color: var(--bg-card);
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
 }
+
+.form-control::placeholder {
+  color: var(--text-placeholder);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary); /* Terracota */
+  box-shadow: 0 0 0 3px rgba(217, 119, 70, 0.15);
+}
+
+.form-control.textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  gap: 20px;
+}
+
+/* === Mensagens de erro === */
 .error {
-  margin-top: 0.25rem;
-  color: #f87171;
-  font-size: 0.875rem;
+  color: #c0392b;
+  font-size: 0.85rem;
+  margin-top: 6px;
 }
+
+/* === Botões === */
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 15px;
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-accent); /* Verde oliva */
+  color: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(106, 123, 83, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #586744;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 123, 83, 0.3);
+}
+
+.btn-primary:disabled {
+  background-color: #B0B8A4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-secondary);
+  border-color: #DCD3C9;
+}
+
+/* === Responsividade === */
+@media (max-width: 768px) {
+  .form-card {
+    padding: 30px 25px;
+  }
+  
+  .form-card-header h1 {
+    font-size: 2rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .preview-container {
+    height: 250px;
+  }
+  
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
 }

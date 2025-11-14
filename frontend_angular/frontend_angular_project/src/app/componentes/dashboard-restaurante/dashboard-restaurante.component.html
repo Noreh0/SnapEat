@@ -1,52 +1,648 @@
-<section class="dashboard-restaurante-page" *ngIf="restaurante">
-  <!-- HEADER COM INFORMAÇÕES GERAIS -->
-  <div class="dash-header-card">
-    <div class="rest-info">
-      <img
-        src="../../../assets/images/default-restaurant.png"
-        alt="{{ restaurante.Nome }}"
-        class="rest-avatar"
-      />
-      <div class="rest-meta">
-        <h1>Bem-vindo, {{ restaurante.Nome }}</h1>
-        <p>
-          Avaliação média:
-          <strong>{{ mediaAval | number:'1.1-1' }}</strong>
-          ({{ totalAval }} avaliações)
-        </p>
+<div class="dashboard-container" *ngIf="restaurante" [@pageAnimation]>
+
+  <!-- Sistema de Feedback -->
+  <div class="feedback-system">
+    <div 
+      *ngFor="let message of feedbackMessages; trackBy: trackByFeedbackId" 
+      class="feedback-message"
+      [class]="'feedback-message--' + message.type"
+      [@feedbackAnimation]>
+      <div class="feedback-content">
+        <div class="feedback-header">
+          <i class="feedback-icon" [ngClass]="{
+            'fas fa-check-circle': message.type === 'success',
+            'fas fa-exclamation-circle': message.type === 'error',
+            'fas fa-exclamation-triangle': message.type === 'warning',
+            'fas fa-info-circle': message.type === 'info'
+          }"></i>
+          <h4 class="feedback-title">{{ message.title }}</h4>
+          <button 
+            class="feedback-close" 
+            (click)="closeFeedbackMessage(message.id)"
+            aria-label="Fechar mensagem">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <p class="feedback-text">{{ message.message }}</p>
       </div>
     </div>
   </div>
 
-  <!-- SEÇÃO DE ÚLTIMAS AVALIAÇÕES -->
-  <section class="recent-section">
-    <h2>Últimas Avaliações</h2>
+  <!-- Indicador de Conectividade -->
+  <div class="connectivity-indicator" [class.offline]="!isOnline">
+    <i class="fas" [ngClass]="{
+      'fa-wifi': isOnline,
+      'fa-wifi-slash': !isOnline
+    }"></i>
+    <span>{{ getConnectivityText() }}</span>
+  </div>
 
-    <!-- quando não há avaliações -->
-    <div *ngIf="avaliacoes.length === 0" class="no-evals">
-      Você ainda não recebeu avaliações.
+  <!-- Overlay Global de Loading -->
+  <div class="global-loading-overlay" *ngIf="loadingState.dashboard">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+      <h3>Carregando Dashboard</h3>
+      <p>Preparando dados do restaurante...</p>
+      <div class="loading-progress">
+        <div class="progress-bar"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- lista de cards de avaliação -->
-    <div class="eval-list">
-      <div
-        *ngFor="let a of avaliacoes"
-        class="eval-card"
-      >
-        <div class="eval-header">
-          <span class="cliente">{{ a.clienteNome }}</span>
-          <span class="stars">{{ renderStars(a.Nota) }}</span>
-          <span class="date">{{ a.data | date:'dd/MM/yyyy' }}</span>
+  <!-- 📍 PRIMEIRO: Apresentação do Restaurante -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <img
+        [src]="getImageUrl(restaurante.imagem_url)"
+        alt="Avatar de {{ restaurante.Nome }}"
+        class="restaurant-avatar"
+      />
+      <div class="restaurant-info">
+        <h1>{{ restaurante.Nome }}</h1>
+        <p class="restaurant-description">
+          {{ 'dashboard.header.description' | translate }}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 📍 SEGUNDO: Cards de Métricas -->
+  <section class="metrics-section">
+    <div class="metrics-grid-full">
+      <div class="metric-card" [@cardAnimation] [class.loading]="loadingState.metricas">
+        <div class="metric-icon">
+          <i class="fas fa-comments"></i>
         </div>
-        <p class="comentario">{{ a.Comentario }}</p>
-        <button
-          *ngIf="isOwner"
-          class="btn-reply"
-          (click)="responder(a)"
-        >
-          Responder
-        </button>
+        <div class="metric-content" *ngIf="!loadingState.metricas">
+          <span class="metric-value">{{ totalAval || 0 }}</span>
+          <span class="metric-label">Total de Avaliações</span>
+        </div>
+        <div class="loading-content-metric" *ngIf="loadingState.metricas">
+          <div class="shimmer-value shimmer-placeholder"></div>
+          <div class="shimmer-label shimmer-placeholder"></div>
+        </div>
+        <div class="loading-overlay" *ngIf="loadingState.metricas">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+      </div>
+      
+      <div class="metric-card" [@cardAnimation] [class.loading]="loadingState.metricas">
+        <div class="metric-icon stars">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="metric-content" *ngIf="!loadingState.metricas">
+          <span class="metric-value">{{ (mediaAval || 0) | number:'1.1-1' }}</span>
+          <span class="metric-label">Média Geral</span>
+        </div>
+        <div class="loading-content-metric" *ngIf="loadingState.metricas">
+          <div class="shimmer-value shimmer-placeholder"></div>
+          <div class="shimmer-label shimmer-placeholder"></div>
+        </div>
+        <div class="loading-overlay" *ngIf="loadingState.metricas">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+      </div>
+      
+      <div class="metric-card" [@cardAnimation] [class.loading]="loadingState.metricas">
+        <div class="metric-icon calendar">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="metric-content" *ngIf="!loadingState.metricas">
+          <span class="metric-value">{{ getAvaliacoesMesAtual() }}</span>
+          <span class="metric-label">Avaliações do Mês</span>
+        </div>
+        <div class="loading-content-metric" *ngIf="loadingState.metricas">
+          <div class="shimmer-value shimmer-placeholder"></div>
+          <div class="shimmer-label shimmer-placeholder"></div>
+        </div>
+        <div class="loading-overlay" *ngIf="loadingState.metricas">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
       </div>
     </div>
   </section>
-</section>
+
+  <!-- 📍 TERCEIRO: Gráficos em Grid -->
+  <section class="charts-section">
+    <div class="charts-section-header">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        {{ 'dashboard.charts.title' | translate }}
+      </h2>
+    </div>
+
+    <!-- Loading Overlay para Gráficos -->
+    <div class="loading-overlay" *ngIf="loadingState.dashboard" [@feedbackAnimation]>
+      <div class="loading-content">
+        <div class="loading-spinner">
+          <i class="fas fa-chart-line fa-3x fa-pulse"></i>
+        </div>
+        <p class="loading-message">
+          <strong>Processando dados dos gráficos...</strong><br>
+          <small>Analisando métricas e tendências</small>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Evolução em largura total -->
+    <div class="chart-card chart-full" [@cardAnimation] [class.loading]="loadingState.dashboard">
+      <!-- Loading State -->
+      <div class="chart-loading-overlay" *ngIf="loadingState.dashboard">
+        <div class="chart-loading-header">
+          <div class="shimmer-text shimmer-placeholder" style="width: 250px; height: 24px; margin-bottom: 16px;"></div>
+        </div>
+        <div class="chart-loading-canvas">
+          <div class="shimmer-chart shimmer-placeholder" style="height: 300px;"></div>
+        </div>
+      </div>
+      
+      <!-- Conteúdo Real -->
+      <div class="chart-real-content" [style.opacity]="loadingState.dashboard ? '0' : '1'">
+        <div class="chart-header">
+          <h3>{{ 'dashboard.charts.evolutionTitle' | translate }}</h3>
+          <button 
+            class="expand-chart-btn" 
+            (click)="expandirGrafico('evolucao')" 
+            [title]="'dashboard.charts.expand' | translate"
+            [disabled]="loadingState.dashboard || !isOnline"
+            [@buttonAnimation]>
+            <i class="fas fa-expand"></i>
+            <span class="connectivity-indicator" *ngIf="!isOnline">
+              <i class="fas fa-wifi-slash" title="Sem conexão"></i>
+            </span>
+          </button>
+        </div>
+        <div class="chart-content" [class.disabled]="!isOnline">
+          <app-grafico-evolucao [restauranteId]="restaurante.ID"></app-grafico-evolucao>
+          <div class="chart-empty" *ngIf="!isOnline">
+            <i class="fas fa-wifi-slash"></i>
+            <p>Conecte-se à internet para visualizar os gráficos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demais gráficos em grid 2 colunas -->
+    <div class="charts-two" [@listAnimation]>
+      <!-- Gráfico Mensal -->
+      <div class="chart-card" [@cardAnimation] [class.loading]="loadingState.dashboard">
+        <!-- Loading State -->
+        <div class="chart-loading-overlay" *ngIf="loadingState.dashboard">
+          <div class="chart-loading-header">
+            <div class="shimmer-text shimmer-placeholder" style="width: 200px; height: 20px; margin-bottom: 12px;"></div>
+          </div>
+          <div class="chart-loading-canvas">
+            <div class="shimmer-chart shimmer-placeholder" style="height: 250px;"></div>
+          </div>
+        </div>
+        
+        <!-- Conteúdo Real -->
+        <div class="chart-real-content" [style.opacity]="loadingState.dashboard ? '0' : '1'">
+          <div class="chart-header">
+            <h3>{{ 'dashboard.charts.monthlyTitle' | translate }}</h3>
+            <button 
+              class="expand-chart-btn" 
+              (click)="expandirGrafico('mensal')" 
+              [title]="'dashboard.charts.expand' | translate"
+              [disabled]="loadingState.dashboard || !isOnline"
+              [@buttonAnimation]>
+              <i class="fas fa-expand"></i>
+              <span class="connectivity-indicator" *ngIf="!isOnline">
+                <i class="fas fa-wifi-slash" title="Sem conexão"></i>
+              </span>
+            </button>
+          </div>
+          <div class="chart-content" [class.disabled]="!isOnline">
+            <app-grafico-mensal-comparativo [restauranteId]="restaurante.ID"></app-grafico-mensal-comparativo>
+            <div class="chart-empty" *ngIf="!isOnline">
+              <i class="fas fa-wifi-slash"></i>
+              <p>Conecte-se à internet para visualizar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Pratos -->
+      <div class="chart-card" [@cardAnimation] [class.loading]="loadingState.dashboard">
+        <!-- Loading State -->
+        <div class="chart-loading-overlay" *ngIf="loadingState.dashboard">
+          <div class="chart-loading-header">
+            <div class="shimmer-text shimmer-placeholder" style="width: 180px; height: 20px; margin-bottom: 12px;"></div>
+          </div>
+          <div class="chart-loading-canvas">
+            <div class="shimmer-chart shimmer-placeholder" style="height: 250px;"></div>
+          </div>
+        </div>
+        
+        <!-- Conteúdo Real -->
+        <div class="chart-real-content" [style.opacity]="loadingState.dashboard ? '0' : '1'">
+          <div class="chart-header">
+            <h3>{{ 'dashboard.charts.dishesTitle' | translate }}</h3>
+            <button 
+              class="expand-chart-btn" 
+              (click)="expandirGrafico('pratos')" 
+              [title]="'dashboard.charts.expand' | translate"
+              [disabled]="loadingState.dashboard || !isOnline"
+              [@buttonAnimation]>
+              <i class="fas fa-expand"></i>
+              <span class="connectivity-indicator" *ngIf="!isOnline">
+                <i class="fas fa-wifi-slash" title="Sem conexão"></i>
+              </span>
+            </button>
+          </div>
+          <div class="chart-content" [class.disabled]="!isOnline">
+            <app-grafico-comparacao-pratos [restauranteId]="restaurante.ID"></app-grafico-comparacao-pratos>
+            <div class="chart-empty" *ngIf="!isOnline">
+              <i class="fas fa-wifi-slash"></i>
+              <p>Conecte-se à internet para visualizar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 📍 QUARTO: Insights e Filtros Responsivos -->
+  <section class="filters-insights-section">
+    <div class="filters-insights-grid">
+      
+      <!-- Insights (Primeiro) -->
+      <div class="panel insights-panel">
+        <h2 class="panel-title">
+          <i class="fas fa-lightbulb"></i>
+          {{ 'dashboard.insights.title' | translate }}
+        </h2>
+        
+        <div *ngIf="!hasEnoughReviews" class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>{{ 'dashboard.insights.warningTitle' | translate }}</strong>
+            <p>{{ 'dashboard.insights.warningText' | translate }}</p>
+          </div>
+        </div>
+        
+        <div *ngIf="hasEnoughReviews" class="alert alert-success">
+          <i class="fas fa-check-circle"></i>
+          <div>
+            <strong>{{ 'dashboard.insights.successTitle' | translate }}</strong>
+            <p>{{ 'dashboard.insights.successText' | translate }}</p>
+          </div>
+        </div>
+
+        <!-- Sentiment Stats - horizontal -->
+        <div class="sentiment-stats horizontal" *ngIf="hasEnoughReviews">
+          <div class="sentiment-stat positive">
+            <div class="stat-icon"><i class="fas fa-smile"></i></div>
+            <div class="stat-content">
+              <div class="stat-header-inline">
+                <span class="stat-value">{{ sentimentStats?.positivo || 0 }}</span>
+                <span class="stat-label">{{ 'dashboard.insights.positive' | translate }}</span>
+              </div>
+              <div class="stat-bar"><div class="stat-fill" [style.width.%]="sentimentStats?.percentuais?.positivo || 0"></div></div>
+            </div>
+          </div>
+          
+          <div class="sentiment-stat neutral">
+            <div class="stat-icon"><i class="fas fa-meh"></i></div>
+            <div class="stat-content">
+              <div class="stat-header-inline">
+                <span class="stat-value">{{ sentimentStats?.neutro || 0 }}</span>
+                <span class="stat-label">{{ 'dashboard.insights.neutral' | translate }}</span>
+              </div>
+              <div class="stat-bar"><div class="stat-fill" [style.width.%]="sentimentStats?.percentuais?.neutro || 0"></div></div>
+            </div>
+          </div>
+          
+          <div class="sentiment-stat negative">
+            <div class="stat-icon"><i class="fas fa-frown"></i></div>
+            <div class="stat-content">
+              <div class="stat-header-inline">
+                <span class="stat-value">{{ sentimentStats?.negativo || 0 }}</span>
+                <span class="stat-label">{{ 'dashboard.insights.negative' | translate }}</span>
+              </div>
+              <div class="stat-bar"><div class="stat-fill" [style.width.%]="sentimentStats?.percentuais?.negativo || 0"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" *ngIf="isOwner">
+          <button 
+            class="custom-btn btn-primary" 
+            (click)="processarAvaliacoes()"
+            [disabled]="loadingState.processamento || totalAval < 3 || !isOnline"
+            [@buttonAnimation]="loadingState.processamento ? 'loading' : 'normal'"
+            [title]="!isOnline ? 'Sem conexão com internet' : (totalAval < 3 ? 'Necessário pelo menos 3 avaliações' : 'Processar análise de sentimento')">
+            <i class="fas" [ngClass]="{
+              'fa-sync-alt': !loadingState.processamento,
+              'fa-spinner fa-spin': loadingState.processamento
+            }"></i>
+            {{ loadingState.processamento ? ('dashboard.insights.processingButton' | translate) : ('dashboard.insights.processButton' | translate) }}
+          </button>
+          
+          <button 
+            class="custom-btn btn-secondary" 
+            (click)="downloadInsights()"
+            [disabled]="!hasEnoughReviews || loadingState.relatorio || !isOnline"
+            [@buttonAnimation]="loadingState.relatorio ? 'loading' : 'normal'"
+            [title]="!isOnline ? 'Sem conexão com internet' : (!hasEnoughReviews ? 'Processe as avaliações primeiro' : 'Baixar relatório de insights')">
+            <i class="fas" [ngClass]="{
+              'fa-download': !loadingState.relatorio,
+              'fa-spinner fa-spin': loadingState.relatorio
+            }"></i>
+            {{ loadingState.relatorio ? 'Gerando...' : ('dashboard.insights.reportButton' | translate) }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros de Busca (Segundo) -->
+      <div class="panel filters-panel" [@cardAnimation]>
+        <h2 class="panel-title">
+          <i class="fas fa-filter"></i>
+          {{ 'dashboard.filters.title' | translate }}
+          <span class="filters-indicator" *ngIf="temFiltrosAtivos()">
+            <i class="fas fa-dot-circle" title="Filtros ativos"></i>
+          </span>
+          <span class="connectivity-indicator" *ngIf="!isOnline">
+            <i class="fas fa-wifi-slash" title="Sem conexão"></i>
+          </span>
+        </h2>
+
+        <!-- Loading State para Filtros -->
+        <div class="filters-loading" *ngIf="loadingState.avaliacoes">
+          <div class="loading-message">
+            <i class="fas fa-spinner fa-spin"></i>
+            Processando filtros...
+          </div>
+        </div>
+
+        <form class="filter-form filters-inline" (submit)="$event.preventDefault()" [@listAnimation]>
+          <div class="filters-row">
+            <div class="filter-item filtro-texto" [@cardAnimation]>
+              <label for="filtroTexto">{{ 'dashboard.filters.searchPlaceholder' | translate }}</label>
+              <div class="input-wrapper">
+                <input
+                  id="filtroTexto"
+                  type="text"
+                  [(ngModel)]="filtroTexto"
+                  name="filtroTexto"
+                  [placeholder]="'dashboard.filters.searchPlaceholder' | translate"
+                  (input)="filtrarAvaliacoes()"
+                  [disabled]="loadingState.avaliacoes || !isOnline"
+                  [attr.title]="!isOnline ? 'Sem conexão com a internet' : ''"
+                />
+                <div class="input-icons">
+                  <i class="fas fa-search" *ngIf="!filtroTexto"></i>
+                  <button 
+                    type="button" 
+                    class="clear-input" 
+                    *ngIf="filtroTexto" 
+                    (click)="filtroTexto = ''; filtrarAvaliacoes()"
+                    [disabled]="loadingState.avaliacoes"
+                    title="Limpar busca">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-item filtro-nota" [@cardAnimation]>
+              <label for="filtroEstrela">{{ 'dashboard.filters.ratingLabel' | translate }}</label>
+              <div class="select-wrapper">
+                <select
+                  id="filtroEstrela"
+                  [(ngModel)]="filtroEstrela"
+                  name="filtroEstrela"
+                  (change)="filtroEstrela = +$any($event.target).value; filtrarAvaliacoes()"
+                  [disabled]="loadingState.avaliacoes || !isOnline"
+                  [attr.title]="!isOnline ? 'Sem conexão com a internet' : ''"
+                >
+                  <option [value]="0">Todas as notas</option>
+                  <option [value]="5">⭐⭐⭐⭐⭐ 5 estrelas</option>
+                  <option [value]="4">⭐⭐⭐⭐ 4 estrelas</option>
+                  <option [value]="3">⭐⭐⭐ 3 estrelas</option>
+                  <option [value]="2">⭐⭐ 2 estrelas</option>
+                  <option [value]="1">⭐ 1 estrela</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+
+            <div class="filter-item filtro-periodo" [@cardAnimation]>
+              <label for="filtroPeriodo">{{ 'dashboard.filters.periodLabel' | translate }}</label>
+              <div class="select-wrapper">
+                <select
+                  id="filtroPeriodo"
+                  [(ngModel)]="filtroPeriodo"
+                  name="filtroPeriodo"
+                  (change)="aplicarFiltroPeriodo()"
+                  [disabled]="loadingState.avaliacoes || !isOnline"
+                  [attr.title]="!isOnline ? 'Sem conexão com a internet' : ''"
+                >
+                  <option value="30">{{ 'dashboard.filters.last30days' | translate }}</option>
+                  <option value="60">{{ 'dashboard.filters.last60days' | translate }}</option>
+                  <option value="90">{{ 'dashboard.filters.last90days' | translate }}</option>
+                  <option value="180">{{ 'dashboard.filters.last6months' | translate }}</option>
+                  <option value="365">{{ 'dashboard.filters.lastYear' | translate }}</option>
+                  <option value="custom">{{ 'dashboard.filters.custom' | translate }}</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+
+            <div class="filter-actions" [@buttonAnimation]>
+              <button
+                type="button"
+                class="custom-btn btn-secondary"
+                (click)="limparFiltros()"
+                [disabled]="loadingState.avaliacoes || !temFiltrosAtivos() || !isOnline"
+                [attr.title]="getButtonTooltip('clear')"
+                [@buttonAnimation]
+              >
+                <i class="fas" [ngClass]="{
+                  'fa-eraser': !loadingState.avaliacoes,
+                  'fa-spinner fa-spin': loadingState.avaliacoes
+                }"></i>
+                <span *ngIf="!loadingState.avaliacoes">{{ 'dashboard.filters.clear' | translate }}</span>
+                <span *ngIf="loadingState.avaliacoes">Limpando...</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-row custom-dates" *ngIf="filtroPeriodo === 'custom'">
+            <div class="filter-item">
+              <label for="filtroDataInicio">{{ 'dashboard.filters.startDate' | translate }}</label>
+              <input
+                id="filtroDataInicio"
+                type="date"
+                [(ngModel)]="filtroDataInicio"
+                name="filtroDataInicio"
+                [max]="hoje"
+                (change)="filtrarAvaliacoes()"
+              />
+            </div>
+
+            <div class="filter-item">
+              <label for="filtroDataFim">{{ 'dashboard.filters.endDate' | translate }}</label>
+              <input
+                id="filtroDataFim"
+                type="date"
+                [(ngModel)]="filtroDataFim"
+                name="filtroDataFim"
+                [max]="hoje"
+                (change)="filtrarAvaliacoes()"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 📍 QUINTO: Avaliações -->
+  <section class="reviews-section panel">
+    <div class="reviews-header">
+      <h2 class="section-title">
+        <i class="fas fa-star"></i>
+        {{ 'dashboard.reviews.title' | translate }}
+      </h2>
+      <span class="reviews-count" *ngIf="!loadingState.avaliacoes">
+        {{ avaliacoesFiltradas.length }} 
+        {{ avaliacoesFiltradas.length === 1 ? 'avaliação encontrada' : 'avaliações encontradas' }}
+        
+        <ng-container *ngIf="filtroPeriodo !== 'custom'">
+          dos últimos {{ filtroPeriodo }} dias
+        </ng-container>
+        <ng-container *ngIf="filtroPeriodo === 'custom'">
+          no período de {{ formatarData(filtroDataInicio) }} até {{ formatarData(filtroDataFim) }}
+        </ng-container>
+      </span>
+      <span class="reviews-count loading-text" *ngIf="loadingState.avaliacoes">
+        <i class="fas fa-spinner fa-spin"></i>
+        Carregando avaliações...
+      </span>
+    </div>
+    
+    <!-- Loading State para Avaliações -->
+    <div class="reviews-loading" *ngIf="loadingState.avaliacoes && avaliacoesFiltradas.length === 0">
+      <div class="review-card-loading" *ngFor="let item of [1,2,3,4,5,6]">
+        <div class="loading-review-content">
+          <div class="shimmer-text shimmer-placeholder" style="width: 70%; height: 20px; margin-bottom: 8px;"></div>
+          <div class="shimmer-text shimmer-placeholder" style="width: 40%; height: 16px; margin-bottom: 12px;"></div>
+          <div class="shimmer-text shimmer-placeholder" style="width: 100%; height: 14px; margin-bottom: 4px;"></div>
+          <div class="shimmer-text shimmer-placeholder" style="width: 80%; height: 14px;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="avaliacoesFiltradas.length === 0 && !loadingState.avaliacoes" class="empty-state" [@emptyStateAnimation]>
+      <div class="empty-icon">
+        <i class="fas" [ngClass]="{
+          'fa-search': filtroTexto || filtroEstrela > 0,
+          'fa-inbox': !filtroTexto && filtroEstrela === 0 && isOnline,
+          'fa-wifi-slash': !isOnline
+        }"></i>
+      </div>
+      <h3 *ngIf="filtroTexto || filtroEstrela > 0">Nenhuma avaliação encontrada</h3>
+      <h3 *ngIf="!filtroTexto && filtroEstrela === 0 && isOnline">Nenhuma avaliação disponível</h3>
+      <h3 *ngIf="!isOnline">Sem conexão</h3>
+      
+      <p *ngIf="filtroTexto || filtroEstrela > 0">
+        Não encontramos avaliações que correspondam aos filtros aplicados. 
+        Tente ajustar os critérios de busca.
+      </p>
+      <p *ngIf="!filtroTexto && filtroEstrela === 0 && isOnline">
+        Este restaurante ainda não possui avaliações no período selecionado.
+      </p>
+      <p *ngIf="!isOnline">
+        Verifique sua conexão com a internet para carregar as avaliações.
+      </p>
+
+      <div class="empty-actions">
+        <button 
+          *ngIf="filtroTexto || filtroEstrela > 0" 
+          class="btn-limpar-busca"
+          (click)="limparFiltros()">
+          <i class="fas fa-eraser"></i>
+          Limpar Filtros
+        </button>
+        
+        <button 
+          *ngIf="!isOnline" 
+          class="btn-reconectar"
+          (click)="forceRefresh()"
+          [disabled]="!isOnline">
+          <i class="fas fa-sync-alt"></i>
+          Tentar Novamente
+        </button>
+      </div>
+    </div>
+    
+    <div class="reviews-grid" [@listAnimation]>
+      <div *ngFor="let a of avaliacoesFiltradas; trackBy: trackByAvaliacaoId" class="review-card" [attr.data-rating]="a.Nota" [@cardAnimation]>
+        <div class="review-header">
+          <span class="review-author">
+            <i class="fas fa-user-circle"></i>
+            {{ a.clienteNome }}
+          </span>
+          <span class="review-date">
+            <i class="fas fa-calendar"></i>
+            {{ formatarData(a.data_avaliacao) }}
+          </span>
+        </div>
+        <div class="review-rating">
+          <span class="review-stars">{{ renderStars(a.Nota) }}</span>
+          <span class="review-note">{{ a.Nota }}/5</span>
+        </div>
+        <p class="review-comment">{{ a.Comentario }}</p>
+        <span *ngIf="a.sentimento_auto" class="sentiment-badge" [ngClass]="{
+          'positive': a.sentimento_auto === 'positivo',
+          'neutral': a.sentimento_auto === 'neutro',
+          'negative': a.sentimento_auto === 'negativo'
+        }">
+          <i class="fas" [ngClass]="{
+            'fa-smile': a.sentimento_auto === 'positivo',
+            'fa-meh': a.sentimento_auto === 'neutro',
+            'fa-frown': a.sentimento_auto === 'negativo'
+          }"></i>
+          {{ a.sentimento_auto }}
+        </span>
+      </div>
+    </div>
+  </section>
+
+    <!-- ✅ MODAL DE GRÁFICO EXPANDIDO -->
+  <div class="chart-modal-overlay" *ngIf="graficoExpandido" (click)="fecharGraficoExpandido()">
+    <div class="chart-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i [class]="getTituloGraficoExpandidoCompleto().icone"></i>
+          {{ getTituloGraficoExpandidoCompleto().titulo }}
+        </h2>
+        <button class="modal-close-btn" (click)="fecharGraficoExpandido()" title="Fechar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-content">
+        <app-grafico-evolucao 
+          *ngIf="graficoExpandido === 'evolucao'"
+          [restauranteId]="restaurante.ID">
+        </app-grafico-evolucao>
+        
+        <app-grafico-mensal-comparativo 
+          *ngIf="graficoExpandido === 'mensal'"
+          [restauranteId]="restaurante.ID">
+        </app-grafico-mensal-comparativo>
+        
+        <app-grafico-comparacao-pratos 
+          *ngIf="graficoExpandido === 'pratos'"
+          [restauranteId]="restaurante.ID">
+        </app-grafico-comparacao-pratos>
+      </div>
+    </div>
+  </div>
+</div>

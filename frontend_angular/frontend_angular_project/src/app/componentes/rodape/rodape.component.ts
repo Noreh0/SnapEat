@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-rodape',
@@ -6,5 +7,7 @@ import { Component } from '@angular/core';
   styleUrl: './rodape.component.css'
 })
 export class RodapeComponent {
+  
+  constructor(public translate: TranslateService) {}
 
 }

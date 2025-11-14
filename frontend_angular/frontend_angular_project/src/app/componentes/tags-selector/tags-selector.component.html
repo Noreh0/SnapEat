@@ -1,0 +1,74 @@
+<div class="tags-selector">
+  <div class="tags-header">
+    <h4 translate>Avalie aspectos específicos (opcional)</h4>
+    <p translate>Ajude outros clientes compartilhando sua experiência detalhada</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+
+  <div class="tags-content" *ngIf="!isLoading">
+    <!-- Iterar sobre as categorias -->
+    <div 
+      class="categoria-group" 
+      *ngFor="let categoria of categorias"
+      [class.has-tags]="getTagsFromCategoria(categoria.key).length > 0">
+      
+      <!-- Cabeçalho da categoria -->
+      <div class="categoria-header" *ngIf="getTagsFromCategoria(categoria.key).length > 0">
+        <i [class]="categoria.icon"></i>
+        <span translate>{{ categoria.label }}</span>
+      </div>
+
+      <!-- Lista de tags -->
+      <div class="tags-list" *ngIf="getTagsFromCategoria(categoria.key).length > 0">
+        <div 
+          class="tag-item" 
+          [class.has-rating]="getNotaAtual(tag.ID!) > 0"
+          *ngFor="let tag of getTagsFromCategoria(categoria.key)">
+          
+          <div class="tag-info">
+            <span class="tag-name">{{ tag.nome }}</span>
+            <span class="tag-description" *ngIf="tag.descricao">
+              {{ tag.descricao }}
+            </span>
+          </div>
+
+          <!-- Sistema de estrelas -->
+          <div class="tag-rating">
+            <!-- Botões de estrelas -->
+            <button
+              type="button"
+              class="star-btn"
+              *ngFor="let star of [1, 2, 3, 4, 5]"
+              [class.active]="getNotaAtual(tag.ID!) >= star"
+              (click)="onNotaChange(tag, star)"
+              [attr.aria-label]="'Dar ' + star + ' estrelas para ' + tag.nome">
+              <!-- Fallback seguro: unicode star (funciona sem FontAwesome) -->
+              <span class="star-icon">★</span>
+            </button>
+            
+            <!-- Botão de limpar -->
+            <button
+              type="button"
+              class="clear-btn"
+              *ngIf="getNotaAtual(tag.ID!) > 0"
+              (click)="onNotaChange(tag, 0)"
+              [attr.aria-label]="'Limpar avaliação de ' + tag.nome">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer com contagem -->
+  <div class="tags-footer" *ngIf="avaliacoesTags.length > 0">
+    <p translate>
+      Você avaliou {{ avaliacoesTags.length }} 
+      {{ avaliacoesTags.length === 1 ? 'aspecto' : 'aspectos' }}
+    </p>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+# 🐳 Dockerfile para Documentação SnapEats API
+# ===========================================
+# 
+# Este Dockerfile cria um container otimizado especificamente
+# para servir a documentação da API SnapEats com alta disponibilidade.
+#
+# Características:
+# - Base Alpine Linux (menor footprint)
+# - Nginx para servir conteúdo estático
+# - Python Flask para API dinâmica
+# - Certificados SSL automáticos
+# - Monitoramento de saúde integrado
+# - Cache otimizado para performance
+#
+# Uso:
+#   docker build -t snapeats-docs .
+#   docker run -p 80:80 -p 443:443 snapeats-docs
+
+# Estágio 1: Build da aplicação
+FROM python:3.11-alpine AS builder
+
+# Metadados do container
+LABEL maintainer="SnapEats Dev Team <dev@snapeats.com>"
+LABEL version="1.0.0"
+LABEL description="Documentação SnapEats API com monitoramento 24/7"
+
+# Variáveis de ambiente para build
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Instalar dependências do sistema
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    linux-headers \
+    && rm -rf /var/cache/apk/*
+
+# Criar diretório de trabalho
+WORKDIR /app
+
+# Copiar requirements e instalar dependências Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar código da aplicação
+COPY . .
+
+# Gerar documentação estática
+RUN python scripts/deploy_docs.py --build-only
+
+# Estágio 2: Container de produção
+FROM nginx:alpine AS production
+
+# Instalar Python para monitoramento
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# Instalar dependências mínimas do Python
+RUN pip3 install --no-cache-dir \
+    requests \
+    flask \
+    gunicorn
+
+# Copiar aplicação do estágio de build
+COPY --from=builder /app /app
+
+# Copiar configuração customizada do Nginx
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/docs.conf /etc/nginx/conf.d/default.conf
+
+# Copiar documentação estática para Nginx
+COPY --from=builder /app/docs/static /usr/share/nginx/html/docs
+
+# Criar usuário não-root para segurança
+RUN addgroup -g 1000 snapeats && \
+    adduser -D -s /bin/sh -u 1000 -G snapeats snapeats
+
+# Definir permissões
+RUN chown -R snapeats:snapeats /app && \
+    chown -R snapeats:snapeats /usr/share/nginx/html
+
+# Copiar scripts de inicialização
+COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/healthcheck.sh /healthcheck.sh
+RUN chmod +x /entrypoint.sh /healthcheck.sh
+
+# Configurar volumes para persistência
+VOLUME ["/app/logs", "/app/data"]
+
+# Expor portas
+EXPOSE 80 443 5000
+
+# Configurar health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD /healthcheck.sh
+
+# Usuário não-root
+USER snapeats
+
+# Comando de inicialização
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

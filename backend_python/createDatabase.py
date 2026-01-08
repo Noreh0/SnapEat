@@ -1,11 +1,15 @@
 import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 conexao = mysql.connector.connect(
-    user='root',
-    password='SnapEats17',
-    host='localhost',
-    port=7000,
-    database='SnapEats'
+    user=os.getenv('DB_USER', 'root'),
+    password=os.getenv('DB_PASSWORD', ''),
+    host=os.getenv('DB_HOST', 'localhost'),
+    port=int(os.getenv('DB_PORT', '7000')),
+    database=os.getenv('DB_NAME', 'SnapEats')
 )
 
 cursor = conexao.cursor()

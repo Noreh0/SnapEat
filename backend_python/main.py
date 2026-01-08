@@ -57,8 +57,11 @@ except AttributeError:
         # Se tudo falhar, vamos modificar os endpoints diretamente
         print("Aviso: Não foi possível configurar o JSONEncoder. Datas serão tratadas nos endpoints.")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:SnapEats17@localhost:7000/SnapEats'
-app.config['JWT_SECRET_KEY'] = 'SENHA SEGURA, NÃO COMPARTILHE'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'DATABASE_URL',
+    f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:{os.getenv('DB_PASSWORD', '')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '7000')}/{os.getenv('DB_NAME', 'SnapEats')}"
+)
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'CHANGE-THIS-IN-PRODUCTION')
 app.config['JWT_BLACKLIST_ENABLE'] = True
 app.config['JWT_ERROR_MESSAGE_KEY'] = 'message'
 app.config['PROPAGATE_EXCEPTIONS'] = True
